@@ -1,6 +1,7 @@
 # 주제
 
-Deepagents code(a.k.a `dcode`) 를 이용해 Coding Assistant 만들기
+Deepagents code(a.k.a `dcode`) 소스코드를 활용하여 
+Coding Assistant 만들기
 
 ## 프로젝트 소스 참고
 
