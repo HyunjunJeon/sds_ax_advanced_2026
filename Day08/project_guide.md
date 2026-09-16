@@ -12,6 +12,7 @@ Deepagents code(a.k.a `dcode`) 를 이용해 Coding Assistant 만들기
 ## 제출 방법(Google Form)
 
 - 주소: https://bit.ly/sds-ax-advanced-project
+  - 원본 주소: https://docs.google.com/forms/d/e/1FAIpQLSfhFw8fmqoDrB498oYLNFPUqGAv1J2luwLoSpc1cdafOE6BKg/viewform
 - 주의사항
   1) 꼭 실명이 아닌 닉네임을 사용해주세요(개인정보 보호)
   2) 여러분이 제공한 소스를 빌드해서 dcode 를 실행 후 평가할 예정입니다. 
