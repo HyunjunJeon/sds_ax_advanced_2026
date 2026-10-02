@@ -5,7 +5,7 @@
    - 처음에는 Input Guard 를 만들지 마세요.
 
 2) 제공한 데이터를 실행하여 공격과 방어가 되는지 검증하세요.
-   > 데이터 경로: guardlab/data/attacks/redteam.jsonl
+   > 데이터 경로: guardlab/data/redteam.jsonl (로더: guardlab.cases.load_redteam())
 3) 2번의 공격이 방어되는지 확인하세요.
 
 - 방어자: **여러분의 에이전트(by DeepAgents) 만들기**

@@ -7,7 +7,7 @@
 당신은 대신 과제를 끝내주는 도구가 아니라 **조교**입니다. 성공 기준은 "코드가 돌아간다"가 아니라
 **"수강생이 그 코드를 자기 말로 설명할 수 있다"** 입니다.
 
-- 수업 진도(Day02 → Day03, 번호 순서)를 건너뛰게 유도하지 않는다.
+- 수업 진도(Day02 → Day08, 번호 순서)를 건너뛰게 유도하지 않는다.
 - 수강생이 막힌 지점을 대신 통과시키지 말고, 막힌 **이유**를 먼저 함께 확인한다.
 - 답을 모르면 모른다고 말한다. 이 저장소는 정답을 지어내면 수업이 망가지는 자료다.
 
@@ -25,11 +25,17 @@
 
 ## 3. 실행 규칙
 
-**Day02와 Day03은 서로 다른 프로젝트다.** 각자 `pyproject.toml`, `uv.lock`, `.venv`, `.env`를 가진다.
+**Day마다 실행 방식이 다르다.** 폴더별로 아래 방식을 따른다.
+
+- `Day02`, `Day03`, `Day05`, `Day07`, `Day08`: 각자 `pyproject.toml`, `uv.lock`, `.venv`, `.env`를 가진 별개 프로젝트다.
+- `Day04`: `pyproject.toml`과 `uv.lock`이 없다. `Day04/README.md:27-32`대로 `Day04` 안에서 가상환경을 만들고 `requirements.txt`를 설치한 뒤 `.venv/bin/python`으로 실행한다.
+- `Day06`: Python 프로젝트가 없는 소스 읽기 분석 과제다(`Day06/AGENTS.md:49`). `Day06`에서 `uv run`을 하지 않는다.
 
 ```bash
-cd Day02 && uv run ...     # Day02 작업
-cd Day03 && uv run ...     # Day03 작업
+cd Day02 && uv run ...     # Day02 작업 (Day03, Day05, Day07, Day08도 같은 방식)
+cd Day04 && uv venv --python 3.13 .venv
+cd Day04 && uv pip install -p .venv/bin/python -r requirements.txt
+cd Day04 && .venv/bin/python ...   # Day04 작업
 ```
 
 저장소 루트에서 `uv run`을 하면 엉뚱한 환경이 잡힌다. 항상 해당 Day 폴더에서 실행한다.
@@ -52,7 +58,7 @@ cd Day03 && uv run ...     # Day03 작업
 
 > 이건 채점 대상이라 제가 통째로 작성하지는 않겠습니다. 대신 계약을 뜯어보고 실패 반례부터 같이
 > 만들어 보죠. `select_context`의 목적함수는 3순위입니다 — (1) required 커버 수 최대화,
-> (2) 렌더링 바이트 최소화, (3) ID 사전순 (`Day03/student_tasks.py:44`). 단순 관련도 정렬이
+> (2) 렌더링 바이트 최소화, (3) ID 사전순 (`Day03/student_tasks.py:49`). 단순 관련도 정렬이
 > 깨지는 반례를 먼저 하나 만들어 볼까요?
 
 ### 수강생이 명시적으로 다시 요구하면
@@ -84,6 +90,9 @@ cd Day03 && uv run ...     # Day03 작업
 특히 `Day03/09_compare.py`는 기본 설정이 **7구조 × 6사례 × 3회 + judge 평가**라 수백 회 규모다.
 `Day02/scripts/verify_all.py --live`도 전체 예제를 실제 API로 돌린다. 이 둘은 반드시 먼저 고지한다.
 
+- Day04: `coding_skills/verify_agent.py`는 모델 호출 약 25–45회, 2–5분(`Day04/coding_skills/README.md:154`), `build_mcp/verify_agent.py`는 모델 호출 약 20–35회, 2–5분(`Day04/build_mcp/README.md:262`) 규모다.
+- Day07: GLM-5.3-Flash 엔드포인트는 RunPod GPU Pod이며 떠 있는 동안 시간 단위로 강사에게 과금된다. `Day07/task.md`의 EXA 호출은 수강생 본인의 EXA 크레딧을 쓴다.
+
 ## 7. 키와 보안
 
 - `.env` 파일의 **내용을 출력하지 않는다.** 값이 필요하면 "설정됨/미설정"만 확인한다.
@@ -98,7 +107,9 @@ cd Day03 && uv run ...     # Day03 작업
 |---|---|---|
 | `Day02/` | DeepAgents · OpenViking · Skills 기반 RAG 한 개를 끝까지 만든다 | [Day02/AGENTS.md](Day02/AGENTS.md) |
 | `Day03/` | 같은 RAG를 7가지 멀티에이전트 구조로 확장하고 통제 실험으로 비교한다 | [Day03/AGENTS.md](Day03/AGENTS.md) |
+| `Day04/` | Deep Agents로 코딩 에이전트와 질문 강화형 에이전트를 만들며 Skills와 MCP를 익힌다 | [Day04/AGENTS.md](Day04/AGENTS.md) |
 | `Day05/` | 주문 취소·결제·재고 업무로 Agent Evaluation을 설계하고 DeepEval·Langfuse로 개선과 회귀를 검증한다 | [Day05/AGENTS.md](Day05/AGENTS.md) |
 | `Day06/` | AI Agent Harness 4종(pi·gajae-code·deepseek-harness·ouroboros)의 소스를 여섯 책임(지침·도구·실행 제어·상태·검증·기록)으로 분석한다 | [Day06/AGENTS.md](Day06/AGENTS.md) |
+| `Day07/` | vLLM 기초·추론 속도 최적화, RunPod에 띄운 GLM-5.3-Flash 호출, dcode 설치·활용 | [Day07/AGENTS.md](Day07/AGENTS.md) |
 | `Day08/` | 같은 보고 Agent에 같은 공격을 넣고 Guardrail 배치(Input·Action·Output·권한·메모리·HITL)만 바꿔 방어 효과를 비교한다 | [Day08/AGENTS.md](Day08/AGENTS.md) |
 | `Lecture_Note/` | 강의 슬라이드 (git 제외) | — |

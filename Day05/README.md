@@ -4,8 +4,7 @@
 실제 실행에 연결하고, 실패 근거를 읽은 뒤 한 조건을 바꿔 개선과 회귀를 설명하는 수업이다.
 기준 강의는 [Day5 Agent Evaluation](../Lecture_Note/Day5_Agent_Evaluation_Golden_Dataset_Langfuse.pptx)이다.
 
-**루트의 `00~09`가 새 주 실습이다.** 기존 번호 파일·전용 도우미·자료·테스트는
-[`legacy/`](legacy/README.md)에 보존했다. Day05의 `.venv`, `.env`, `uv.lock`을 함께 사용한다.
+**루트의 `00~09`가 새 주 실습이다.** Day05의 `.venv`, `.env`, `uv.lock`을 함께 사용한다.
 
 ## 수업 흐름
 
@@ -23,14 +22,10 @@
 | 08 | [08_promote_regression.py](08_promote_regression.py) | 실패를 어떻게 재현·검수하고 최종 확인할 것인가? | 회귀 초안, holdout 결과 |
 | 09 | [09_report_decision.py](09_report_decision.py) | 이번 후보를 승인·보류할 근거는 무엇인가? | `09_report.md` |
 
-순수 수업 6시간을 가정한 [재구성 계획](docs/restructure_plan.md)을 바탕으로 구현했다.
+순수 수업 6시간을 가정해 구성했다.
 모든 번호를 한 번에 자동 실행하지 않는다. 검수·가설·사람 판정은 중간에 직접 작성한다.
 
-강사용 [02 수업 진행안](docs/02_teaching_guide.md)에는 사례 읽기 → 결과 예측 → 미검수 오류 확인 →
-교차 검수 → 동결 결과 설명의 50분 운영 예시를 정리했다.
-[도메인 전문가 피드백 운영안](docs/expert_feedback_workflow.md)에는 문서 기반 질문 생성, Agent 답변 검수,
-피드백 반영·재확인 방법과 전문가에게 보낼 요청 문안을 담았다.
-바로 열어 볼 수 있는 [전문가 검수용 엑셀 기본 양식](expert_feedback_template.xlsx)도 제공한다.
+전문가 피드백을 받을 때는 [전문가 검수용 엑셀 기본 양식](expert_feedback_template.xlsx)을 쓴다.
 작성 안내·가상 예시 4건·빈 검수 10건·피드백 반영·원문 근거를 포함하며, 원본을 복사해 쓴다.
 
 ## 준비
@@ -41,7 +36,6 @@
 cd Day05
 uv sync
 uv run python 00_check_env.py
-uv run pytest -q
 ```
 
 실행 조건은 [course_config.py](course_config.py)와 각 번호 파일 상단 상수에 있다. CLI 플래그는 없다.
@@ -51,14 +45,12 @@ Agent와 Judge 모델은 서로 다르게 둔다. 00의 기본 점검은 외부 
 
 외부 연결 없는 코드 계약 확인은 `MODE="scripted"`, `USE_LANGFUSE=False`로 선택한다.
 scripted의 두 드라이버는 강사 제공 예시다. 이 결과로 실제 Agent의 성능·프롬프트 개선을 주장하지 않는다.
-`python -m business_lab`은 이제 번호 순서 안내를 출력한다. 이전 통합 실행은 legacy에 있다.
+`python -m business_lab`은 이제 번호 순서 안내를 출력한다.
 
 ## 01~02: 업무 기준을 작성하고 검수한다
 
 현재 01의 엑셀은 개발자가 Scenario 계약을 배우는 실습 자료다. 도메인 전문가에게는
 질문·답변·원문 근거를 보여 주고 판단과 수정 의견을 받은 뒤, 개발자가 기대 상태와 평가 규칙으로 옮긴다.
-DeepEval로 실제 전달 문서에서 질문을 합성하는 전문가 검수 흐름은
-[추가 구현할 연결](docs/expert_feedback_workflow.md#8-현재-코드에서-가능한-것과-추가-구현할-것)로 구분했다.
 전문가용 기본 양식은 의견 회수용이며, 아래 02가 읽는 Scenario 엑셀과는 형식이 다르다.
 개발자가 확인된 답변·의견을 `01b_refine_goldens.py`의 `REVISIONS`에 직접 옮기면 개선 초안을 만든다.
 전문가용 엑셀의 열·수식을 파싱하거나 자유 의견을 모델로 자동 해석하는 단계는 없다.
@@ -152,7 +144,7 @@ Langfuse에서는 같은 승인 Dataset의 Item을 반복별 Run으로 실행한
 [learner_evaluator.py](learner_evaluator.py)는 “주문 번호가 없는 턴에 쓰기 시도가 있었는가”를 검사하는 예시다.
 서비스가 차단한 시도도 FAIL이며, 턴 기록이 없으면 `INSUFFICIENT_EVIDENCE`다.
 자신의 평가 항목을 보강하기 전에 입력·판정 계약과 정상·실패 반례를 먼저 정한다.
-[counterexamples.py](business_lab/counterexamples.py)와 [테스트](tests/test_numbered_course.py)를 함께 읽는다.
+[counterexamples.py](business_lab/counterexamples.py)를 함께 읽는다.
 
 ```bash
 uv run python 05_evaluate_runs.py
@@ -236,4 +228,3 @@ Agent 비용은 모든 모델 응답에 공급자가 제공한 비용이 있을 
 
 업무 서비스는 SQLite의 격리 환경과 장애 주입으로 재현한다. 실제 결제·출고 시스템이나
 실서비스의 분산 트랜잭션·부하 전체를 재현하지 않는다. 외부 서비스 연결과 평가 정확도는 별도 검증 대상이다.
-구조 변경의 테스트 결과와 실제 연결의 확인 범위는 [검증 기록](docs/verification.md)에 남겼다.

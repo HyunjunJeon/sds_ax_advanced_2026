@@ -19,7 +19,7 @@ Supervisor/Handoff)로 확장하고, **어떤 실패가 왜 개선됐고 추가 
 --baseline  --candidate  --changed  --require-same-plan  --out
 ```
 
-실행 조건은 **각 파일 상단의 `실험 = LabConfig(...)`** 에 있다 (정의: `common/lab.py:58`).
+실행 조건은 **각 파일 상단의 `실험 = LabConfig(...)`** 에 있다 (정의: `common/lab.py:64`).
 조건을 바꾸려면 **파일을 편집하고 다시 실행한다.**
 
 ```bash
@@ -49,9 +49,9 @@ uv run python 01_baseline_rag.py     # 파일 안의 설정을 그대로 사용
 | `02_adaptive_rag.py` | 제공 | 계획·검토·제한 재검색 |
 | `03_sequential_rag.py` | 제공 | 조사·작성·검토 Context 분리 |
 | `04_router_rag.py` | 제공 | 최초 담당자 선택 |
-| **`05_parallel_rag.py`** | **학생 구현** | fan-out/합류. `build` 안 TODO 1~5 (`05_parallel_rag.py:66`) |
+| **`05_parallel_rag.py`** | **학생 구현** | fan-out/합류. `build` 안 TODO 1~5 (`05_parallel_rag.py:73`) |
 | `06_supervisor_rag.py` | 제공 | 의존성·실패·재계획 |
-| **`07_handoff_rag.py`** | **학생 구현** | 담당자 이전·유지. TODO 1~4 (`07_handoff_rag.py:68`) |
+| **`07_handoff_rag.py`** | **학생 구현** | 담당자 이전·유지. TODO 1~4 (`07_handoff_rag.py:75`) |
 | `08_web_enrichment.py` | 제공 | EXA → 검사 → 적재 → 재검색 |
 | `09_compare.py` | 제공 | 같은 사례로 구조 비교 |
 | **`10/11/12_*_challenge.py`** | **학생 구현** | 과제 A/B/C. 실제 구현은 `student_tasks.py` |
@@ -65,9 +65,9 @@ uv run python 01_baseline_rag.py     # 파일 안의 설정을 그대로 사용
 
 | 과제 | 구현 대상 | 공개 테스트 |
 |---|---|---|
-| A. Context 선택 | `student_tasks.py:42` `select_context` | `challenge_tests/test_context_challenge.py` (11개) |
-| B. 지연 결과 안전 | `student_tasks.py:88` `merge_attempts`, `:102` `schedule_ready` | `challenge_tests/test_recovery_challenge.py` |
-| C. lease fencing | `student_tasks.py:143` `FencedRegistry` (`claim`/`commit`/`head`/`snapshot`) | `challenge_tests/test_ingestion_challenge.py` |
+| A. Context 선택 | `student_tasks.py:49` `select_context` | `challenge_tests/test_context_challenge.py` (11개) |
+| B. 지연 결과 안전 | `student_tasks.py:95` `merge_attempts`, `:109` `schedule_ready` | `challenge_tests/test_recovery_challenge.py` |
+| C. lease fencing | `student_tasks.py:150` `FencedRegistry` (`claim`/`commit`/`head`/`snapshot`) | `challenge_tests/test_ingestion_challenge.py` |
 | 05/07 그래프 | 각 파일의 `build` 함수 | `challenge_tests/test_graph_challenge.py` (5개) |
 
 **공개 테스트 통과는 알고리즘 계약만 검증한다.** 과제의 나머지 점수는 `common/`의 실제 RAG에
@@ -97,8 +97,8 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 ```
 
 **05/07과 10~12는 실행 방식이 다르다.** 10~12는 `run_challenge`가 안내문을 출력한 뒤 공개
-테스트를 **바로 실행**한다 (`common/challenges.py:23`). 05/07은 `run_lab`이라 **실제 실험 실행을
-시도**하다가 그래프 안에서 `NotImplementedError`가 나고, `common/lab.py:395`가 다음 단계를
+테스트를 **바로 실행**한다 (`common/challenges.py:14`). 05/07은 `run_lab`이라 **실제 실험 실행을
+시도**하다가 그래프 안에서 `NotImplementedError`가 나고, `common/lab.py:399`가 다음 단계를
 안내한 뒤 exit code 1로 끝난다 — 테스트가 자동으로 돌지 않으므로 출력된 pytest 명령을 따로 실행한다.
 
 ## 3. 과제 대응 프로토콜
@@ -132,7 +132,7 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 
 > 이건 채점 대상이라 통째로 작성하지는 않겠습니다. 대신 반례부터 같이 잡죠.
 > `merge_attempts`의 권위는 도착 순서가 아니라 `task_id` + `number`입니다
-> (`student_tasks.py:88`). 지금 실패하는 `test_late_success_cannot_resurrect_an_old_attempt`가
+> (`student_tasks.py:95`). 지금 실패하는 `test_late_success_cannot_resurrect_an_old_attempt`가
 > 정확히 그 지점입니다 — 시도 1의 늦은 성공이 시도 2의 실패를 덮으면 안 됩니다.
 > 어떤 자료구조로 "최신 시도"를 판별할 생각인지 먼저 말씀해 주시겠어요?
 
@@ -142,16 +142,16 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 
 | 수강생 질문 | 답이 있는 곳 |
 |---|---|
-| 실험 조건을 어떻게 바꾸나요? | `common/lab.py:58` `LabConfig` (필드마다 주석에 의미가 있다) |
+| 실험 조건을 어떻게 바꾸나요? | `common/lab.py:64` `LabConfig` (필드마다 주석에 의미가 있다) |
 | 구조별 그래프는 어디 있나요? | 번호 파일의 `build(service)` 함수 |
 | 검색·생성·검토는 누가 하나요? | `common/service.py` — `retrieve`/`ensure`/`generate`/`review`/`finish`/`worker`/`plan`/`route`/`synthesize` |
-| State와 합류(reducer)는? | `common/contracts.py:84` `State`, `:75` `merge_results` |
-| 예산은 어떻게 세나요? | `common/runtime.py:18` `Meter` — planner·Worker·reviewer·judge를 **합산**한다 |
+| State와 합류(reducer)는? | `common/contracts.py:84` `merge_results`, `:93` `State` |
+| 예산은 어떻게 세나요? | `common/runtime.py:26` `Meter` — planner·Worker·reviewer·judge를 **합산**한다 |
 | local과 viking 검색의 차이는? | `common/rag_backend.py` (local은 어휘 일치이지 벡터 검색이 아니다) |
-| 웹 문서는 어떻게 적재되나요? | `common/exa_client.py` → `common/ingestion.py` → `common/source_registry.py:82` `reserve` |
+| 웹 문서는 어떻게 적재되나요? | `common/exa_client.py` → `common/ingestion.py` → `common/source_registry.py:89` `reserve` |
 | 평가(judge)는 어떻게 하나요? | `common/evaluation.py` — gold는 **이 모듈에서만** 읽고 Agent 입력에 넣지 않는다 |
-| 짝 비교가 왜 거절되나요? | `common/paired_analysis.py:84` — 미선언 변수, 짝 누락, 반복 부족 |
-| 결과는 어디에 저장되나요? | `outputs/rag-comparison/<run_id>/` (`common/lab.py:358` `output_dir`) |
+| 짝 비교가 왜 거절되나요? | `common/paired_analysis.py:81` `analyze_pairs` — 미선언 변수, 짝 누락, 반복 부족 |
+| 결과는 어디에 저장되나요? | `outputs/rag-comparison/<run_id>/` (`common/lab.py:364` `output_dir`) |
 | Day02 코드는 어디에? | `vendor/day02/` (`common/day02_bridge.py`가 연결한다) |
 | 재현에 필요한 hash는? | `common/provenance.py` — 코드·자료·lock의 hash만 기록하고 `.env`는 읽지 않는다 |
 
@@ -173,7 +173,7 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 - **`entity` / `as_of` / `thread`**: 셋이 함께 scope 해시가 되어 대화를 격리한다. 하나만 달라도
   다른 대화다.
 - **전체 입력 토큰 ≠ 근거 Context 바이트**: system·history·도구 스키마가 포함되는지 구분해서 말한다.
-- **`CHANGEABLE`** (`common/paired_analysis.py:16`): 짝 비교에서 선언 가능한 변수 14개.
+- **`CHANGEABLE`** (`common/paired_analysis.py:23`): 짝 비교에서 선언 가능한 변수 14개.
   `implementation`, `architecture`, `context_bytes`, `context_mode`, `serial_workers`, `no_replan`,
   `no_owner_memory`, `skill`, `web_mode`, `max_calls`, `max_tools`, `seconds`,
   `web_max_age_hours`, `max_web_documents`. 여기 없는 이름을 `CHANGED`에 넣으면 분석기가 거절한다.
@@ -228,3 +228,23 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 | `challenge_tests/` | 공개 반례. **수정 금지.** 수강생은 자기 테스트를 따로 추가한다 |
 | `data/gold.jsonl` | **사후 평가 전용.** 실행 경로에서 읽지 않는다 |
 | `.env`, `.openviking/`, `work/`, `outputs/` | 커밋 대상 아님. 내용 출력 금지 |
+
+## 수업 중 활동 (자유 실습)
+
+이 섹션은 채점 대상이 아닌 자유 실습으로, 다음을 수행한다:
+
+1. EXA API를 발급한다. 구글 로그인을 추천한다 (https://exa.ai/).
+2. Sequential 구조의 DeepAgent 기반 리서치 시스템을 만든다.
+3. Parallel 구조의 DeepAgent 기반 리서치 시스템을 만든다.
+4. 같은 주제로 실행하고 그 결과를 비교한다.
+
+**이 활동은 채점이 없으므로 에이전트는 완전한 구현까지 도움을 제공할 수 있다.**
+
+**중요:** 이 정책은 채점 대상인 `05_parallel_rag.py`, `07_handoff_rag.py`의 TODO, `student_tasks.py`,
+`10`~`13` 파일의 단계적 힌트 정책을 바꾸지 않는다. 이 활동은 별도의 리서치 시스템을 구축하므로,
+에이전트는 이 활동의 결과를 `05_parallel_rag.py`나 `07_handoff_rag.py` TODO를 채우는 경로로
+사용하지 않는다. 참고 구현으로 `03_sequential_rag.py`(제공)를 안내할 수 있지만, `05_parallel_rag.py`를
+참고 구현으로 제시하지 않는다.
+
+EXA 웹 검색과 모델 호출은 수강생의 크레딧을 사용한다. 이 활동을 실행하기 전에 에이전트는
+**규모를 한 줄로 고지**한다.

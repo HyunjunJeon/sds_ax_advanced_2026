@@ -9,7 +9,7 @@
 - 엄밀한 비교 방법: 분해가 매번 달라지면 동시 실행의 효과와 분해의 효과가 섞인다.
   plan_file 저장·재생으로 "같은 분해"를 고정하고 나서야 병렬/순차를 비교할 수 있다.
 
-이 파일의 그래프는 직접 구현한다. 아래 가이드를 따라 build 안의 TODO 1~4를 채우고
+이 파일의 그래프는 직접 구현한다. 아래 가이드를 따라 build 안의 TODO 1~5를 채우고
 challenge_tests/test_graph_challenge.py가 전부 통과하면 완성이다. 구현 전에는
 NotImplementedError가 나는 것이 정상이다.
 

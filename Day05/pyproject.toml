@@ -27,8 +27,6 @@ dev = ["pytest>=9,<10"]
 package = false
 
 [tool.pytest.ini_options]
-# 모두 LLM 호출 없이 도는 테스트다. 설치 확인용으로 비용 없이 돌릴 수 있다.
-testpaths = ["tests", "legacy/tests"]
 pythonpath = ["."]
 
 [tool.pyright]

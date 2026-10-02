@@ -168,6 +168,23 @@ uv run day02 ask "..." --as-of 2026-09-08 --format grounded-qa
 Agent에 노출하는 파일 시스템은 `skills/`로 제한되어 있고, 쓰기·셸·하위 Agent 위임은 허용 도구에
 없다(`src/day02/agents/factory.py`). 수강생이 "Agent가 파일을 못 읽는다"고 하면 이 제약을 설명한다.
 
+## 6.5 자유 실습 — 수업 중 활동
+
+Day02 폴더의 **`task.md`**는 01~05 번 예제를 토대로 두 가지 제한 조건 하에서 RAG 시스템을 구성하는
+방법을 묻는 자유 실습이다:
+
+- 검색이 실패했을 때는 어떻게 할까?
+- 답변 시 참고할 Skill이 없을 때는 어떻게 할까?
+
+**이 과제는 채점 대상이 아니며, 모든 과정에 대해 온전한 구현까지 함께 진행할 수 있다.** 루트
+AGENTS.md의 단계적 힌트 정책(L0~L3)은 이 파일에 적용되지 않는다. 대신 같은 Day02 폴더의
+`student_tasks.py`, `07`, `08`, `10`~`13` 파일에는 계속 힌트 정책이 적용된다.
+
+관련 코드를 참고할 때는 다음을 확인한다:
+
+- 검색 실패/근거 부족: 질문을 뒷받침할 자료가 부족하거나 근거가 상충할 때 insufficient-evidence Skill을 사용한다 (`skills/insufficient-evidence/SKILL.md:3`). 검증 규칙은 `src/day02/validation.py:73-76`에 정의되어 있다.
+- 답변 작성 조건: 현재 턴에서 검색을 반드시 실행해야 한다 (`src/day02/validation.py:61`). 선택한 Skill의 SKILL.md 전체 본문을 읽어야 한다 (`src/day02/validation.py:59`).
+
 ## 7. 검증과 비용
 
 ```bash

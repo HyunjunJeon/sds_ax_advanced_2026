@@ -12,6 +12,10 @@ golden_dataset.csv 의 context/contexts.json 은 골든 정답을 만들 때 쓴
 이 에이전트에는 주지 않는다. 에이전트는 docs_2026_08.pdf 원문만 보고 스스로 찾아 답해야
 "실제 문서 검색·근거 확인" 역량이 의미가 있다.
 
+원본 SOURCE_CSV(economic_report_golden/golden_dataset.csv)는 읽기만 하고 수정하지 않는다.
+답변은 복사본 outputs/gold_agent/golden_dataset_answers.csv(ANSWERS_CSV)에 쓴다.
+이미 채워진 actual_output 은 'input' 이 같으면 이어받고, 빈 것만 새로 답한다.
+
 PDF 는 pymupdf4llm 으로 마크다운 변환해 outputs/gold_agent/ 에 캐시한다(재실행 시 재사용).
 """
 
@@ -25,10 +29,11 @@ from deepagents.backends import FilesystemBackend
 from deepagents.middleware.filesystem import FilesystemPermission
 
 PDF_PATH = Path("docs_2026_08.pdf")
-GOLDEN_CSV = Path(
-    "outputs/gold_agent/golden_dataset_top10.csv"
-)  # TODO: 테스트 후 economic_report_golden/golden_dataset.csv 로 되돌릴 것
-DOC_CACHE_DIR = Path("outputs/gold_agent/doc_cache")  # 백엔드 root. GOLDEN_CSV(정답 포함)는 이 밖에 둔다.
+SOURCE_CSV = Path("economic_report_golden/golden_dataset.csv")  # 추적되는 원본. 읽기 전용.
+# 답변 복사본. 이름의 'golden_dataset' 은 gold_agent_eval.py 의 오염 검사가 찾는 문자열이다.
+ANSWERS_CSV = Path("outputs/gold_agent/golden_dataset_answers.csv")
+MAX_ROWS: int | None = None  # None 이면 전체. 10 은 비용을 줄인 테스트 크기다.
+DOC_CACHE_DIR = Path("outputs/gold_agent/doc_cache")  # 백엔드 root. ANSWERS_CSV(정답 포함)는 이 밖에 둔다.
 DOC_CACHE_MD = DOC_CACHE_DIR / "docs_2026_08.md"
 RECURSION_LIMIT = 40
 
@@ -64,13 +69,32 @@ def build_agent(model):
 
 
 def load_rows():
-    with GOLDEN_CSV.open(encoding="utf-8-sig", newline="") as f:
+    """SOURCE_CSV(원본)를 읽기만 한다. MAX_ROWS 가 있으면 앞에서 그만큼만 쓴다."""
+    with SOURCE_CSV.open(encoding="utf-8-sig", newline="") as f:
         reader = csv.DictReader(f)
-        return reader.fieldnames, list(reader)
+        rows = list(reader)
+        return reader.fieldnames, rows[:MAX_ROWS]
+
+
+def merge_existing_answers(rows):
+    """ANSWERS_CSV 에 이미 있는 비어 있지 않은 actual_output 을 'input' 으로 맞춰 이어받는다."""
+    if not ANSWERS_CSV.exists():
+        return rows
+    with ANSWERS_CSV.open(encoding="utf-8-sig", newline="") as f:
+        done = {
+            r["input"]: r["actual_output"]
+            for r in csv.DictReader(f)
+            if (r.get("actual_output") or "").strip()
+        }
+    for row in rows:
+        if row["input"] in done:
+            row["actual_output"] = done[row["input"]]
+    return rows
 
 
 def save_rows(fieldnames, rows):
-    with GOLDEN_CSV.open("w", encoding="utf-8-sig", newline="") as f:
+    ANSWERS_CSV.parent.mkdir(parents=True, exist_ok=True)
+    with ANSWERS_CSV.open("w", encoding="utf-8-sig", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
         writer.writerows(rows)
@@ -95,9 +119,11 @@ def main():
     callbacks = [CallbackHandler()]
 
     fieldnames, rows = load_rows()
+    rows = merge_existing_answers(rows)
     todo = [row for row in rows if not row["actual_output"].strip()]
     if not todo:
-        print(f"{GOLDEN_CSV} 의 actual_output 이 이미 모두 채워져 있습니다.")
+        save_rows(fieldnames, rows)
+        print(f"{ANSWERS_CSV} 의 actual_output 이 이미 모두 채워져 있습니다.")
         return
 
     print(
@@ -120,7 +146,7 @@ def main():
         print(f"[{index}/{len(todo)}] {question[:40]}... -> {len(output)}자")
 
     langfuse.flush()
-    print(f"{GOLDEN_CSV} 의 actual_output {len(todo)}건을 채웠습니다.")
+    print(f"{ANSWERS_CSV} 의 actual_output {len(todo)}건을 채웠습니다.")
 
 
 if __name__ == "__main__":

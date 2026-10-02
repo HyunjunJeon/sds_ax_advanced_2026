@@ -44,7 +44,7 @@
 
 | 단계 | 명령 | 먼저 고칠 상수 | 화면에서 볼 것 | 소요 |
 |---|---|---|---|---|
-| 0 | `uv run pytest -q` | 없음 | `34 passed`. 환경 확인 | 5초 |
+| 0 | `uv run pytest -q` | 없음 | `35 passed`. 환경 확인 | 5초 |
 | 1 | `uv run python 00_baseline_agent.py` | `MODEL_MODE` | 정상 완료. `전송함`에 승인 검토자, `초안`에 파일 1개. 답변이 아니라 상태로 판정한다 | 1~2분 |
 | 2 | `uv run python 01_input_guard.py` | `INJECTION_GUARD` (`"remote"`면 강사 `.env` 줄 필요) | `user_only` 대 `user_and_tool_results`. `security_training`이 과잉 차단됐는가 | 6실행, 8~12분 |
 | 3 | `uv run python 02_action_guard.py` | 같음. 두 번째 실행은 `INJECTION_GUARD="always_allow"` | `middleware_parent`의 `검사 없이 실행된 경로 ['research']`. `tool_wrapper`는 `action@research`에서 차단 | 20실행, 20~30분 (수업 중엔 `CASES`를 2건으로) |
@@ -72,7 +72,7 @@
 cd Day08
 cp .env.example .env        # OPENROUTER_API_KEY 를 직접 채운다
 uv sync
-uv run pytest -q            # 모델 호출 없는 검증. 33 passed
+uv run pytest -q            # 모델 호출 없는 검증. 35 passed
 uv run python 00_baseline_agent.py
 ```
 

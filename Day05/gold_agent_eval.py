@@ -10,7 +10,7 @@ output.content만 모은다. glob/ls는 경로 목록일 뿐 근거 문장이 �
 ToolNode를 감싸는 type=="CHAIN", name=="tools" observation은 같은 내용을 중복 반환하므로 제외한다.
 
 오염 방어: read_file/grep의 input에 "golden_dataset"이 있으면 즉시 멈춘다. gold_agent.py의
-DOC_CACHE_DIR가 GOLDEN_CSV(정답 컬럼 포함)를 다시 포함하게 됐다는 뜻이라, 채점 자체가 무의미하다.
+DOC_CACHE_DIR가 ANSWERS_CSV(정답 컬럼 포함)를 다시 포함하게 됐다는 뜻이라, 채점 자체가 무의미하다.
 
 도구 호출 없이 답한 문항은 FaithfulnessMetric을 부르지 않고 자동 실패 처리한다 — 도구 호출
 유무는 코드로 바로 판별되는 사실이라 유료 판사를 쓰지 않는다.
@@ -31,8 +31,8 @@ from business_lab.connections import connect_langfuse
 from business_lab.models import load_judge
 
 GOLDEN_CSV = Path(
-    "outputs/gold_agent/golden_dataset_top10.csv"
-)  # gold_agent.py와 같은 경로 유지
+    "outputs/gold_agent/golden_dataset_answers.csv"
+)  # gold_agent.py의 ANSWERS_CSV와 같은 경로
 RESULTS_JSON = Path("outputs/gold_agent/faithfulness_scores.json")
 TRACE_NAME = "gold-agent-question"
 RETRIEVAL_TOOLS = {"read_file", "grep"}
@@ -101,7 +101,7 @@ def build_retrieval_context(client, trace_id: str) -> list[str]:
     if contaminated:
         raise ValueError(
             f"오염된 trace {trace_id}: observation {[o['id'] for o in contaminated]}가 "
-            "golden_dataset CSV를 읽었습니다. gold_agent.py의 DOC_CACHE_DIR/GOLDEN_CSV 경로 "
+            "golden_dataset CSV를 읽었습니다. gold_agent.py의 DOC_CACHE_DIR/ANSWERS_CSV 경로 "
             "분리부터 다시 확인하세요."
         )
     tool_obs.sort(key=lambda o: o["startTime"])
