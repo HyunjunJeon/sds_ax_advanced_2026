@@ -32,7 +32,7 @@ def serve(reply: dict | None = None, status: int = 200):
 
 
 def test_key_status_reports_only_set_or_unset_never_a_value():
-    secret = "sk-ant-very-secret-value"
+    secret = "test-anthropic-very-secret-value"
     status = key_status(Settings(anthropic_api_key=secret, langfuse_secret_key="lf-secret-value"))
     assert status["ANTHROPIC_API_KEY"] == "설정됨" and status["LANGFUSE_SECRET_KEY"] == "설정됨"
     assert status["TYPESAFE_API_KEY"] == "미설정"
@@ -40,7 +40,7 @@ def test_key_status_reports_only_set_or_unset_never_a_value():
 
 
 def test_settings_repr_hides_key_values():
-    assert "sk-ant-secret" not in repr(Settings(anthropic_api_key="sk-ant-secret", typesafe_api_key="ts-secret"))
+    assert "test-anthropic-secret" not in repr(Settings(anthropic_api_key="test-anthropic-secret", typesafe_api_key="ts-secret"))
 
 
 def test_require_names_every_missing_key_and_points_to_env_example():

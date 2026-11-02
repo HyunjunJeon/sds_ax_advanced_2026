@@ -16,7 +16,7 @@ Outcome = Literal["answered", "insufficient", "needs_approval", "denied", "human
 
 
 class WorkerTask(BaseModel):
-    """Supervisor가 Worker에게 주는 것. 전체 대화가 아니라 이 작업에 필요한 만큼만 준다."""
+    """일을 나눠 보내는 쪽(그래프의 분배 노드)이 Worker에게 주는 것. 전체 대화가 아니라 이 작업에 필요한 만큼만 준다."""
     task_id: str
     goal: str
     facts: dict = Field(default_factory=dict)

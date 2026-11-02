@@ -153,8 +153,14 @@ def args_valid(record: RunRecord) -> Score:
     mcp_calls = [call for call in record.tool_calls if call.get("name") in MCP_TOOLS]
     if not mcp_calls:
         return Score("args_valid", None, "MCP 호출이 없음")
+    # 입력 검증 실패는 도구 오류(ok=False)이고 구조화된 결과(dict)가 없다. 서버 업무 오류와 GoalGuard 차단은
+    # success=false dict이고, 성공한 결과의 본문이 이 문구를 인용할 수도 있어 문구만으로는 가리지 않는다.
     rejected = [
-        call["name"] for call in mcp_calls if "validation error" in _dumps(call.get("result")).lower()
+        call["name"]
+        for call in mcp_calls
+        if call.get("ok") is False
+        and not isinstance(call.get("result"), dict)
+        and "validation error" in _dumps(call.get("result")).lower()
     ]
     if rejected:
         return Score("args_valid", False, f"입력 검증 오류가 난 호출: {rejected}")

@@ -23,6 +23,7 @@ from langchain_core.outputs import ChatGeneration, ChatResult
 from langchain_core.tools import BaseTool
 from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.types import Command
+import pytest
 from pydantic import Field
 
 MCP_TOOLS = {
@@ -289,3 +290,25 @@ def test_server_elicitation_surfaces_as_an_interrupt_and_resume_records_the_user
     assert "잘 되면 완료" in interrupt["requests"][0]["message"]
     recorded = tool_results(messages, "record_answer")[-1].artifact["structured_content"]
     assert recorded["answers"]["acceptance_criteria"] == elicited
+
+
+def cache_controlled_deferred_tools(payload: dict) -> list[str]:
+    """Anthropic API가 거절하는 조합: defer_loading과 cache_control을 함께 가진 도구."""
+    return [tool["name"] for tool in payload["tools"] if tool.get("defer_loading") and "cache_control" in tool]
+
+
+@pytest.mark.parametrize("tool_disclosure", ["skill", "upfront"])
+def test_claude_request_never_puts_cache_control_on_a_deferred_tool(tmp_path, tool_disclosure):
+    """실제 API는 defer_loading 도구의 cache_control을 400으로 거절한다(live 1차: save_evidence).
+    캐시 표식은 지연되지 않은 도구로 옮겨 가야 하고, 캐시 자체는 계속 켜져 있어야 한다."""
+    model = ClaudeRequestRecorder(model="claude-sonnet-5-5", api_key="offline-test", script=[
+        call("read_file", "toolu_1", file_path=SKILL_PATH), AIMessage(content="끝."),
+    ])
+    asyncio.run(run_agent(tmp_path, model, tool_disclosure=tool_disclosure))
+
+    for payload in model.payloads:
+        assert cache_controlled_deferred_tools(payload) == []
+        assert sum("cache_control" in tool for tool in payload["tools"]) == 1
+        additions = [block for message in payload["messages"] if isinstance(message["content"], list)
+                     for block in message["content"] if block.get("type") == "tool_addition"]
+        assert not any("cache_control" in block or "cache_control" in block["tool"]["definition"] for block in additions)

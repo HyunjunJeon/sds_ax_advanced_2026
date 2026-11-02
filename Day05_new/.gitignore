@@ -1,0 +1,5 @@
+.env
+outputs/
+.deepeval/
+__pycache__/
+.ipynb_checkpoints/

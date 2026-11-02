@@ -70,7 +70,7 @@
 - agentskills.io 2026 명세에서 1024자 한도 외의 변경
 - 유효한 키로 한 Langfuse 인증, 그리고 서버 쪽 span이 실제로 Langfuse에 내보내지는지
 
-Langfuse 인증: 복사한 키가 401이므로 저자가 키를 교체한다. 교체한 키로 Langfuse 인증 확인(`auth_check`가 True)이 통과하는 것이 run 3의 모든 유료 측정의 선행 조건이다.
+Langfuse 인증: 복사한 키가 401이므로 저자가 키를 교체한다. 개정 2에 따라 저자 측정(dev, holdout)은 Langfuse 없이 로컬로 돌리므로 키 교체는 그 측정의 선행 조건이 아니다. Langfuse에 기록하는 07 수업 측정만 인증 확인(`auth_check`가 True)이 시작 전에 통과해야 한다.
 
 <!-- PREREG:BEGIN -->
 ## 사전 등록 (이 블록은 확정 후 수정하지 않는다)
@@ -112,15 +112,15 @@ H2 (S2): 에이전트 미들웨어 GoalGuard가 Jev Noul 질문으로 `start_int
 
 ### P4. 프로토콜
 
-- Langfuse 데이터셋 `day04_new-capability-v1`을 `Day04_new/data/cases.jsonl`에서 만든다(dev 10, holdout 6; metadata는 split, stage, kind).
-- holdout은 최종 주장을 위해 한 번만 연다.
+- 사례는 `Day04_new/data/cases.jsonl`이다(dev 10, holdout 8; metadata는 split, stage, kind). Langfuse에 기록하는 실행은 이 파일로 데이터셋 `day04_new-capability-v1`을 만든다.
+- holdout은 최종 주장을 위해 한 번만 연다. holdout도 A, A2, B 세 변형으로 돌린다.
 - 임계값은 저자가 검토한 뒤의 `Day04_new/data/gate_labels_draft.jsonl` dev 라벨로만 조정한다. 초기 임계값 0.5는 자리표시자이며 미조정으로 표시한다.
 - 사례마다 사용자 발화와 elicitation 응답은 스크립트로 정해 둔다. LLM이 사용자를 흉내 내지 않는다.
 - 변형: A(게이트 끔), A2(게이트 끔, A/A용 반복), B(H1과 H2 켬). 두 게이트는 서로 다른 단계를 겨냥하므로 목표 지표를 각각 따로 읽고, 상호작용 가능성은 주의사항으로 적는다.
 - 반복 횟수: 저자 실행 N=5, 수업 N=3.
 - 각 실행의 metadata에 모델, effort, SKILL.md sha256, 서버 코드 sha256, 게이트 플래그, 임계값, Jev 모델 id, 데이터셋 버전을 고정해 기록한다.
 - 로컬 사본 `Day04_new/outputs/runs/*.jsonl`은 오류를 포함한 모든 항목을 남긴다.
-- 모든 유료 실행 전에 Langfuse 인증 확인이 통과해야 한다.
+- 저자 측정(dev, holdout)은 Langfuse에 기록하지 않고 로컬 사본과 `<실행 이름>.meta.json`에만 남긴다(개정 2). Langfuse에 기록하는 유료 실행(07 수업 측정)은 시작 전에 인증 확인이 통과해야 한다.
 
 ### P5. 판정 규칙 (`Day04_new/cap_lab/stats.py`의 `decide()`와 일치)
 
@@ -144,6 +144,121 @@ H2 (S2): 에이전트 미들웨어 GoalGuard가 Jev Noul 질문으로 `start_int
 에이전트 프로세스는 `Day04_new/data/`를 읽지 않는다. 도구 인자나 읽은 경로에 `cases.jsonl`, `gate_labels`, `/data/` 중 하나라도 나오면 `contamination_free`는 실패다.
 <!-- PREREG:END -->
 
+## 사전 등록 개정 1 (2026-11-02, 유료 측정 전)
+
+저자가 2026-11-02에 결정했다. PREREG 블록은 P4의 아래 두 줄만 바꾸었고 P5 판정 규칙을 포함한 나머지 바이트는 그대로다.
+
+- 개정 전 블록 sha256: `39435e721a73580f0a7a46bf8c41770ecfb2567904ba9251869041c89441b745`
+- 개정 후 블록 sha256: `0fd3e8062667bcb25495bcab949085baa08654fa7cd8de98b45445ce1a7c68fe` (`Day04_new/docs/prereg.sha256`에 기록)
+
+바뀐 줄(P4):
+
+```text
+(전) - Langfuse 데이터셋 `day04_new-capability-v1`을 `Day04_new/data/cases.jsonl`에서 만든다(dev 10, holdout 6; metadata는 split, stage, kind).
+(후) - Langfuse 데이터셋 `day04_new-capability-v1`을 `Day04_new/data/cases.jsonl`에서 만든다(dev 10, holdout 8; metadata는 split, stage, kind).
+(전) - holdout은 최종 주장을 위해 한 번만 연다.
+(후) - holdout은 최종 주장을 위해 한 번만 연다. holdout도 A, A2, B 세 변형으로 돌린다.
+```
+
+사례 추가: `ho-07`(R1 권한 거부, `freeze_seed` 거부)와 `ho-08`(R2 일시 오류, `start_interview` 1회 장애)를 `Day04_new/data/cases.jsonl`에 덧붙였다. 기존 사례는 바꾸지 않았다.
+
+이유: 확정된 설계로는 holdout 판정이 구조적으로 항상 `판정 불가: 데이터 부족`이었다.
+
+1. holdout을 A와 B로만 돌려(8절 6 x 5 x 2) A 대 A2 잡음 폭이 없었고, `compare()`는 가드마다 잡음 폭을 요구하므로 P5 4번이 모든 가드에서 걸렸다.
+2. holdout에 R1, R2 사례가 없어 P6 가드 `no_blind_retry`, `retry_bounded`의 값이 없었고, 이것도 P5 4번을 걸었다.
+
+저자는 "A2 + R1/R2 사례 추가"를 골랐다: holdout 8 사례 x 5 반복 x 3 변형 = 120회. P5 규칙, 임계값, 예산은 그대로다.
+
+유료 측정이 없었다는 확인: 개정 시점에 `Day04_new/outputs/runs/` 폴더가 없다(로컬 사본 `*.jsonl` 없음). 사례 파일과 문서 외에 holdout 결과를 본 적이 없다.
+
+## 사전 등록 개정 2 (2026-11-02, 유료 측정 전)
+
+저자가 2026-11-02에 유료 측정 전에 승인했다. PREREG 블록은 P4의 아래 두 줄만 바꾸었고 P5 판정 규칙을 포함한 나머지 바이트는 그대로다.
+
+- 개정 전 블록 sha256: `0fd3e8062667bcb25495bcab949085baa08654fa7cd8de98b45445ce1a7c68fe` (개정 1 이후)
+- 개정 후 블록 sha256: `ee964af5717919128c9ccf1dd5adaace9da39b9f9f2b4c26f7565f2b8e939396` (`Day04_new/docs/prereg.sha256`에 기록)
+
+바뀐 줄(P4):
+
+```text
+(전) - Langfuse 데이터셋 `day04_new-capability-v1`을 `Day04_new/data/cases.jsonl`에서 만든다(dev 10, holdout 8; metadata는 split, stage, kind).
+(후) - 사례는 `Day04_new/data/cases.jsonl`이다(dev 10, holdout 8; metadata는 split, stage, kind). Langfuse에 기록하는 실행은 이 파일로 데이터셋 `day04_new-capability-v1`을 만든다.
+(전) 모든 유료 실행 전에 Langfuse 인증 확인이 통과해야 한다.
+(후) - 저자 측정(dev, holdout)은 Langfuse에 기록하지 않고 로컬 사본과 `<실행 이름>.meta.json`에만 남긴다(개정 2). Langfuse에 기록하는 유료 실행(07 수업 측정)은 시작 전에 인증 확인이 통과해야 한다.
+```
+
+이유: 저자가 2026-11-02에 이번 측정에는 Langfuse를 쓰지 않아도 된다고 결정했다. 복사한 Langfuse 키는 인증에서 401로 실패하고(5절), 저자가 나중에 교체한다. 판정은 로컬 사본을 `compare()`로 읽어서 하며 `compare()`는 Langfuse를 읽지 않는다.
+
+바뀌지 않는 것: P5 판정 규칙, 임계값, 예산, 사례, 분할, 반복 횟수. 07 수강생 노트북은 그대로 Langfuse에 기록하며 인증이 실패하면 멈춘다(`run_experiment`의 기본 `record`는 `"langfuse"`).
+
+실행기 지원: `run_experiment(..., record="local")`(`Day04_new/cap_lab/experiment.py:474`, 인자 `record` `:485`, 로컬 분기 `_run_local` `:563`)와 저자 스크립트 `Day04_new/tests/run_measurement.py`. 로컬 실행은 `outputs/runs/<실행 이름>.jsonl`과 `<실행 이름>.meta.json`(시작과 끝에 기록, 끝나지 않으면 `finished_at`이 null)을 남긴다.
+
+키 교체 뒤 로컬 사본을 Langfuse에 올릴 수 있다. 그래도 판정은 계속 로컬 사본으로 한다.
+
+유료 측정이 없었다는 확인: 개정 시점에 `Day04_new/outputs/runs/` 폴더가 없다(`ls`가 "No such file or directory"). 따라서 `dev-*`, `holdout-*` 사본이 없고 dev, holdout 결과를 본 적이 없다.
+
+## 결과 1: dev 기준선 (A, A2), 2026-11-02
+
+PREREG 블록과 개정 2 뒤에 덧붙인 결과다. 블록은 수정하지 않았다. 이 절은 dev 10사례의 기준선이며 B(게이트 켬)와 holdout은 아직 실행하지 않았다. 따라서 B에 대한 판정은 이 절에 없다. 수치는 `Day04_new/outputs/runs/dev-baseline-summary.json`과 `dev-*.meta.json`에서 가져왔고, 실행 줄 수·호출 수·토큰은 `dev-*-r*.jsonl`에서 다시 합산해 일치를 확인했다.
+
+### 설정과 실행 규모
+
+- 설정(`dev-A-r1.meta.json`, 10개 meta 파일이 같은 설정): 모델 `claude-sonnet-5-5`, effort `medium`, interface `rich`, tool_disclosure `skill`, 게이트 H1·H2 `off`, `jev_model` `off`(Jev 사용 0회), record `local`(개정 2), SKILL.md sha256 `7c8e469a95b6c67af0387c810dca20f47bda59237ceba4fc350f34b12e79593b`, 서버 sha256 `82a13e69cde8197e39e820d5f6b487252d7b9a1f6bed4580970dc245dd39c79b`. A와 A2의 차이는 변형 이름뿐이다(A2는 A의 반복, 잡음 폭을 재는 용도).
+- 실행: dev-A 5개 반복 x 10사례 = 50줄, dev-A2 50줄, 합계 100회. 오류 줄 0, 모든 meta의 `finished_at`이 채워짐(중단 없음).
+- 규모: Claude 호출 497회(A 250, A2 247, `model_calls` 점수의 합), 입력 토큰 3,592,503, 출력 토큰 146,573, Jev 0회. 캐시 쓰기 토큰은 기록하지 않았다.
+
+### 지표별 (통과/확인된 수, 미확인은 분모에서 제외; `compare()`와 같은 case_values 사용)
+
+| 지표 | A | A2 | A2-A 차이 [95%] | 잡음 폭 | 미확인(A) |
+|---|---|---|---|---|---|
+| trigger_ok | 10/10 = 1.00 [0.72,1.00] | 10/10 | 0 | 0 | 40 |
+| tool_selection_ok | 50/50 = 1.00 [0.93,1.00] | 50/50 | 0 | 0 | 0 |
+| args_valid | 45/45 = 1.00 [0.92,1.00] | 45/45 | 0 | 0 | 5 |
+| goal_preserved | 10/10 = 1.00 [0.72,1.00] | 10/10 | 0 | 0 | 40 |
+| vague_not_frozen | 5/10 = 0.50 [0.24,0.76] | 4/10 = 0.40 [0.17,0.69] | -0.10 [-0.20,0.00] | 0.20 | 40 |
+| frozen_ok | 10/20 = 0.50 [0.30,0.70] | 11/20 = 0.55 [0.34,0.74] | +0.05 [0.00,0.15] | 0.15 | 30 |
+| evidence_linked | 10/10 = 1.00 [0.72,1.00] | 10/10 | 0 | 0 | 40 |
+| no_blind_retry, retry_bounded, side_effect_stable | 각 5/5 | 각 5/5 | 0 | 0 | 45 |
+| contamination_free | 50/50 | 50/50 | 0 | 0 | 0 |
+
+수치 지표 평균 A / A2 (차이 [구간], 잡음 폭): model_calls 5.00 / 4.94 (-0.06 [-0.22,0.08], 0.22), tool_calls 4.66 / 4.62 (-0.04, 0.20), latency_s 15.16 / 14.63 (-0.53 [-1.38,0.27], 1.38), input_tokens 36,230 / 35,620 (-609, 2,282), output_tokens 1,476 / 1,455 (-21, 90). 모든 차이가 잡음 폭 안에 있다. 미확인은 그 사례에 해당 기대가 없어 채점하지 않은 실행이다(`scores`의 `value`가 null).
+
+### P3 병목 귀속 (`attribute()`, 첫 실패 단계)
+
+| 범위 | S1 | S2 | S3 | S5 | S6 | unchecked | no_failure |
+|---|---|---|---|---|---|---|---|
+| A | 0 | 0 | 5 | 5 | 0 | 0 | 40 |
+| A2 | 0 | 0 | 6 | 4 | 0 | 0 | 40 |
+| 합산 | 0 | 0 | 11 | 9 | 0 | 0 | 80 |
+
+첫 실패가 있는 20회 중 S3 55%, S5 45%, S2 0%. 사례별: dev-05 A는 S5 x5, A2는 S3 x1 + S5 x4. dev-06은 A, A2 모두 S3 x5. 나머지 8사례는 10회 모두 실패 없음.
+
+### H1/H2 목표 지표 (기준선)
+
+H1은 S3 `vague_not_frozen`, H2는 S2 `goal_preserved`로 읽었다(위 P2).
+
+| 목표 | 사례 | 통과율 |
+|---|---|---|
+| H1 vague_not_frozen (vague_criteria) | dev-05 A 5/5, A2 4/5; dev-06 A 0/5, A2 0/5; 합산 9/20 = 0.45 [0.26,0.66] | 미확인 0 |
+| H2 goal_preserved (goal_verbatim) | dev-03 A 5/5, A2 5/5; dev-04 A 5/5, A2 5/5; 합산 20/20 = 1.00 [0.84,1.00] | 미확인 0 |
+
+### P3 읽기
+
+- 첫 실패 몫이 가장 큰 단계는 S3(11/20 = 55%)다. H1(S3)의 병목 전제와 맞는다. H1 목표 지표는 0.45(구간 0.26~0.66)라 올라갈 여지가 있다. 다만 그 실패는 사실상 dev-06 하나(10회 모두 실패)이고, dev-05는 10회 중 1회만 S3에서 실패한다(나머지 dev-05의 첫 실패는 S5).
+- H2(S2)의 첫 실패는 0회이고 목표 지표 `goal_preserved`는 20/20 = 100%다. 기준선에 개선 여지가 없고 가장 큰 몫도 S2가 아니다. 이것은 P3이 말하는 "기준선이 H1 또는 H2와 모순"에 해당할 수 있다: 저자 확인 필요. P3은 이 경우 게이트 위치를 바꾸기 전에 저자에게 묻고, 효과가 없어 보인다는 이유로 게이트를 제거하지 않는다고 정한다. 이 문서는 어느 쪽도 결정하지 않았다.
+- S5 첫 실패가 9회(45%)로 S3에 근접하다(11 대 9). S5는 H1·H2 어느 쪽의 목표도 아니다: 저자 확인 필요(결정하지 않음).
+- 이 값은 dev 10사례(목표 사례는 H1 2개, H2 2개)이고 사례당 5회 반복이라 표본이 매우 작다. 위 신뢰구간이 넓다.
+- 측정되지 않은 것: B(게이트 켬)와 holdout은 실행하지 않았다. 게이트의 효과에 대해서는 아무 것도 말할 수 없다.
+
+### 기준선 전에 찾은 코드 결함 두 가지
+
+첫 번째 실제 실행(`Day04_new/outputs/live-pass1`, 노트북 00~07)이 측정 전에 코드 결함 두 가지를 드러냈다. Claude 호출 39회 중 29회가 실패했다.
+
+- (A) 모든 skill 공개 방식의 Claude 호출이 HTTP 400(`Tool 'save_evidence' cannot have both defer_loading=true and cache_control set.`)으로 실패했다. 기본 프롬프트 캐싱이 마지막 도구에 `cache_control`을 붙였는데 그 도구가 `defer_loading`이었다. 수정(cache-fix): `Day04_new/cap_lab/middleware.py:126`의 `DeferralSafePromptCaching`(`name` `:138`, `_apply_caching` `:141`)이 기본 미들웨어를 이름으로 대체하고 태그를 deferred가 아닌 마지막 도구(`grep`)로 옮긴다. 등록은 `Day04_new/cap_lab/agent.py:133`, 테스트는 `Day04_new/tests/test_agent.py:295`, `:301`. upfront 요청은 그대로이고 deferral도 끄지 않았다.
+- (B) 한 프로세스에서 두 번째 이후의 `run_small_compare`가 `Connection error.`로 실패했다(원인은 추정이 아니라 수정 노드가 offline 테스트로 재현했다: 실행마다 새 이벤트 루프를 쓰는 `_run_blocking`과 `lru_cache`로 공유되는 비동기 클라이언트). 수정(loop-fix): `Day04_new/cap_lab/notebook.py:20`(import)와 `:124`(`cache_clear()`)로 실행마다 캐시를 비운다. 테스트는 `Day04_new/tests/test_notebook_helpers.py:261`, `:269`. 이 한 줄 수정에 `experiment.py`는 포함하지 않았다(`langfuse` 기록에서 repeats 2 이상이면 `experiment.py:542` 부근이 같은 위험에 노출될 가능성이 있다: 추정, 확인 필요).
+
+기준선(dev-A, dev-A2)은 두 수정 뒤에 실행했다. 2차 노트북 실행에서 오류 0이었다(8장).
+
 ## 8. 비용
 
 유료 실행은 각각 한 번만 하며 검증 중에는 하지 않는다. 사례당 Claude 호출은 약 5~9회다(`Day04/build_mcp/README.md:262`는 4 사례에 20~35회라고 적는다).
@@ -151,11 +266,22 @@ H2 (S2): 에이전트 미들웨어 GoalGuard가 Jev Noul 질문으로 `start_int
 | 실행 | 규모 | Claude 호출 |
 |---|---|---|
 | 저자 dev | 10 사례 x 5 반복 x 3 변형 = 150회 | 약 750~1,350 |
-| holdout | 6 x 5 x 2 = 60회 | 약 300~540 |
+| holdout | 8 x 5 x 3 = 120회 | 약 600~1,080 |
 | 수업 | 4 x 3 x 3 = 36회 | 약 180~330 |
 | Part 2, Part 5 각각 | 2 x 3 x 2 = 12회 | 약 60~110 |
 
 Jev는 게이트당 실행마다 1~3회 호출한다.
+
+실제 값(2026-11-02, 위 계획값은 그대로 둔다. `outputs/runs/*.jsonl`, `outputs/live*/summary.json`에서 다시 합산):
+
+| 실행 | 실제 | 비고 |
+|---|---|---|
+| dev 기준선 A, A2 | 100회(50+50), 오류 0. Claude 호출 497(250+247), 입력 3,592,503 / 출력 146,573 토큰, Jev 0. 벽시계 A 15분 13초(913초) + A2 14분 37초(877초) = 29분 50초(1,790초) | 계획(변형 3개 150회, 750~1,350호출) 중 변형 2개분. 사례당 약 4.97호출로 계획 범위의 아래쪽 5~9보다 낮다 |
+| 노트북 2차(수정 후) | Claude 123호출, 오류 0, 입력 811,755(캐시 읽기 722,137) / 출력 33,703 토큰. 커널 Jev 4회 + 서버 측 계량 1회(미계량 약 2회). 합산 벽시계 468.6초 | 00~07 실행. 07은 Langfuse 확인에서 설계대로 멈춤(Langfuse 기록 0). 예고는 Claude 약 290회였고 실제가 낮다 |
+| 노트북 1차(수정 전) | Claude 39호출 중 실패 29, 성공 10. 토큰 입력 52,570 / 출력 2,245. 벽시계 150.4초 | 결함 (A), (B)로 낭비. 실패 호출이 과금되었는지는 확인하지 못했다(추정 불가) |
+| 수정 노드의 실제 확인 | cache-fix: dev-01 skill 공개 3호출(16,962 / 956 토큰). loop-fix: dev-01 3호출(17,000 / 817), dev-02 1호출(3,495 / 1,204) | 호출 합 7, 토큰 입력 37,457 / 출력 2,977 |
+
+기준선까지 합한 Claude 호출 계측 합계: 497 + 123 + 39 + 7 = 666(`outputs/live*`의 계측은 호출 시작 수이며 1차의 실패 29 포함). 예고한 범위(Claude 약 790~1,190)보다 낮다. 캐시 쓰기 토큰은 계측하지 않았고, 서버 측 Jev 약 2회는 계량하지 못했다.
 
 ## 9. 외부 전송
 
@@ -165,7 +291,7 @@ Langfuse는 프롬프트와 도구 입출력을 받는다. Decision API는 답�
 
 1. run 1 기반: 환경, 이 문서, `cap_lab`, 오프라인 테스트.
 2. run 2 노트북과 문서.
-3. 저자 라벨 검토 관문과 Langfuse 키 교체.
+3. 저자 라벨 검토 관문. 저자 측정은 Langfuse 없이 로컬로 돌리므로 키 교체는 run 3의 선행 조건이 아니다(개정 2). 키 교체는 07의 Langfuse 기록에만 필요하다.
 4. run 3 유료 측정. 결과 절은 PREREG 블록 뒤에 덧붙이고 블록 자체는 수정하지 않는다.
 
 ## 11. 출처

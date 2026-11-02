@@ -12,8 +12,10 @@ import json
 from collections.abc import Awaitable, Callable, Sequence
 from dataclasses import dataclass
 
-from langchain.agents.middleware import AgentMiddleware, ToolCallRequest
+from langchain.agents.middleware import AgentMiddleware, ModelRequest, ToolCallRequest
+from langchain_anthropic.middleware import AnthropicPromptCachingMiddleware
 from langchain_core.messages import AnyMessage, HumanMessage, ToolMessage
+from langchain_core.tools import BaseTool
 from langgraph.types import Command
 
 from cap_lab.decisions import DecisionBackend, DecisionError, Noul
@@ -119,3 +121,47 @@ def _user_request(messages: Sequence[AnyMessage]) -> str:
         if isinstance(message, HumanMessage):
             return message.text
     return ""
+
+
+class DeferralSafePromptCaching(AnthropicPromptCachingMiddleware):
+    """도구 캐시 표식(cache_control)을 defer_loading이 아닌 도구로 옮기는 프롬프트 캐싱.
+
+    기본 구현은 도구 목록의 마지막 도구에 표식을 붙이는데(langchain_anthropic/middleware/prompt_caching.py:246),
+    MCP 도구가 모두 defer_loading이면 마지막 도구가 지연 도구가 되어 Anthropic API가 400으로 거절한다
+    ("cannot have both defer_loading=true and cache_control set"). 표식을 마지막 비지연 도구로 옮기면
+    캐시와 Skill 공개 지연이 함께 유지된다. 비지연 도구가 없으면 표식을 도구에 붙이지 않는다.
+    name이 기본 캐싱 미들웨어와 같아야 create_deep_agent가 그 자리를 대신 채운다(deepagents/graph.py:216-246).
+    이름이 다르면 기본 것이 안쪽에 남아 표식을 다시 붙인다.
+    """
+
+    @property
+    def name(self) -> str:
+        return "AnthropicPromptCachingMiddleware"
+
+    def _apply_caching(self, request: ModelRequest) -> ModelRequest:
+        cached = super()._apply_caching(request)
+        tools = cached.tools or []
+        deferred = [tool for tool in tools if _is_deferred(tool) and _has_cache_control(tool)]
+        if not deferred:
+            return cached
+        cache_control = self._cache_control
+        target = next((tool for tool in reversed(tools) if isinstance(tool, BaseTool) and not _is_deferred(tool)), None)
+        fixed = [
+            _with_extras(tool, {k: v for k, v in tool.extras.items() if k != "cache_control"}) if tool in deferred
+            else _with_extras(tool, {**(tool.extras or {}), "cache_control": cache_control}) if tool is target
+            else tool
+            for tool in tools
+        ]
+        return cached.override(tools=fixed)
+
+
+def _is_deferred(tool: object) -> bool:
+    return isinstance(tool, BaseTool) and (tool.extras or {}).get("defer_loading") is True
+
+
+def _has_cache_control(tool: object) -> bool:
+    return isinstance(tool, BaseTool) and "cache_control" in (tool.extras or {})
+
+
+def _with_extras(tool: BaseTool, extras: dict) -> BaseTool:
+    return tool.model_copy(update={"extras": extras})

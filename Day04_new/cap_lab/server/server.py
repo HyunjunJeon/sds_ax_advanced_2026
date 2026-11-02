@@ -1,9 +1,12 @@
-"""Day04/build_mcp/reference/server.py에서 가져온 사본. 수정: import 경로, from __future__ import annotations 제거, 도구 주석(ToolAnnotations), 장애 주입(--fault), H1 완료 기준 판정 게이트(--gate h1).
+"""Day04/build_mcp/reference/server.py에서 가져온 사본. 수정: import 경로, from __future__ import annotations 제거, 도구 주석(ToolAnnotations), 장애 주입(--fault), H1 완료 기준 판정 게이트(--gate h1), 수업 비교용 약한 도구 인터페이스(--interface plain), Streamable HTTP 실행(--transport streamable-http).
 
 강사용 기준 MCP 서버. 도구 공개와 업무 처리를 연결한다.
 --gate off(기본)는 기준 서버와 같은 7개 도구를 같은 이름·인자·반환 형식으로 공개하고 판정기를 만들지 않는다.
 --gate h1은 record_answer의 완료 기준을 판정기로 검사한다. 점수가 문턱값보다 낮으면 MRTR로 사용자에게
 직접 묻고, 판정할 수 없으면 아무것도 기록하지 않는다(fail-closed).
+--interface plain은 같은 7개 도구와 같은 업무·오류 코드를 약한 인터페이스로 공개한다(Part 2 비교의 한쪽):
+enum 없는 str 인자, 짧은 설명, annotations·outputSchema 없음. rich(기본)는 지금의 도구 정의 그대로다.
+--transport streamable-http는 stdio 대신 http://127.0.0.1:<--port>/mcp 에서 서버를 연다(Part 4).
 판정기 키는 cap_lab.settings.load_settings가 읽는 Day04_new/.env(또는 DAY04_ENV_FILE이 가리키는 파일)에서 온다.
 가짜 판정기(DAY04_ALLOW_FAKE_DECIDER, DAY04_FAKE_DECIDER)는 cap_lab/server/gate.py에 설명했다.
 """
@@ -11,6 +14,7 @@
 # from __future__ import annotations를 쓰지 않는다. 주석이 문자열로 미뤄지면 SDK가 create_server 안의
 # Resolve(assess)를 풀지 못해 resolver 인자를 찾지 못하고, assessment·revision이 모델이 보는 도구 인자가 된다.
 import argparse
+import functools
 import json
 import math
 import os
@@ -23,6 +27,7 @@ from typing import Annotated, Any, Literal
 # 스크립트로 실행하면 sys.path[0]이 이 폴더다. cap_lab 패키지를 찾도록 Day04_new를 앞에 넣는다.
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
+import pydantic_core
 from mcp.server import MCPServer
 from mcp.server.elicitation import AcceptedElicitation, ElicitationResult
 from mcp.server.mcpserver.resolve import Elicit, Resolve
@@ -50,7 +55,10 @@ ToolName = Literal[
     "start_interview", "record_answer", "get_session", "freeze_seed",
     "list_evidence", "read_evidence", "save_evidence",
 ]
+AnswerField = Literal["constraints", "acceptance_criteria"]
 FAULT_EXAMPLE = '{"permission_denied": ["save_evidence"], "transient": {"record_answer": 1}}'
+# --transport streamable-http가 여는 주소. 인증이 없는 서버라 같은 컴퓨터의 클라이언트만 접속하게 한다.
+LOOPBACK = "127.0.0.1"
 
 
 class FaultPlan(BaseModel):
@@ -105,6 +113,24 @@ class RevisedCriteria(BaseModel):
     )
 
 
+def without_output_schema(tool: Callable[..., dict[str, Any]]) -> Callable[..., CallToolResult]:
+    """plain 인터페이스의 도구 사본. outputSchema는 공개하지 않고 결과 모양은 rich와 같게 돌려준다.
+
+    본문 텍스트는 rich에서 SDK가 dict 결과로 만드는 텍스트와 같은 방식으로 만든다
+    (mcp/server/mcpserver/utilities/func_metadata.py:653). structuredContent도 그대로 둔다.
+    실행기는 structuredContent의 success:false로 업무 오류를 가리므로(cap_lab/experiment.py의
+    _record_tool_message) 결과 모양이 같아야 두 인터페이스를 같은 잣대로 채점한다.
+    """
+
+    @functools.wraps(tool)
+    def unadvertised(**arguments: Any) -> CallToolResult:
+        result = tool(**arguments)
+        text = pydantic_core.to_json(result, fallback=str, indent=2).decode()
+        return CallToolResult(content=[TextContent(type="text", text=text)], structured_content=result)
+
+    return unadvertised
+
+
 @dataclass(frozen=True)
 class Assessment:
     """record_answer 한 번에 대한 게이트 판단. 판정하지 않은 호출이면 decision이 None이다."""
@@ -121,6 +147,7 @@ def create_server(
     gate: Literal["off", "h1"] = "off",
     threshold: float = 0.5,
     faults: FaultPlan | None = None,
+    interface: Literal["rich", "plain"] = "rich",
 ) -> MCPServer:
     evidence = EvidenceStore(evidence_dir or db_path.parent / "evidence")
     workflow = Workflow(db_path, evidence)
@@ -151,6 +178,26 @@ def create_server(
         name="requirements-lab",
         middleware=[record_tools, fault_middleware(faults or FaultPlan())],
     )
+
+    def publish(
+        annotations: ToolAnnotations, plain_description: str
+    ) -> Callable[[Callable[..., dict[str, Any]]], Callable[..., dict[str, Any]]]:
+        """도구를 등록한다. rich는 docstring 설명과 annotations를 공개하고 SDK가 반환 형식에서 outputSchema를 만든다.
+        plain은 plain_description만 공개한다. 등록한 원래 함수를 그대로 돌려준다.
+        """
+
+        def register(tool: Callable[..., dict[str, Any]]) -> Callable[..., dict[str, Any]]:
+            if interface == "rich":
+                mcp.add_tool(tool, annotations=annotations)
+            else:
+                mcp.add_tool(without_output_schema(tool), description=plain_description, structured_output=False)
+            return tool
+
+        return register
+
+    # plain은 record_answer의 field를 enum 없는 str로 받는다. 맨 위 주석대로 이 파일은 주석을 정의할 때
+    # 평가하므로, 여기서 고른 타입이 그대로 도구의 입력 형식이 된다. 모르는 값은 업무 코드가 unknown_field로 거절한다.
+    answer_field = AnswerField if interface == "rich" else str
 
     def invoke(action: Callable[[], dict]) -> dict[str, Any]:
         try:
@@ -200,8 +247,9 @@ def create_server(
 
     # 기록을 추가만 하고 지우지 않는다(destructive=false). 호출마다 새 세션 ID를 만들므로
     # 응답을 놓쳤다고 다시 부르면 업무가 중복된다(idempotent=false).
-    @mcp.tool(annotations=ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False))
+    @publish(ToolAnnotations(
+        read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False),
+        "인터뷰를 시작한다.")
     def start_interview(goal: str) -> dict[str, Any]:
         """새 업무의 목표를 저장하고 세션 ID와 첫 질문을 반환한다."""
         return invoke(lambda: workflow.start_interview(goal))
@@ -212,7 +260,7 @@ def create_server(
 
         def record_answer(
             session_id: str,
-            field: Literal["constraints", "acceptance_criteria"],
+            field: answer_field,
             answer: str,
             assessment: Annotated[Assessment, Resolve(assess)],
             revision: Annotated[ElicitationResult[RevisedCriteria], Resolve(ask_if_untestable)],
@@ -245,7 +293,7 @@ def create_server(
 
         def record_answer(
             session_id: str,
-            field: Literal["constraints", "acceptance_criteria"],
+            field: answer_field,
             answer: str,
         ) -> dict[str, Any]:
             """세션의 제약 또는 완료 기준을 기록한다. 확정 뒤에는 수정할 수 없다."""
@@ -254,43 +302,46 @@ def create_server(
     # 답변 수정도 새 변경 기록을 추가할 뿐 이전 기록을 지우지 않는다(destructive=false).
     # 같은 답변의 재전송은 변경 기록을 늘리지 않는다(idempotent=true).
     # 게이트를 켜면 완료 기준을 외부 Decision API로 판정하므로 열린 세계다(openWorld=gate on).
-    mcp.add_tool(
-        record_answer,
-        annotations=ToolAnnotations(
+    publish(
+        ToolAnnotations(
             read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=gate == "h1"
         ),
-    )
+        "답변을 기록한다.",
+    )(record_answer)
 
     # 조회처럼 보이지만 읽기 전용이 아니다: 파일에만 있는 기록을 DB로 복원하고 근거 파일을 다시 내보낸다.
     # 빠진 기록만 추가하고 내용이 다른 기존 파일은 덮어쓰지 않는다(destructive=false).
     # 다시 불러도 같은 상태와 같은 파일이 된다(idempotent=true).
-    @mcp.tool(annotations=ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False))
+    @publish(ToolAnnotations(
+        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
+        "세션을 조회한다.")
     def get_session(session_id: str) -> dict[str, Any]:
         """세션을 조회하고 근거 파일을 복구한다. DB가 없으면 근거에서 복원한다."""
         return invoke(lambda: workflow.get_session(session_id))
 
     # 확정 기록을 추가만 한다. 이미 확정한 세션을 다시 확정하면 같은 명세를 반환한다(idempotent=true).
-    @mcp.tool(annotations=ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False))
+    @publish(ToolAnnotations(
+        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
+        "명세를 확정한다.")
     def freeze_seed(session_id: str) -> dict[str, Any]:
         """제약과 완료 기준이 기록된 명세를 확정한다. 업무 구현을 실행하지 않는다."""
         return invoke(lambda: workflow.freeze_seed(session_id))
 
-    @mcp.tool(annotations=READ_ONLY)
+    @publish(READ_ONLY, "근거 목록을 조회한다.")
     def list_evidence(session_id: str = "") -> dict[str, Any]:
         """근거 파일의 ID·제목·경로를 조회한다. 세션 ID 생략 시 세션 목록을 반환한다."""
         return invoke(lambda: evidence.list(session_id))
 
-    @mcp.tool(annotations=READ_ONLY)
+    @publish(READ_ONLY, "근거를 읽는다.")
     def read_evidence(session_id: str, evidence_id: str) -> dict[str, Any]:
         """근거 파일의 본문을 읽는다. 이후 작업은 이 내용과 근거 ID를 사용한다."""
         return invoke(lambda: evidence.read(session_id, evidence_id))
 
     # 같은 제목·본문·원본 ID는 같은 산출물 ID라 다시 보내도 파일이 늘지 않는다(idempotent=true).
     # 내용이 바뀌면 별도 파일로 남기고 기존 파일을 덮어쓰지 않는다(destructive=false).
-    @mcp.tool(annotations=ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False))
+    @publish(ToolAnnotations(
+        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
+        "근거를 저장한다.")
     def save_evidence(
         session_id: str, title: str, content: str, source_evidence_id: str = ""
     ) -> dict[str, Any]:
@@ -306,6 +357,13 @@ def finite_float(text: str) -> float:
     value = float(text)
     if not math.isfinite(value):
         raise argparse.ArgumentTypeError("유한한 숫자여야 합니다.")
+    return value
+
+
+def port_number(text: str) -> int:
+    value = int(text)
+    if not 1 <= value <= 65535:
+        raise argparse.ArgumentTypeError("1~65535 사이의 정수여야 합니다.")
     return value
 
 
@@ -340,6 +398,24 @@ if __name__ == "__main__":
         default="",
         help=f"실험용 장애 주입 JSON. 예: {FAULT_EXAMPLE}",
     )
+    parser.add_argument(
+        "--interface",
+        choices=("rich", "plain"),
+        default="rich",
+        help="rich(기본): 지금의 도구 정의. plain: 같은 도구·업무를 enum·설명·annotations·outputSchema 없이 공개한다(Part 2 비교)",
+    )
+    parser.add_argument(
+        "--transport",
+        choices=("stdio", "streamable-http"),
+        default="stdio",
+        help=f"stdio(기본): 표준 입출력으로 통신한다. streamable-http: http://{LOOPBACK}:<--port>/mcp 에서 연다(Part 4)",
+    )
+    parser.add_argument(
+        "--port",
+        type=port_number,
+        default=8765,
+        help=f"--transport streamable-http가 {LOOPBACK}에서 열 포트 (기본 8765). stdio에서는 쓰지 않는다",
+    )
     args = parser.parse_args()
     try:
         faults = FaultPlan.model_validate_json(args.fault or "{}")
@@ -347,11 +423,17 @@ if __name__ == "__main__":
         first = error.errors()[0]
         where = ".".join(str(part) for part in first["loc"])
         parser.error(f"--fault 형식이 잘못되었습니다({where}: {first['msg']}). 예: {FAULT_EXAMPLE}")
-    # stdio의 stdout은 MCP 통신에 사용한다. 진단 로그는 stderr에 쓴다.
-    create_server(
+    server = create_server(
         args.db.resolve(),
         args.evidence_dir.resolve(),
         gate=args.gate,
         threshold=args.gate_threshold,
         faults=faults,
-    ).run(transport="stdio")
+        interface=args.interface,
+    )
+    if args.transport == "stdio":
+        # stdio의 stdout은 MCP 통신에 사용한다. 진단 로그는 stderr에 쓴다.
+        server.run(transport="stdio")
+    else:
+        # mcp 2.3.0의 전송 이름도 streamable-http다. 경로는 SDK 기본값 /mcp다.
+        server.run(transport="streamable-http", host=LOOPBACK, port=args.port)

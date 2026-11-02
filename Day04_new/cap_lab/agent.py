@@ -1,6 +1,7 @@
 """Day04_new Deep Agent 조립. Claude, MCP 서버(stdio 자식 프로세스)의 도구 7개, requirements-interview Skill, H2 GoalGuard.
 
-MCP 도구는 Skill의 SKILL.md를 read_file로 읽기 전에는 모델에 스키마가 가지 않는다(defer_loading).
+MCP 도구는 Skill의 SKILL.md를 read_file로 읽기 전에는 모델에 스키마가 가지 않는다(defer_loading, tool_disclosure="skill").
+tool_disclosure="upfront"는 Part 5 비교용으로 MCP 도구를 처음부터 모두 공개한다. Skill 폴더는 그대로 둔다.
 에이전트의 파일 도구는 Skill 폴더만 읽고 쓰기는 거절한다. Day04_new/data/에는 닿지 않는다(오염 방지).
 MCP 도구는 비동기 전용이다. 에이전트는 ainvoke/astream으로 실행한다.
 """
@@ -29,7 +30,7 @@ from langgraph.graph.state import CompiledStateGraph
 from langgraph.types import Checkpointer
 
 from cap_lab.decisions import DecisionBackend, make_decider
-from cap_lab.middleware import GoalGuard
+from cap_lab.middleware import DeferralSafePromptCaching, GoalGuard
 from cap_lab.server.server import FaultPlan
 from cap_lab.settings import ROOT, Settings, make_model
 
@@ -54,6 +55,7 @@ def server_argv(
     gate: Literal["off", "h1"] = "off",
     threshold: float = 0.5,
     fault: FaultPlan | None = None,
+    interface: Literal["rich", "plain"] = "rich",
 ) -> list[str]:
     """server.py 뒤에 붙일 인자. 스크립트 경로는 build_agent가 붙인다.
 
@@ -67,7 +69,7 @@ def server_argv(
     ]
     if fault is not None:
         argv += ["--fault", fault.model_dump_json()]
-    return argv
+    return argv + ["--interface", interface]
 
 
 @dataclass
@@ -95,10 +97,12 @@ async def build_agent(
     model: BaseChatModel | None = None,
     checkpointer: Checkpointer = None,
     server_env: dict[str, str] | None = None,
+    tool_disclosure: Literal["skill", "upfront"] = "skill",
 ) -> AgentHandle:
     """MCP 서버를 띄우고 Deep Agent를 만든다. model·decider를 주지 않으면 settings의 키로 만든다.
 
     interrupt(MCP elicitation)를 재개하려면 checkpointer와 config의 thread_id가 필요하다.
+    tool_disclosure="skill"은 MCP 도구를 Skill을 읽은 뒤에 공개하고, "upfront"는 처음부터 공개한다.
     """
     # 키가 없으면 자식 프로세스를 띄우기 전에 멈춘다.
     model = model or make_model(settings)
@@ -107,7 +111,9 @@ async def build_agent(
         PythonStdioTransport(SERVER_SCRIPT, args=server_args, env=_server_env(server_env), cwd=str(ROOT))
     )
     try:
-        tools = [_deferred(tool) for tool in await adapter.list_tools()]
+        tools = await adapter.list_tools()
+        if tool_disclosure == "skill":
+            tools = [_deferred(tool) for tool in tools]
         _disable_general_purpose_subagent(model)
         backend = FilesystemBackend(root_dir=skills_dir, virtual_mode=True)
         agent = create_deep_agent(
@@ -123,6 +129,8 @@ async def build_agent(
                     tool_token_limit_before_evict=None,
                     human_message_token_limit_before_evict=None,
                 ),
+                # 이름이 같아 기본 캐싱 미들웨어 자리를 대신한다. 지연 도구에 cache_control이 붙으면 API가 400이다.
+                DeferralSafePromptCaching(unsupported_model_behavior="ignore"),
                 *([goal_guard] if goal_guard else []),
             ],
             skills=["/"],

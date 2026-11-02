@@ -114,9 +114,17 @@ def test_args_valid_passes_with_real_session(lab):
 
 
 def test_args_valid_fails_on_validation_error_result(lab):
-    bad = {"isError": True, "content": [{"type": "text", "text": "1 validation error for call[start_interview]"}]}
-    score = args_valid(lab.record(calls=[call("start_interview", {}, bad)]))
+    # 실제 경로에서 관찰한 모양(tests/test_realism.py): 텍스트 블록 목록, ok=False.
+    text = "Error executing tool start_interview: 1 validation error for start_interviewArguments\ngoal\n  Field required"
+    bad = [{"type": "text", "text": text}]
+    score = args_valid(lab.record(calls=[dict(call("start_interview", {}, bad), ok=False)]))
     assert score.value is False and "검증 오류" in score.comment
+
+
+def test_args_valid_ignores_successful_result_that_quotes_validation_error(lab):
+    """근거 파일 본문이 '검증 오류' 문구를 인용해도 성공한 호출(ok=True)은 입력 검증 실패가 아니다."""
+    quoted = {"success": True, "content": "메모: 1 validation error for x 라는 문구를 인용"}
+    assert args_valid(lab.record(calls=[dict(call("read_evidence", {}, quoted), ok=True)])).value is True
 
 
 def test_args_valid_fails_on_invented_session_id(lab):

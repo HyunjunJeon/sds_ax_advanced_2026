@@ -27,7 +27,9 @@
 | `live-04-c2-notes.md`, `live-05-c2-notes.md` | C2 재실행에서 04·05의 새 실행 기록, 저장된 관찰 문장이 새 기록에 아직 참인지의 확인, 05 셀 34 문장의 근거 |
 | `preflight-c2-notes.md` | C2 재실행 직전의 코드 해시(`gate.py`, `exa.py`, `workers.py` 등)와 루트 `pyproject.toml`, `uv.lock` 해시. 이후 판단의 기준선 |
 | `cost-report-b1.txt` | B1 재실행 직후 노트북별 비용 표 (`tests/cost_report.py` 출력) |
-| `cost-report-c2.txt` | C2 재실행 직후 노트북별 비용 표. 이 폴더를 만들 때 현재 `tests/cost_report.py` 출력과 한 글자도 다르지 않음을 확인 |
+| `cost-report-c2.txt` | C2 재실행 직후 노트북별 비용 표. 이 폴더를 만들 때 현재 `tests/cost_report.py` 출력과 한 글자도 다르지 않음을 확인. 2026-11-02 전체 재실행 뒤에는 현재 출력과 다르다(지금 출력은 아래 `cost-report-rerun-20261102.txt`) |
+| `live-rerun-20261102-notes.md` | 2026-11-02 Supervisor 용어 수정 뒤 13개 기록을 모두 다시 돌린 기록. 다시 돌린 이유, 순서와 시각, 실행 당시 코드 해시 27개, 기록별 전후 호출 수·초·비용, 감사 결과, 지출, 이전 기록을 남긴 곳 |
+| `cost-report-rerun-20261102.txt` | 전체 재실행 직후 노트북별 비용 표 (`tests/cost_report.py` 출력). 합계 996회, 3419.6초, 6.9435 USD |
 | `stale-records-notes.md` | 00~03과 06의 저장된 실행 기록이 `gate.py`, `workers.py`, `exa.py` 수정 앞의 기록이어도 기록이 달라지지 않는 이유 |
 
 ### 실제 모델 행과 반복 관찰
