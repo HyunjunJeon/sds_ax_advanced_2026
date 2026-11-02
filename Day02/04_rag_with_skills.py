@@ -31,6 +31,10 @@ def main():
     parser.add_argument("--format", default="grounded-qa", choices=[
         "auto", "grounded-qa", "comparison", "procedure", "table-analysis", "insufficient-evidence",
     ])
+    parser.add_argument("--namespace", default="business")
+    parser.add_argument("--question", help="생략하면 답변 형식별 업무 예제를 사용")
+    parser.add_argument("--entity", default="알파")
+    parser.add_argument("--as-of", type=date.fromisoformat, default=date(2026, 9, 8))
     args = parser.parse_args()
     questions = {
         "grounded-qa": "알파 SLA의 서비스 크레딧 신청 기한은 언제인가요?",
@@ -40,7 +44,8 @@ def main():
         "table-analysis": "알파 SLA 표의 크레딧 비율 중 최댓값을 table_query로 계산하고, 단위와 계산 기준을 설명해주세요.",
         "insufficient-evidence": "알파 고객의 2035년 화성 지사 주소와 우편번호는 무엇인가요?",
     }
-    result = ask(Settings.load(), questions[args.format], as_of=date(2026, 9, 8), answer_format=args.format)
+    result = ask(Settings.load(), args.question or questions[args.format], entity=args.entity,
+                 as_of=args.as_of, namespace=args.namespace, answer_format=args.format)
     print(result["markdown"])
     print(f"\n실행 기록: outputs/runs/{result['run_id']}.json")
 

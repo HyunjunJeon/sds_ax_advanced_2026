@@ -1,0 +1,74 @@
+[
+ {
+  "repeat": 1,
+  "run_id": "a9ec803b139a4220a70a3a7a02246962",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 16.363
+ },
+ {
+  "repeat": 2,
+  "run_id": "31702a3e44494ac1a9a8913b946529bc",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 3,
+  "elapsed_seconds": 7.956
+ },
+ {
+  "repeat": 3,
+  "run_id": "2f9d9c7c40154d0896327b63a124805a",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 14.119
+ },
+ {
+  "repeat": 4,
+  "run_id": "6ad767df44ff4d338c22dc967004e294",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 8,
+  "elapsed_seconds": 20.109
+ },
+ {
+  "repeat": 5,
+  "run_id": "b71bfde8d80247a1bca8b24b276f45da",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 3,
+  "elapsed_seconds": 7.554
+ },
+ {
+  "repeat": 6,
+  "run_id": "d9c4b67c4cc145d1ac6c3818a653baa1",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 15.533
+ },
+ {
+  "repeat": 7,
+  "run_id": "950835a3ac6744e0a45ae190b86b8059",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 10,
+  "elapsed_seconds": 23.378
+ },
+ {
+  "repeat": 8,
+  "run_id": "737b7a1f47524bfba8a48fa52a8edd2c",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 7,
+  "elapsed_seconds": 20.376
+ },
+ {
+  "repeat": 9,
+  "run_id": "33d1df617e384936a0e272bbc7d62f61",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 16.679
+ }
+]

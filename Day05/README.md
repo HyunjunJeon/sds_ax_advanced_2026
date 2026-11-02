@@ -4,7 +4,7 @@
 실제 실행에 연결하고, 실패 근거를 읽은 뒤 한 조건을 바꿔 개선과 회귀를 설명하는 수업이다.
 기준 강의는 [Day5 Agent Evaluation](../Lecture_Note/Day5_Agent_Evaluation_Golden_Dataset_Langfuse.pptx)이다.
 
-**루트의 `00~09`가 새 주 실습이다.** Day05의 `.venv`, `.env`, `uv.lock`을 함께 사용한다.
+**루트의 `00~09`가 새 주 실습이다.** 저장소 루트의 `.venv`와 `uv.lock`, Day05의 `.env`를 사용한다.
 
 ## 수업 흐름
 
@@ -34,7 +34,7 @@
 
 ```bash
 cd Day05
-uv sync
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 uv run python 00_check_env.py
 ```
 

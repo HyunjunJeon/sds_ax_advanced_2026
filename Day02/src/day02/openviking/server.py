@@ -17,7 +17,7 @@ from day02.errors import ConfigurationError, Day02Error, ServiceError
 from day02.openviking.client import VikingClient
 from day02.settings import Settings, read_json, write_json
 
-SERVER_VERSION = "0.4.16"
+SERVER_VERSION = "0.4.22"
 
 
 def check_port_available(port: int):

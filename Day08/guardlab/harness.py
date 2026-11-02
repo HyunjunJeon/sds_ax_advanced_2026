@@ -4,7 +4,7 @@
   1. HarnessProfile.excluded_tools 로 DeepAgents 내장 도구(ls/read_file/write_file/edit_file/glob/grep/delete/execute)를
      모델의 도구 목록에서 뺀다. _ToolExclusionMiddleware 가 스택 맨 끝에서 걸러내고, 호출 경계에서도 거절한다.
   2. general_purpose_subagent=enabled False 로 부모 도구 전체를 물려받는 기본 Subagent 도 만들지 않는다.
-  3. 프로필은 프로세스 전역 레지스트리(provider 키)에 등록되고 create_deep_agent 시점에 해석된다. 0.7.13 에는
+  3. 프로필은 프로세스 전역 레지스트리(provider 키)에 등록되고 create_deep_agent 시점에 해석된다. 0.7.32 에도
      해제 API 가 없어서 with 블록 안에서만 등록하고 나올 때 원래 값으로 되돌린다. 같은 프로세스에서 구성을 바꿔 가며
      비교하는 02·06 때문이다.
   4. 문서가 명시하듯 "model-facing calibration 이지 security surface 가 아니다". 파일 권한·도구 래퍼를 대체하지 않는다.

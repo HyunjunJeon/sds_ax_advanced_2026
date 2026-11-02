@@ -1,0 +1,682 @@
+{
+ "status": "ran",
+ "reason": null,
+ "vllm": "v0.32.0 (rust/ copied to scratchpad/realrun/rust, test file src/parser/src/realrun.rs, not part of the repo)",
+ "toolchain": {
+  "cargo": "1.97.1 (c980f4866 2026-06-30)",
+  "rustc": "1.97.1 (8bab26f4f 2026-07-14)"
+ },
+ "command": "cargo test -p vllm-parser --lib realrun_dump (build ~25s, no native dependency missing, no server, no GPU)",
+ "method": {
+  "tool_parsers": [
+   "Glm45MoeToolParser (Separator::Newline)",
+   "Glm47MoeToolParser (Separator::Flexible)"
+  ],
+  "reasoning_parsers": "glm45 -> Glm45ReasoningParser (before_start/after_end '\\n'); glm47 -> Glm47ReasoningParser = DeepSeekV3ReasoningParser alias (reasoning/mod.rs:69-70, 63)",
+  "tokenizer": "vllm_tokenizer TestTokenizer with only <think>=256 and </think>=257, not the real GLM tokenizer",
+  "pipeline": "reasoning.push(text) -> content -> tool.parse_into -> finish, as chat layer would; prompt_plain = initialize([]), prompt_think_open = initialize([256]) (template prefilled <think>); whole = one chunk, stream5 = 5 chars per chunk",
+  "tools": "get_temperature(city:string), set_timer(minutes:integer,label:string), same schemas as reference_parser.json",
+  "limit": "Parser crates only. Chat layer, tool_choice handling, unified parser, real tokenizer, HTTP response shape were not run. Unknown-tool filtering was grepped in rust/src/chat and parser: no hit outside renderers, so not found, but not run end to end."
+ },
+ "rows": [
+  {
+   "id": "clean_call",
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "python": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": false,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "reasoning_then_call",
+   "raw_text": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "python": {
+    "reasoning": "사용자가 서울 기온을 묻는다.",
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "사용자가 서울 기온을 묻는다.</think>",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "사용자가 서울 기온을 묻는다.</think>",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "사용자가 서울 기온을 묻는다.",
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "사용자가 서울 기온을 묻는다.",
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "사용자가 서울 기온을 묻는다.</think>\n",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "사용자가 서울 기온을 묻는다.</think>\n",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "사용자가 서울 기온을 묻는다.",
+     "content_after_reasoning": "\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "\n",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "사용자가 서울 기온을 묻는다.",
+     "content_after_reasoning": "\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "\n",
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": false,
+    "prompt_think_open": false
+   }
+  },
+  {
+   "id": "malformed_markup",
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+   "python": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"부산\"}"
+     }
+    ],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_te\": "
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_te\": "
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_te\": "
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_te\": "
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": true,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "truncated_call",
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+   "python": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{}"
+     }
+    ],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: incomplete GLM MoE tool call"
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: incomplete GLM MoE tool call"
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: incomplete GLM MoE tool call"
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: incomplete GLM MoE tool call"
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": true,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "unknown_tool",
+   "raw_text": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "python": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>\": "
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "get_humidity",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "get_humidity",
+       "arguments": "{\"city\":\"서울\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": false,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "bad_arg_type",
+   "raw_text": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+   "python": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": \"곧\", \"label\": \"라면\"}"
+     }
+    ],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_k\": "
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [],
+     "error": "tool parser parsing failed: near \"set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_k\": "
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "set_timer",
+       "arguments": "{\"minutes\":\"곧\",\"label\":\"라면\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "normal_text": "",
+     "tool_calls": [
+      {
+       "name": "set_timer",
+       "arguments": "{\"minutes\":\"곧\",\"label\":\"라면\"}"
+      }
+     ],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": false,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "no_call",
+   "raw_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+   "python": {
+    "reasoning": "도구가 필요한 질문이 아니다.",
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "도구가 필요한 질문이 아니다.",
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "도구가 필요한 질문이 아니다.",
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "도구가 필요한 질문이 아니다.",
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "도구가 필요한 질문이 아니다.",
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": true,
+    "prompt_think_open": true
+   }
+  },
+  {
+   "id": "no_call_missing_think_end",
+   "raw_text": "안녕하세요, 무엇을 도와드릴까요?",
+   "python": {
+    "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+    "content": null,
+    "tool_calls": [],
+    "error": null
+   },
+   "rust": {
+    "glm45/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/whole": {
+     "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm45/prompt_think_open/stream5": {
+     "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/whole": {
+     "reasoning": null,
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_plain/stream5": {
+     "reasoning": null,
+     "content_after_reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "normal_text": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/whole": {
+     "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    },
+    "glm47/prompt_think_open/stream5": {
+     "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "content_after_reasoning": null,
+     "normal_text": "",
+     "tool_calls": [],
+     "error": null
+    }
+   },
+   "whole_equals_stream5_in_all_variants": true,
+   "glm45_equals_glm47": {
+    "prompt_plain": true,
+    "prompt_think_open": true
+   }
+  }
+ ]
+}

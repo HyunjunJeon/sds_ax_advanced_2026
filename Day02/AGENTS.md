@@ -47,7 +47,7 @@ RAG 한 개를 Python으로 끝까지 만든다. Agent는 DeepAgents, 저장소�
 `src/day02/cli.py:41`에 있다. 여기에 없는 서브커맨드나 옵션은 존재하지 않는다.
 
 ```bash
-uv sync --locked
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 uv run python scripts/install_rhwp.py   # HWP 바이너리 실습용. HWPX는 Python으로 직접 처리한다.
 uv run day02 server init                # 설정·키 발급 (.openviking/)
 uv run day02 server start               # 개인 서버 기동 (기본 127.0.0.1:19350)
@@ -76,7 +76,7 @@ uv run day02 ask "..." --as-of 2026-09-08 --format grounded-qa
 
 | 명령 | 대상 | 기대 결과 |
 |---|---|---|
-| `uv run pytest -q` | `tests/` — 제공 코드의 회귀검사 | **40 passed.** 과제 구현 여부와 무관하게 항상 통과해야 한다 |
+| `uv run pytest -q` | `tests/` — 제공 코드의 회귀검사 | **56 passed.** 과제 구현 여부와 무관하게 항상 통과해야 한다 |
 | `uv run pytest challenge_tests -q` | 07/08/A/B/C의 공개 반례 | **구현 전 54 failed가 정상이다** |
 
 `uv run pytest -q`가 깨졌다면 과제 미구현 때문이 아니라 **제공 코드에 회귀가 났다는 뜻**이다.
@@ -188,7 +188,7 @@ AGENTS.md의 단계적 힌트 정책(L0~L3)은 이 파일에 적용되지 않는
 ## 7. 검증과 비용
 
 ```bash
-uv run pytest -q     # 오프라인 단위·회귀 테스트. 현재 40 passed. 자유롭게 실행해도 된다.
+uv run pytest -q     # 오프라인 단위·회귀 테스트. 현재 56 passed. 자유롭게 실행해도 된다.
 ```
 
 이 값이 깨지면 수강생 환경 문제가 아니라 **변경이 회귀를 냈다는 뜻**이다.
@@ -210,3 +210,11 @@ Day03은 이 폴더의 코드와 업무 문서를 `Day03/vendor/day02/`에 **스
 Day03 질문에 답할 때는 이 폴더가 아니라 그쪽을 봐야 할 수 있다. 반대로 여기서의 변경이 Day03에
 자동 반영되지는 않는다. Day03은 CLI 플래그 없이 LabConfig 편집 방식을 쓴다 — 이 폴더의
 00~06 예제 CLI와 혼동하지 않게 수강생에게 알려준다.
+
+## 2026-10 공식 원문 확장
+
+선택 실습과 평가 해석은 `docs/OCTOBER_2026.md`를 먼저 읽는다. 기존 번호 순서와 과제 경계는 같다.
+`02_ingest.py --corpus official-2026-10`으로 적재하고 03/04의 `--namespace`를 맞춘다.
+09는 파일 안 `CORPUS` 상수로 선택한다. `scripts/evaluate_answers.py`는 04 완료 후 사용하는 유료 답변 사후 평가다.
+공식 코퍼스의 `gold.jsonl`도 사후 평가 전용이다. `review_status=draft`는 사람 검수 전 초안이며,
+인용 구조 통과·문서 recall·의미상 정답 여부는 따로 해석한다. 실패·평가 누락·usage 누락을 숨기지 않는다.

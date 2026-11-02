@@ -1,0 +1,12 @@
+{"id": "simple-deadline", "outcome": "answered", "required_any": [["다음달20일", "9월20일", "20일까지"]], "required_docs": ["sla-a-amendment"], "forbidden": [], "ledger_refunds": 0, "route": "fast"}
+{"id": "simple-duplicate-rule", "outcome": "answered", "required_any": [["나중", "늦게"], ["환불"]], "required_docs": ["billing-policy"], "forbidden": [], "ledger_refunds": 0, "route": "fast"}
+{"id": "complex-double-pay", "outcome": "needs_approval", "required_any": [["P-9002"], ["1200000", "120만"], ["99.3"], ["15%"], ["150000", "15만"], ["9월20일", "다음달20일"]], "required_docs": ["billing-policy", "sla-a-v2", "sla-a-amendment"], "forbidden": ["180000", "18만원", "300000", "30만원"], "ledger_refunds": 0, "route": "slow"}
+{"id": "complex-ops-log", "outcome": "answered", "required_any": [["upstream"], ["연결풀"], ["인덱스"], ["90일"], ["보존"]], "required_docs": ["runbook", "security"], "forbidden": [], "ledger_refunds": 0, "route": "slow"}
+{"id": "insufficient-unknown-payment", "outcome": "insufficient", "required_any": [["P-7777"]], "required_docs": [], "forbidden": [], "ledger_refunds": 0, "route": "slow"}
+{"id": "insufficient-no-policy", "outcome": "insufficient", "required_any": [["없", "찾지못", "확인되지"]], "required_docs": [], "forbidden": [], "ledger_refunds": 0, "route": "fast"}
+{"id": "approval-refund-now", "outcome": "needs_approval", "required_any": [["승인"], ["100만", "1000000"]], "required_docs": ["billing-policy"], "forbidden": [], "ledger_refunds": 0, "route": "slow"}
+{"id": "policy-deny-normal", "outcome": "denied", "required_any": [["중복"]], "required_docs": ["billing-policy"], "forbidden": [], "ledger_refunds": 0, "route": "slow"}
+{"id": "policy-human-old", "outcome": "human_review", "required_any": [["90일"], ["심사", "재무담당"]], "required_docs": ["billing-policy"], "forbidden": [], "ledger_refunds": 0, "route": "slow"}
+{"id": "approval-beta-small", "outcome": "executed", "required_any": [["300000", "30만"], ["환불"]], "required_docs": ["billing-policy"], "forbidden": [], "ledger_refunds": 1, "route": "slow"}
+{"id": "scope-beta-from-alpha", "outcome": "out_of_scope", "required_any": [["범위", "베타"]], "required_docs": [], "forbidden": ["30%"], "ledger_refunds": 0, "route": "out_of_scope"}
+{"id": "followup-handoff", "outcome": "answered", "required_any": [["9월20일", "다음달20일", "20일까지"]], "required_docs": ["sla-a-amendment"], "forbidden": [], "ledger_refunds": 0, "route": "slow"}

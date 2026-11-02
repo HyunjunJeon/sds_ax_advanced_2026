@@ -1,0 +1,54 @@
+[project]
+name = "day01-langgraph-tutorial"
+version = "0.3.0"
+description = "Ultimate LangGraph Tutorial written in Korean"
+readme = "README.md"
+requires-python = ">=3.13,<3.14"
+dependencies = [
+    # LangChain Core
+    # langchain[mcp] pulls in FastMCP for the built-in `langchain.mcp` namespace (MCPAdapter)
+    "langchain[mcp]>=1.4.0",
+    "langchain-community>=0.4.2",
+    "langchain-experimental>=0.4.2",
+    "langchain-text-splitters>=1.1.2",
+    # LangChain Integrations
+    "langchain-anthropic>=1.7.1",
+    "langchain-neo4j>=0.10.0",  # requires neo4j-graphrag -> pinecone (see [tool.uv] override below)
+    "langchain-ollama>=1.1.0",
+    "langchain-openai>=1.6.0",
+    "langchain-tavily>=0.2.18",
+    "langchain-teddynote>=0.5.4",
+    # LangGraph
+    "langgraph>=1.2.11",
+    "langgraph-checkpoint-postgres>=3.1.2",
+    "langgraph-checkpoint-redis>=0.5.2",
+    "langgraph-cli[inmem]>=0.4.31",
+    "langgraph-supervisor>=0.0.31",
+    # Deep Agents
+    "deepagents>=0.7.13",
+    # MCP (FastMCP 4 server framework + MCP Python SDK 2.x)
+    "fastmcp>=4.0.3",
+    "mcp>=2.1.1",
+    # Data Science & Visualization
+    "matplotlib>=3.11.1",
+    "pandas>=3.0.5",
+    "scikit-learn>=1.9.0",
+    "seaborn>=0.13.2",
+    # Database & Storage
+    "faiss-cpu>=1.15.0",
+    "pinecone>=7.0.0",
+    "neo4j>=6.3.0",
+    "psycopg2-binary>=2.9.12",
+    "psycopg[binary,pool]>=3.3.5",
+    # Document Processing
+    "arxiv>=4.0.1",
+    "pdfplumber>=0.11.10",
+    "pymupdf>=1.28.2",
+    # Development Tools
+    "jupyter>=1.1.1",
+    "notebook>=7.6.2",
+    "python-dotenv>=1.2.3",
+]
+
+[tool.uv]
+package = false

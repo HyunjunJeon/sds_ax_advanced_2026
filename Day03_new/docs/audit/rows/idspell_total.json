@@ -1,0 +1,1 @@
+{"used": 25, "rows": {"S1": {"calls": 9, "counted": 9, "status": "ok", "outcome": "denied", "budget_model": 9}, "S2": {"calls": 7, "counted": 7, "status": "ok", "outcome": "denied", "budget_model": 7}, "S3": {"calls": 9, "counted": 9, "status": "ok", "outcome": "denied", "budget_model": 9}}}

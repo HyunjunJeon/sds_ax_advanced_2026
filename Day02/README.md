@@ -6,19 +6,23 @@
 Agent는 **DeepAgents**, 검색 저장소는 **로컬 OpenViking**, 답변 형식은 **Skills**를 사용합니다.
 Jupyter와 Docker 없이 실행할 수 있습니다.
 
+**2026-10-31 개편:** DeepAgents 0.7.32·OpenViking 0.4.22 기준이며, 앱 환경은 저장소 루트 `uv.lock`으로 고정합니다.
+기본 업무 예제 뒤에는 [10월 공식 원문 실습](docs/OCTOBER_2026.md)을 진행합니다.
+원문 발췌 9개·사례 12개를 출처·공개일·해시와 함께 제공하고, 검색 비교와 답변 사후 평가를 구분합니다.
+
 이 문서의 모든 명령은 실제로 존재하는 플래그만 적습니다. 문서의 명령과 코드의 명령이
 다르면 그것을 버그로 보고 바로잡습니다([전체 검증](#전체-실행-검증) 참고).
 설치·포트·키·문제 해결은 [SETUP.md](docs/SETUP.md)를 참고하세요.
 
 ## 1. 준비와 첫 실행
 
-이 폴더는 상위 프로젝트와 분리된 **Python 3.13** 환경을 사용합니다. 생성·임베딩은 OpenRouter API를 호출합니다.
+이 폴더는 저장소 루트의 **Python 3.13** 공용 환경을 사용합니다. 생성·임베딩은 OpenRouter API를 호출합니다.
 상위 `.env`의 `OPENROUTER_API_KEY`와 `OPENROUTER_BASE_URL`을 읽을 수 있으며, 상위 파일을 수정하지 않습니다.
 키가 없다면 `.env.example`을 `.env`로 복사하고 API 키를 입력하세요. `.env`는 Git에 포함하지 않습니다.
 
 ```bash
-cd /Users/jhj/Desktop/sds_ax_advanced_class/Day02
-uv sync --locked
+cd Day02  # 저장소 루트에서
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 uv run python 00_prepare.py          # 모델 호출 없이 환경·코퍼스·Skills 점검
 uv run python scripts/install_rhwp.py # HWP 바이너리 실습용(HWPX는 Python으로 직접 처리)
 uv run day02 server init

@@ -36,8 +36,9 @@ from pathlib import Path
 
 from dotenv import dotenv_values
 
-from .config import DAY03, LAB, Settings, viking_url
+from .config import DAY02, DAY03, LAB, Settings, viking_url
 from .contracts import Request
+from .day02_bridge import load_corpus
 from .exa_client import ExaClient
 from .ingestion import Ingestion
 from .provenance import run_provenance
@@ -82,6 +83,8 @@ class LabConfig:
     #          실제 모델은 호출하며, 벡터 검색 성능으로 해석하지 않는다.
     # "viking": OpenViking 서버 검색. viking_env로 서버 URL/키 파일을 지정한다.
     backend: str = "local"
+    # "official-2026-10": 10월 2일 기준 공식 릴리스 원문. 새 workspace와 함께 선택한다.
+    corpus: str = "business"
     # 코퍼스·대화·적재 상태가 저장되는 디렉터리. 서로 다른 실험은 서로 다른 workspace에서
     # 시작해야 앞 실험의 웹 적재가 뒷실험에 영향을 주지 않는다.
     workspace: str = "work/rag/default"
@@ -151,6 +154,7 @@ def settings_from(config: LabConfig) -> Settings:
         workspace = DAY03 / workspace
     s = Settings(
         backend=config.backend,
+        corpus=config.corpus,
         workspace=workspace,
         web=config.web,
         model=config.model,
@@ -166,9 +170,13 @@ def settings_from(config: LabConfig) -> Settings:
     # 방지한다. 바꾸려면 새 workspace를 만들지 말고 새 디렉터리를 지정한다.
     marker = s.workspace / "backend.json"
     server = viking_url() if s.backend == "viking" else None
+    corpus = load_corpus(DAY02, config.corpus)
+    # 기존 business 작업 영역의 표시는 유지한다. 새 코퍼스는 원문 해시까지 고정한다.
     record = {"backend": s.backend, "server": server}
+    if config.corpus != "business":
+        record["corpus"] = corpus.provenance()
     if marker.exists() and json.loads(marker.read_text()) != record:
-        raise ValueError("작업 영역의 backend/서버가 다릅니다. 새 workspace를 지정하세요.")
+        raise ValueError("작업 영역의 backend/서버/코퍼스가 다릅니다. 새 workspace를 지정하세요.")
     marker.write_text(json.dumps(record))
     return s
 
@@ -304,11 +312,12 @@ def execute(architecture: str, config: LabConfig, request: Request | None = None
         "exa_mode": config.exa_mode,
         "backend": settings.backend,
         # 실행 시점의 코드·자료 hash. 키 값은 포함되지 않는다(provenance 참고).
-        "provenance": _provenance_snapshot(),
+        "provenance": _provenance_snapshot(config.corpus),
         "request": request.model_dump(),
         "model": settings.model,
         "web_mode": settings.web,
         "settings": {
+            "corpus": config.corpus,
             "max_calls": settings.max_calls,
             "max_tools": settings.max_tools,
             "seconds": settings.seconds,
@@ -351,14 +360,13 @@ def _resolve(path: str) -> Path | None:
 # 실행 시점의 코드·자료 hash. 프로세스마다 한 번만 계산한다(코드는 실행 중 바뀌지
 # 않는다고 본다). 13_mini_pjt의 짝 비교가 이 값을 "implementation" 조건으로 대조해
 # "설정이 같고 코드만 바뀐 전후"를 검증할 수 있게 행마다 기록한다.
-_PROVENANCE = None
+_PROVENANCE = {}
 
 
-def _provenance_snapshot():
-    global _PROVENANCE
-    if _PROVENANCE is None:
-        _PROVENANCE = run_provenance()
-    return _PROVENANCE
+def _provenance_snapshot(corpus="business"):
+    if corpus not in _PROVENANCE:
+        _PROVENANCE[corpus] = run_provenance(corpus)
+    return _PROVENANCE[corpus]
 
 
 def output_dir() -> Path:
@@ -430,12 +438,23 @@ def compare(
 
     if not 1 <= repeats <= 5:
         raise ValueError("repeats는 1~5")
+    if not architectures or not cases:
+        raise ValueError("구조와 사례를 하나 이상 선택하세요.")
+    if len(architectures) != len(set(architectures)) or len(cases) != len(set(cases)):
+        raise ValueError("구조/사례 선택이 중복됩니다.")
     if not set(architectures) <= set(FILES):
         raise ValueError("알 수 없는 architecture: " + str(set(architectures) - set(FILES)))
-    cases_table = {r["id"]: r for r in load_jsonl(LAB / "data/cases.jsonl")}
-    gold = {r["id"]: r for r in load_jsonl(LAB / "data/gold.jsonl")}
+    corpus = load_corpus(DAY02, config.corpus)
+    cases_path = LAB / "data/cases.jsonl" if config.corpus == "business" else corpus.cases_path
+    gold_path = LAB / "data/gold.jsonl" if config.corpus == "business" else corpus.gold_path
+    cases_table = {r["id"]: r for r in load_jsonl(cases_path)}
     if not set(cases) <= set(cases_table):
         raise ValueError("알 수 없는 case: " + str(set(cases) - set(cases_table)))
+    turns_per_repeat = sum(len(cases_table[c].get("turns", [cases_table[c]["question"]])) for c in cases)
+    executions = len(architectures) * turns_per_repeat * repeats
+    print(f"[비용 고지] {len(architectures)}구조 × {len(cases)}사례 × {repeats}회, "
+          f"후속 턴 포함 {executions}실행. 실행당 모델 상한 {config.max_calls}회; "
+          f"별도 judge {'사용' if judge else '미사용'}. 코퍼스={config.corpus}", flush=True)
     out = output_dir()
     root = _resolve(config.workspace)
     rows = []
@@ -471,12 +490,17 @@ def compare(
                     )
                     row = execute(route, cell, request)
                     row.update(case_id=case_id, repeat=repeat, turn=turn)
+                    row["evaluation_eligible"] = turn == len(case.get("turns", [case["question"]])) - 1
                     # 다중 턴 문제의 gold는 마지막 질문 기준이다. 첫 질문을 같은 gold로
                     # 채점하면 올바른 중간 답변을 오답으로 세는 평가 오류가 생긴다.
-                    if turn == len(case.get("turns", [case["question"]])) - 1:
+                    if row["evaluation_eligible"]:
                         judge_meter = Meter(settings)
-                        judge_model = Models(settings, judge_meter) if judge else None
                         try:
+                            judge_model = Models(settings, judge_meter) if judge and row["result"]["status"] not in {
+                                "failed", "budget_exceeded", "index_pending"
+                            } else None
+                            # 정답은 Agent 실행 후 평가 단계에서만 읽는다.
+                            gold = {g["id"]: g for g in load_jsonl(gold_path)}
                             row["evaluation"] = evaluate(row["result"], gold[case_id], judge_model)
                         except Exception as exc:
                             row["evaluation"] = {"error": type(exc).__name__}
@@ -500,9 +524,10 @@ def compare(
     lines = [
         "# RAG 구조 비교",
         "",
-        f"실제 모델 실행 / EXA {config.exa_mode} / backend {config.backend} / web {config.web}",
+        f"실제 모델 실행 / 코퍼스 {config.corpus} / EXA {config.exa_mode} / backend {config.backend} / web {config.web}",
         "",
         "complete는 자체 검토 상태다. 정답률은 judge 평가와 사람의 원문 검토를 함께 읽는다.",
+        "draft 평가 기준은 AI가 원문에 대조해 작성한 초안이다. 사람 검수 전 잠정 지표로 읽는다.",
         "",
         "| 구조 | 실행 | 완료 | 보류 | 오류 | 평균 지연(s) | 평균 모델 호출 |",
         "|---|---:|---:|---:|---:|---:|---:|",
@@ -512,6 +537,11 @@ def compare(
         f"{s['errors']} | {s['mean_latency_s']} | {s['mean_model_calls']} |"
         for s in summary
     ]
+    lines += ["", "| 구조 | 최종 턴 | Judge 평가 | 평가 커버리지 | 평가 초안 | usage 확인 실행 |",
+              "|---|---:|---:|---:|---:|---:|"]
+    lines += [f"| {s['architecture']} | {s['final_turns']} | {s['judged_final_turns']} | "
+              f"{s['judge_coverage']} | {s['draft_evaluations']} | {s['usage_observed_runs']} |" for s in summary]
+    lines += ["", "판정되지 않은 실행을 정답이나 0비용으로 채우지 않는다. summary.json의 토큰·품질 지표와 함께 읽는다."]
     (out / "REPORT.md").write_text("\n".join(lines) + "\n")
     print("결과:", out)
     if any(r["result"]["status"] in {"failed", "budget_exceeded", "index_pending"} for r in rows):

@@ -197,8 +197,8 @@ Skill은 그 응답을 해석하고 사용자가 다음 행동을 알 수 있게
 기준 구현은 아래 명령으로 실제 에이전트를 검사한다. 각각 유료 모델을 여러 번 호출한다.
 
 ```bash
-.venv/bin/python coding_skills/verify_agent.py
-.venv/bin/python build_mcp/verify_agent.py
+uv run python coding_skills/verify_agent.py
+uv run python build_mcp/verify_agent.py
 ```
 
 형식 검사만으로는 올바른 Skill 선택이나 결과 품질을 확인할 수 없다.

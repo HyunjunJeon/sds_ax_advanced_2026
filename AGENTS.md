@@ -7,7 +7,7 @@
 당신은 대신 과제를 끝내주는 도구가 아니라 **조교**입니다. 성공 기준은 "코드가 돌아간다"가 아니라
 **"수강생이 그 코드를 자기 말로 설명할 수 있다"** 입니다.
 
-- 수업 진도(Day02 → Day08, 번호 순서)를 건너뛰게 유도하지 않는다.
+- 수업 진도(Day01 → Day08, 번호 순서)를 건너뛰게 유도하지 않는다.
 - 수강생이 막힌 지점을 대신 통과시키지 말고, 막힌 **이유**를 먼저 함께 확인한다.
 - 답을 모르면 모른다고 말한다. 이 저장소는 정답을 지어내면 수업이 망가지는 자료다.
 
@@ -25,20 +25,22 @@
 
 ## 3. 실행 규칙
 
-**Day마다 실행 방식이 다르다.** 폴더별로 아래 방식을 따른다.
+**설치는 저장소 루트에서 한 번, 실행은 각 Day 폴더에서 한다.** 루트 `pyproject.toml`이 uv workspace이고 `uv.lock`과 `.venv`는 루트에 하나만 있다.
 
-- `Day02`, `Day03`, `Day05`, `Day07`, `Day08`: 각자 `pyproject.toml`, `uv.lock`, `.venv`, `.env`를 가진 별개 프로젝트다.
-- `Day04`: `pyproject.toml`과 `uv.lock`이 없다. `Day04/README.md:27-32`대로 `Day04` 안에서 가상환경을 만들고 `requirements.txt`를 설치한 뒤 `.venv/bin/python`으로 실행한다.
+- `Day01`, `Day02`, `Day03`, `Day05`, `Day07`, `Day08`: workspace 멤버다. 각자 `pyproject.toml`과 `.env`를 가진다.
+- `Day04`: `pyproject.toml`이 없다. 패키지는 루트 `pyproject.toml`에 선언되어 있고 `uv run`이 루트 환경을 찾는다.
+- `Day02/runtime/openviking`: workspace 밖의 별도 환경이다. `openviking 0.4.22`가 `mcp<2`를 요구해 합칠 수 없다.
 - `Day06`: Python 프로젝트가 없는 소스 읽기 분석 과제다(`Day06/AGENTS.md:49`). `Day06`에서 `uv run`을 하지 않는다.
+- `Day02_new`: 기존 `Day02`와 나란히 놓인 노트북 버전이다. Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. 키는 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`와 Decision API 키 하나(`TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY` 중)가 필요하다(다른 Day의 OpenRouter 키와 다르다). 상세는 [Day02_new/AGENTS.md](Day02_new/AGENTS.md).
+- `Day03_new`: 기존 `Day03`과 나란히 놓인 노트북 버전이다. Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. 키는 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`가 따로 필요하고(다른 Day의 OpenRouter 키와 다르다), `EXA_API_KEY`도 필요하다. 00의 키 확인 셀이 두 키를 모두 확인하고 EXA는 06의 필수 실습에서 쓴다. 상세는 [Day03_new/AGENTS.md](Day03_new/AGENTS.md).
+- `Day07_new`: 기존 `Day07`과 나란히 놓인 이론 중심 노트북 버전이다(`Day07/`는 그대로 둔다). Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. GPU·API 키·RunPod 없이 실행되며 키 설정이 필요 없다. 05·06의 서버 접속 셀은 `RUN_POD = False`로 잠겨 있고 Pod 동작은 저자가 확인하지 않았다. 상세는 [Day07_new/AGENTS.md](Day07_new/AGENTS.md).
 
 ```bash
-cd Day02 && uv run ...     # Day02 작업 (Day03, Day05, Day07, Day08도 같은 방식)
-cd Day04 && uv venv --python 3.13 .venv
-cd Day04 && uv pip install -p .venv/bin/python -r requirements.txt
-cd Day04 && .venv/bin/python ...   # Day04 작업
+uv sync --locked           # 저장소 루트에서 한 번만
+cd Day02 && uv run ...     # Day01~Day05, Day07, Day08 모두 같은 방식
 ```
 
-저장소 루트에서 `uv run`을 하면 엉뚱한 환경이 잡힌다. 항상 해당 Day 폴더에서 실행한다.
+실습은 항상 해당 Day 폴더에서 실행한다. 상대 경로와 `.env`가 폴더 기준이다. **Day 폴더 안에서 `uv sync`를 실행하지 않는다.** 그 Day에 필요 없는 패키지가 지워진다. 복구는 루트에서 `uv sync --locked`다.
 
 ## 4. 과제 정책 — 단계적 힌트
 
@@ -105,11 +107,15 @@ cd Day04 && .venv/bin/python ...   # Day04 작업
 
 | 폴더 | 주제 | 상세 |
 |---|---|---|
+| `Day01/` | LangGraph V1 튜토리얼 노트북. 원본 출처는 `Day01/UPSTREAM.md` | [Day01/README.md](Day01/README.md) |
 | `Day02/` | DeepAgents · OpenViking · Skills 기반 RAG 한 개를 끝까지 만든다 | [Day02/AGENTS.md](Day02/AGENTS.md) |
+| `Day02_new/` | Day02의 새 노트북 버전(`Day02/`는 그대로 둔다). Agentic RAG를 노트북 00~06으로 배우고 `create_deep_agent`로 조립한다 | [Day02_new/AGENTS.md](Day02_new/AGENTS.md) |
 | `Day03/` | 같은 RAG를 7가지 멀티에이전트 구조로 확장하고 통제 실험으로 비교한다 | [Day03/AGENTS.md](Day03/AGENTS.md) |
+| `Day03_new/` | Day03의 새 노트북 버전(`Day03/`는 그대로 둔다). Workflow와 Agent의 경계부터 Multi-Agent 선택 기준까지를 노트북 00~06으로 배운다 | [Day03_new/AGENTS.md](Day03_new/AGENTS.md) |
 | `Day04/` | Deep Agents로 코딩 에이전트와 질문 강화형 에이전트를 만들며 Skills와 MCP를 익힌다 | [Day04/AGENTS.md](Day04/AGENTS.md) |
 | `Day05/` | 주문 취소·결제·재고 업무로 Agent Evaluation을 설계하고 DeepEval·Langfuse로 개선과 회귀를 검증한다 | [Day05/AGENTS.md](Day05/AGENTS.md) |
 | `Day06/` | AI Agent Harness 4종(pi·gajae-code·deepseek-harness·ouroboros)의 소스를 여섯 책임(지침·도구·실행 제어·상태·검증·기록)으로 분석한다 | [Day06/AGENTS.md](Day06/AGENTS.md) |
 | `Day07/` | vLLM 기초·추론 속도 최적화, RunPod에 띄운 GLM-5.3-Flash 호출, dcode 설치·활용 | [Day07/AGENTS.md](Day07/AGENTS.md) |
+| `Day07_new/` | Day07의 새 노트북 버전(`Day07/`는 그대로 둔다). vLLM v0.32.0 소스를 근거로 서빙 기초·KV Cache·최근 모델의 KV 통제(02c 사례)·파라미터와 측정·Quantization·KV 운영과 LMCache(04b 운영)(앞 330분 이론)와 Agent 연결·Tool Calling 오류를 노트북 00~06(02a, 02b, 02c, 04b 포함)으로 배운다 | [Day07_new/AGENTS.md](Day07_new/AGENTS.md) |
 | `Day08/` | 같은 보고 Agent에 같은 공격을 넣고 Guardrail 배치(Input·Action·Output·권한·메모리·HITL)만 바꿔 방어 효과를 비교한다 | [Day08/AGENTS.md](Day08/AGENTS.md) |
 | `Lecture_Note/` | 강의 슬라이드 (git 제외) | — |

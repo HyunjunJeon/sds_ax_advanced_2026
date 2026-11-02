@@ -1,0 +1,5244 @@
+{
+ "status": "partial",
+ "reason": "게이팅, 스케줄러 쪽 생성자, 가짜 텐서 저장은 돌렸다. worker 쪽 생성자와 KV 저장·복원, 실제 모델, GPU backend는 돌리지 못했다(parts.not_run). 설치는 PyPI가 막혀 클론 복사본을 NO_GPU_EXT=1로 빌드했다",
+ "run": {
+  "date": "2026-11-02",
+  "window_kst": "09:40-09:43",
+  "provenance": "새 venv와 빈 출력 폴더에서 돌린 결과만 담는다. 끊긴 이전 시도의 결과 파일은 쓰지 않았다",
+  "scripts": "<scratch>/lmrun (저장소 밖). 재현 방법은 docs/reference/lmcache.md"
+ },
+ "versions": {
+  "vllm": "v0.32.0",
+  "vllm_commit": "5df63a7",
+  "lmcache": "v0.5.6",
+  "lmcache_commit": "3e11e10812b448142c6cdb177a3058652bd826fa",
+  "lmcache_build": "클론을 복사해 NO_GPU_EXT=1로 빌드, 소스 수정 없음. cupy와 CUDA 확장 없음",
+  "python": "3.12.14",
+  "platform": "darwin arm64",
+  "target_device": "VLLM_TARGET_DEVICE=cpu",
+  "lmrun": {
+   "torch": "2.15.0",
+   "transformers": "5.19.0",
+   "numpy": "2.2.6",
+   "protobuf": "6.33.6",
+   "grpcio": "1.85.1"
+  },
+  "refrun": {
+   "torch": "2.15.0",
+   "transformers": "5.22.1",
+   "numpy": "2.5.4",
+   "torchvision": "0.29.2"
+  },
+  "note": "vLLM requirements/common.txt:10은 transformers >=5.16.1,<5.20.0을 요구한다. lmrun은 그 범위 안이고 refrun의 값은 범위 밖이다. 게이팅 결과는 두 환경에서 LMCacheMPConnector만 다르다"
+ },
+ "limit": "실제 클래스의 게이팅과 스케줄러 쪽 생성자까지다. 어떤 모델도 LMCache에서 돌리지 않았다. 가짜 텐서 저장이 된다는 것은 서버와 클라이언트의 저장 경로에 대한 사실이고 어떤 모델의 동작에 대한 사실이 아니다. spec 입력은 실제 클래스와 실제 get_kv_cache_spec 호출이지만 byte 치수는 config와 코드를 읽어 맞춘 값이다",
+ "parts": {
+  "install": {
+   "status": "ran",
+   "attempts": [
+    {
+     "attempt": 1,
+     "method": "uv pip install lmcache==0.5.6 (PyPI)",
+     "status": "not_run",
+     "error_line": "cause: Because all versions of cupy-cuda13x have no wheels with a matching platform tag (e.g., `macosx_27_0_arm64`) and lmcache==0.5.6 depends on cupy-cuda13x, we can conclude that lmcache==0.5.6 cannot be used."
+    },
+    {
+     "attempt": 2,
+     "method": "NO_GPU_EXT=1 uv pip install <클론 복사본>",
+     "status": "ran",
+     "lmcache": "0.5.6",
+     "native_extensions": [
+      "lmcache_fs",
+      "lmcache_native",
+      "lmcache_redis"
+     ],
+     "cupy_installed": false
+    }
+   ]
+  },
+  "gating": {
+   "status": "ran",
+   "environments": {
+    "lmrun_external": "lmcache 있음, LMCacheMPConnector는 외부 구현",
+    "lmrun_upstream": "lmcache 있음, LMCACHE_USE_UPSTREAM_MP=1로 내장 구현 강제",
+    "refrun": "lmcache 없음"
+   },
+   "refrun_differs_from_lmrun_only_for": [
+    "LMCacheMPConnector"
+   ],
+   "declarations": {
+    "lmrun_external": {
+     "DecodeBenchConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.decode_bench_connector.DecodeBenchConnector",
+      "import_error": null
+     },
+     "ExampleConnector": {
+      "supports_hma": false,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.example_connector.ExampleConnector",
+      "import_error": null
+     },
+     "ExampleHiddenStatesConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.example_hidden_states_connector.ExampleHiddenStatesConnector",
+      "import_error": null
+     },
+     "FlexKVConnectorV1": {
+      "supports_hma": false,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.flexkv_connector.FlexKVConnectorV1",
+      "import_error": null
+     },
+     "HF3FSKVConnector": {
+      "supports_hma": false,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.hf3fs.hf3fs_connector.HF3FSKVConnector",
+      "import_error": null
+     },
+     "HiSparseConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.hisparse.connector.HiSparseConnector",
+      "import_error": null
+     },
+     "LMCacheConnectorV1": {
+      "supports_hma": false,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "import_error": null
+     },
+     "LMCacheMPConnector": {
+      "supports_hma": true,
+      "class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "import_error": null
+     },
+     "MoRIIOConnector": {
+      "supports_hma": null,
+      "class": null,
+      "import_error": "No module named 'msgpack'"
+     },
+     "MooncakeConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.mooncake.mooncake_connector.MooncakeConnector",
+      "import_error": null
+     },
+     "MooncakeStoreConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.mooncake.store.connector.MooncakeStoreConnector",
+      "import_error": null
+     },
+     "MultiConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.multi_connector.MultiConnector",
+      "import_error": null
+     },
+     "NixlConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.nixl.connector.NixlPullConnector",
+      "import_error": null
+     },
+     "NixlPullConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.nixl.connector.NixlPullConnector",
+      "import_error": null
+     },
+     "NixlPushConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.nixl.connector.NixlPushConnector",
+      "import_error": null
+     },
+     "OffloadingConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "import_error": null
+     },
+     "SimpleCPUOffloadConnector": {
+      "supports_hma": true,
+      "class": "vllm.distributed.kv_transfer.kv_connector.v1.simple_cpu_offload_connector.SimpleCPUOffloadConnector",
+      "import_error": null
+     }
+    },
+    "lmrun_upstream_LMCacheMPConnector": {
+     "supports_hma": false,
+     "class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream"
+    },
+    "refrun_LMCacheMPConnector": {
+     "import_error": "No module named 'lmcache'"
+    },
+    "fallback_when_submodule_missing": {
+     "class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+     "supports_hma": false
+    }
+   },
+   "rows": {
+    "lmrun_external": [
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheConnectorV1 does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheConnectorV1",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheConnectorV1 does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "OffloadingConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "OffloadingConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "OffloadingConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheConnectorV1 does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheConnectorV1 does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "OffloadingConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheConnectorV1",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheConnectorV1",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheConnectorV1 does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_connector.LMCacheConnectorV1",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "OffloadingConnector",
+      "flag": "default",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "OffloadingConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "OffloadingConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.offloading_connector.OffloadingConnector",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     }
+    ],
+    "lmrun_upstream": [
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheMPConnectorUpstream does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "passed_gate",
+      "outcome": "gate_passed",
+      "exception": null,
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheMPConnectorUpstream does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheMPConnectorUpstream does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheMPConnectorUpstream does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "create_connector",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Connector LMCacheMPConnectorUpstream does not support HMA but HMA is enabled. Please set `--disable-hybrid-kv-cache-manager`.",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/factory.py:57"
+      },
+      "connector_class": "vllm.distributed.kv_transfer.kv_connector.v1.lmcache_mp_connector.LMCacheMPConnectorUpstream",
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     }
+    ],
+    "refrun_LMCacheMPConnector": [
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": null,
+      "stage": "VllmConfig",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {}
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          9,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MambaSpec",
+          8,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          4352,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          11,
+          69632,
+          true
+         ],
+         [
+          "CircularBufferSpec",
+          11,
+          8704,
+          false
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          9,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          4352,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          11,
+          4,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": null,
+      "stage": "VllmConfig",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {}
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          8,
+          16,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": null,
+      "stage": "VllmConfig",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {}
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          22,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          62,
+          256,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          21,
+          4,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          20,
+          8,
+          true
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": null,
+      "stage": "VllmConfig",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {}
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "TypeError",
+         "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+         "raised_at": "vllm/v1/kv_cache_interface.py:138"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "NotImplementedError",
+         "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1347"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          6,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          5,
+          32,
+          false
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          12,
+          64,
+          true
+         ],
+         [
+          "UniformTypeKVCacheSpecs",
+          4,
+          8,
+          false
+         ]
+        ]
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "default",
+      "hma_disabled": null,
+      "stage": "VllmConfig",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {}
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--disable-hybrid-kv-cache-manager",
+      "hma_disabled": true,
+      "stage": "get_kv_cache_groups",
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       },
+       "BLHNC": {
+        "outcome": "refused",
+        "exception": {
+         "type": "ValueError",
+         "message": "Failed to promote local KV cache specs to one unified type.",
+         "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+        },
+        "groups": []
+       }
+      }
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "flag": "--no-disable-hybrid-kv-cache-manager",
+      "hma_disabled": false,
+      "stage": "get_connector_class",
+      "outcome": "refused",
+      "exception": {
+       "type": "ModuleNotFoundError",
+       "message": "No module named 'lmcache'",
+       "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:11"
+      },
+      "connector_class": null,
+      "by_layout": {
+       "LBHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       },
+       "BLHNC": {
+        "outcome": "ok",
+        "exception": null,
+        "groups": [
+         [
+          "MambaSpec",
+          3,
+          384,
+          true
+         ],
+         [
+          "MLAAttentionSpec",
+          3,
+          384,
+          true
+         ]
+        ]
+       }
+      }
+     }
+    ]
+   },
+   "no_connector": [
+    {
+     "model": "GLM-5.3-Flash",
+     "connector": null,
+     "flag": "--disable-hybrid-kv-cache-manager",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "Failed to promote local KV cache specs to one unified type.",
+      "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+     },
+     "groups": []
+    },
+    {
+     "model": "GLM-5.2",
+     "connector": null,
+     "flag": "--disable-hybrid-kv-cache-manager",
+     "outcome": "ok",
+     "groups": [
+      [
+       "UniformTypeKVCacheSpecs",
+       8,
+       16,
+       true
+      ]
+     ]
+    },
+    {
+     "model": "DeepSeek-V4-Flash",
+     "connector": null,
+     "flag": "--disable-hybrid-kv-cache-manager",
+     "outcome": "refused",
+     "exception": {
+      "type": "TypeError",
+      "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+      "raised_at": "vllm/v1/kv_cache_interface.py:138"
+     },
+     "groups": []
+    },
+    {
+     "model": "DeepSeek-V4.1-Flash",
+     "connector": null,
+     "flag": "--disable-hybrid-kv-cache-manager",
+     "outcome": "refused",
+     "exception": {
+      "type": "TypeError",
+      "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+      "raised_at": "vllm/v1/kv_cache_interface.py:138"
+     },
+     "groups": []
+    },
+    {
+     "model": "Kimi-K3",
+     "connector": null,
+     "flag": "--disable-hybrid-kv-cache-manager",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "Failed to promote local KV cache specs to one unified type.",
+      "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+     },
+     "groups": []
+    }
+   ],
+   "promotion": {
+    "GLM-5.3-Flash": {
+     "input_spec_types": [
+      "CircularBufferSpec",
+      "MLAAttentionSpec",
+      "MambaSpec"
+     ],
+     "promote_all_together": {
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      }
+     },
+     "unify_hybrid": {
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      }
+     }
+    },
+    "GLM-5.2": {
+     "input_spec_types": [
+      "MLAAttentionSpec"
+     ],
+     "promote_all_together": {
+      "outcome": "ok",
+      "output_spec_types": [
+       "MLAAttentionSpec"
+      ]
+     },
+     "unify_hybrid": {
+      "outcome": "ok",
+      "output_spec_types": [
+       "MLAAttentionSpec"
+      ]
+     }
+    },
+    "DeepSeek-V4-Flash": {
+     "input_spec_types": [
+      "MLAAttentionSpec",
+      "SlidingWindowMLASpec"
+     ],
+     "promote_all_together": {
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      }
+     },
+     "unify_hybrid": {
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      }
+     }
+    },
+    "DeepSeek-V4.1-Flash": {
+     "input_spec_types": [
+      "CircularBufferSpec",
+      "MLAAttentionSpec",
+      "SlidingWindowMLASpec"
+     ],
+     "promote_all_together": {
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      }
+     },
+     "unify_hybrid": {
+      "outcome": "refused",
+      "exception": {
+       "type": "TypeError",
+       "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+       "raised_at": "vllm/v1/kv_cache_interface.py:138"
+      }
+     }
+    },
+    "Kimi-K3": {
+     "input_spec_types": [
+      "MLAAttentionSpec",
+      "MambaSpec"
+     ],
+     "promote_all_together": {
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      }
+     },
+     "unify_hybrid": {
+      "outcome": "refused",
+      "exception": {
+       "type": "ValueError",
+       "message": "Failed to promote local KV cache specs to one unified type.",
+       "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+      }
+     }
+    }
+   },
+   "promotion_probes": [
+    {
+     "case": "MLA + SlidingWindowMLA (bounded_replay False)",
+     "outcome": "refused",
+     "exception": {
+      "type": "TypeError",
+      "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+      "raised_at": "vllm/v1/kv_cache_interface.py:138"
+     },
+     "call_chain": [
+      "vllm/v1/core/kv_cache_utils.py:1746",
+      "vllm/v1/kv_cache_interface.py:138"
+     ]
+    },
+    {
+     "case": "MLA + SlidingWindowMLA (bounded_replay True)",
+     "outcome": "refused",
+     "exception": {
+      "type": "TypeError",
+      "message": "MLAAttentionSpec.__init__() got an unexpected keyword argument 'bounded_replay'",
+      "raised_at": "vllm/v1/kv_cache_interface.py:138"
+     },
+     "call_chain": [
+      "vllm/v1/core/kv_cache_utils.py:1746",
+      "vllm/v1/kv_cache_interface.py:138"
+     ]
+    },
+    {
+     "case": "MLA + CircularBuffer (no sliding window)",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "Failed to promote local KV cache specs to one unified type.",
+      "raised_at": "vllm/v1/core/kv_cache_utils.py:1760"
+     },
+     "call_chain": [
+      "vllm/v1/core/kv_cache_utils.py:1760"
+     ]
+    },
+    {
+     "case": "Full + SlidingWindow (non-MLA promotion)",
+     "outcome": "ok",
+     "output_spec_types": [
+      "FullAttentionSpec"
+     ]
+    }
+   ],
+   "layout_resolution": {
+    "assumed_supported": [
+     "LBHNC",
+     "LBNHC",
+     "LHBNC",
+     "BLHNC",
+     "BLNHC",
+     "BHLNC"
+    ],
+    "rows": [
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": null,
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheConnectorV1",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "LMCacheMPConnector",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.3-Flash",
+      "connector": "OffloadingConnector",
+      "layout": "LBHNC",
+      "preference": "LBHNC"
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": null,
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheConnectorV1",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "LMCacheMPConnector",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "GLM-5.2",
+      "connector": "OffloadingConnector",
+      "layout": "LBHNC",
+      "preference": "LBHNC"
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": null,
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheConnectorV1",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "LMCacheMPConnector",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4-Flash",
+      "connector": "OffloadingConnector",
+      "layout": "LBHNC",
+      "preference": "LBHNC"
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": null,
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheConnectorV1",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "LMCacheMPConnector",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "DeepSeek-V4.1-Flash",
+      "connector": "OffloadingConnector",
+      "layout": "LBHNC",
+      "preference": "LBHNC"
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": null,
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheConnectorV1",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "LMCacheMPConnector",
+      "layout": "LBHNC",
+      "preference": null
+     },
+     {
+      "model": "Kimi-K3",
+      "connector": "OffloadingConnector",
+      "layout": "LBHNC",
+      "preference": "LBHNC"
+     }
+    ],
+    "assumption": "모든 worker가 모든 layout을 지원한다고 가정한 호출이다. GPU backend가 돌지 않아 실제 목록은 미확인"
+   }
+  },
+  "connector_construct": {
+   "status": "ran",
+   "scope": "SCHEDULER 역할 생성자까지. 생성자에는 engine core가 쓰는 generate_scheduler_kv_cache_config 결과를 넘겼다(vllm/v1/engine/core.py:339). 외부 MP는 localhost의 실제 lmcache server에 접속했다",
+   "rows": [
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash + chunk 256 (default)",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "LMCache chunk size 256 must be a multiple of 4352 (the vLLM block size scaled by decode_context_parallel_size). Set --chunk-size to a multiple of 4352."
+     },
+     "raised_at": "lmcache/integration/vllm/vllm_multi_process_adapter.py:780",
+     "raised_source": "raise ValueError("
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash + --no-enable-prefix-caching (Mamba none)",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "LMCache cannot serve this model's KV cache groups: group 0: MambaSpec with mamba_cache_mode='none' (only 'align' and 'all' keep reusable state snapshots); group 1: MambaSpec with mamba_cache_mode='none' (only 'align' and 'all' keep reusable state snapshots); group 2: MambaSpec with mamba_cache_mode='none' (only 'align' and 'all' keep reusable state snapshots); group 3: MambaSpec with mamba_cache_m"
+     },
+     "raised_at": "lmcache/integration/vllm/kv_cache_group_edits.py:168",
+     "raised_source": "raise ValueError("
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash + max_num_batched_tokens < N",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "Mamba-hybrid models with LMCache require max_num_batched_tokens >= block_size so every prefill step advances at least one full block; got max_num_batched_tokens=4351, block_size=4352. Set --max-num-batched-tokens to at least 4352."
+     },
+     "raised_at": "lmcache/integration/vllm/lmcache_mp_connector.py:421",
+     "raised_source": "raise ValueError("
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.2 + lazy_offload + --no-enable-prefix-caching",
+     "outcome": "refused",
+     "exception": {
+      "type": "ValueError",
+      "message": "lmcache.mp.lazy_offload requires vLLM prefix caching (enable_prefix_caching=True)"
+     },
+     "raised_at": "lmcache/integration/vllm/lmcache_mp_connector.py:722",
+     "raised_source": "raise ValueError("
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+     "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+     "group_tokens_per_block": [
+      4352,
+      4352,
+      4352,
+      4352,
+      4352,
+      0
+     ],
+     "scheduler_block_size": 4352,
+     "report_request_errors": true,
+     "group_specs": [
+      "MambaSpec",
+      "MambaSpec",
+      "MambaSpec",
+      "MambaSpec",
+      "MLAAttentionSpec",
+      "CircularBufferSpec"
+     ],
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "outcome": "constructed",
+     "spans_probe": [
+      4352,
+      4352,
+      4352,
+      4352,
+      4352,
+      0
+     ]
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash LBHNC + chunk = scheduler block + --separate-object-groups",
+     "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+     "group_tokens_per_block": [
+      4352,
+      4352,
+      4352,
+      4352,
+      4352,
+      69632,
+      0
+     ],
+     "scheduler_block_size": 69632,
+     "report_request_errors": true,
+     "group_specs": [
+      "MambaSpec",
+      "MambaSpec",
+      "MambaSpec",
+      "MambaSpec",
+      "MLAAttentionSpec",
+      "MLAAttentionSpec",
+      "CircularBufferSpec"
+     ],
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "outcome": "constructed",
+     "spans_probe": [
+      4352,
+      4352,
+      4352,
+      4352,
+      4352,
+      69632,
+      0
+     ]
+    },
+    {
+     "mode": "external",
+     "case": "DeepSeek-V4.1-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+     "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+     "group_tokens_per_block": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      64,
+      0
+     ],
+     "scheduler_block_size": 64,
+     "report_request_errors": true,
+     "group_specs": [
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "MLAAttentionSpec",
+      "CircularBufferSpec"
+     ],
+     "prefix_cacheable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+     ],
+     "outcome": "constructed",
+     "spans_probe": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      64,
+      0
+     ]
+    },
+    {
+     "mode": "external",
+     "case": "DeepSeek-V4.1-Flash LBHNC geometry probe",
+     "outcome": "refused",
+     "exception": {
+      "type": "NotImplementedError",
+      "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers."
+     },
+     "raised_at": "vllm/v1/core/kv_cache_utils.py:1347",
+     "raised_source": "raise NotImplementedError("
+    },
+    {
+     "mode": "external",
+     "case": "DeepSeek-V4-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+     "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+     "group_tokens_per_block": [
+      64,
+      64,
+      256,
+      4,
+      8
+     ],
+     "scheduler_block_size": 256,
+     "report_request_errors": true,
+     "group_specs": [
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec",
+      "MLAAttentionSpec",
+      "SlidingWindowMLASpec",
+      "SlidingWindowMLASpec"
+     ],
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ],
+     "outcome": "constructed",
+     "spans_probe": [
+      64,
+      64,
+      256,
+      4,
+      8
+     ]
+    },
+    {
+     "mode": "external",
+     "case": "DeepSeek-V4-Flash LBHNC geometry probe",
+     "outcome": "refused",
+     "exception": {
+      "type": "NotImplementedError",
+      "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers."
+     },
+     "raised_at": "vllm/v1/core/kv_cache_utils.py:1347",
+     "raised_source": "raise NotImplementedError("
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.2 LBHNC + chunk = scheduler block + --separate-object-groups",
+     "connector_class": "lmcache.integration.vllm.lmcache_mp_connector.LMCacheMPConnector",
+     "group_tokens_per_block": [
+      16
+     ],
+     "scheduler_block_size": 16,
+     "report_request_errors": false,
+     "group_specs": [
+      "MLAAttentionSpec"
+     ],
+     "prefix_cacheable": [
+      true
+     ],
+     "outcome": "constructed",
+     "spans_probe": [
+      16
+     ]
+    },
+    {
+     "mode": "external",
+     "case": "GLM-5.3-Flash BLHNC + chunk = scheduler block, no --separate-object-groups",
+     "scheduler_block_size": 4352,
+     "group_tokens_per_block": [
+      4352,
+      4352,
+      4352,
+      4352,
+      4352,
+      0
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "external",
+     "case": "no server listening",
+     "outcome": "refused",
+     "exception": {
+      "type": "ConnectionError",
+      "message": "Cannot reach the LMCache MP server at 'tcp://localhost:59999' within 2.0s. This usually means the standalone LMCache server is not running, or it is listening on a different host/port. To start one locally with the default port (5555): lmcache server --l1-size-gb 20 --eviction-policy LRU To target a different host/port, override via kv_connector_extra_config (lmcache.mp.host / lmcache.mp.port), e."
+     },
+     "raised_at": "lmcache/integration/vllm/vllm_multi_process_adapter.py:332",
+     "raised_source": "raise ConnectionError(hint) from None"
+    },
+    {
+     "mode": "offload",
+     "case": "--kv-offloading-size 2",
+     "kv_connector": "OffloadingConnector",
+     "kv_role": "kv_both",
+     "extra": {
+      "cpu_bytes_to_use": 2147483648.0
+     },
+     "hma_disabled": false,
+     "kv_load_failure_policy": "fail",
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "--kv-offloading-size 2 --kv-offloading-backend lmcache",
+     "kv_connector": "LMCacheMPConnector",
+     "kv_role": "kv_both",
+     "extra": {},
+     "hma_disabled": false,
+     "kv_load_failure_policy": "fail",
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "--kv-offloading-backend lmcache only",
+     "kv_connector": null,
+     "kv_role": null,
+     "extra": {},
+     "hma_disabled": false,
+     "kv_load_failure_policy": null,
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on GLM-5.3-Flash LBHNC",
+     "connector_class": "OffloadingConnector",
+     "hma_disabled": false,
+     "mamba_cache_mode": "align",
+     "num_groups": 7,
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "offloading_group_ids": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on DeepSeek-V4.1-Flash LBHNC",
+     "outcome": "refused",
+     "exception": {
+      "type": "NotImplementedError",
+      "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers."
+     },
+     "raised_at": "vllm/v1/core/kv_cache_utils.py:1347",
+     "raised_source": "raise NotImplementedError("
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on DeepSeek-V4-Flash LBHNC",
+     "outcome": "refused",
+     "exception": {
+      "type": "NotImplementedError",
+      "message": "Layer model.layers.2.self_attn.indexer.k_cache: page size is not divisible by the maximum page size and cannot be padded. Padding is only supported for non-MLA attention layers."
+     },
+     "raised_at": "vllm/v1/core/kv_cache_utils.py:1347",
+     "raised_source": "raise NotImplementedError("
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on GLM-5.3-Flash BLHNC",
+     "connector_class": "OffloadingConnector",
+     "hma_disabled": false,
+     "mamba_cache_mode": "align",
+     "num_groups": 6,
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true,
+      false
+     ],
+     "offloading_group_ids": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on DeepSeek-V4.1-Flash BLHNC",
+     "connector_class": "OffloadingConnector",
+     "hma_disabled": false,
+     "mamba_cache_mode": "none",
+     "num_groups": 9,
+     "prefix_cacheable": [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      true,
+      false
+     ],
+     "offloading_group_ids": [
+      7
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on DeepSeek-V4-Flash BLHNC",
+     "connector_class": "OffloadingConnector",
+     "hma_disabled": false,
+     "mamba_cache_mode": "none",
+     "num_groups": 5,
+     "prefix_cacheable": [
+      true,
+      true,
+      true,
+      true,
+      true
+     ],
+     "offloading_group_ids": [
+      0,
+      1,
+      2,
+      3,
+      4
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "offload",
+     "case": "OffloadingConnector SCHEDULER on GLM-5.2 LBHNC",
+     "connector_class": "OffloadingConnector",
+     "hma_disabled": false,
+     "mamba_cache_mode": "none",
+     "num_groups": 1,
+     "prefix_cacheable": [
+      true
+     ],
+     "offloading_group_ids": [
+      0
+     ],
+     "outcome": "constructed"
+    },
+    {
+     "mode": "v1",
+     "case": "LMCacheConnectorV1 SCHEDULER on GLM-5.2, external adapter",
+     "connector_class": "LMCacheConnectorV1",
+     "engine_class": "lmcache.integration.vllm.vllm_v1_adapter.LMCacheConnectorV1Impl",
+     "hma_disabled": true,
+     "num_groups": 1,
+     "outcome": "constructed"
+    },
+    {
+     "mode": "v1",
+     "case": "LMCacheConnectorV1 SCHEDULER on GLM-5.2, use_native",
+     "outcome": "refused",
+     "exception": {
+      "type": "ImportError",
+      "message": "cannot import name 'CudaIPCWrapper' from 'lmcache.v1.multiprocess.custom_types' (lmcache/v1/multiprocess/custom_types.py)"
+     },
+     "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_integration/multi_process_adapter.py:12",
+     "raised_source": "from lmcache.v1.multiprocess.custom_types import ("
+    },
+    {
+     "mode": "upstream",
+     "case": "reformat_block_ids with 2 groups",
+     "outcome": "refused",
+     "exception": {
+      "type": "RuntimeError",
+      "message": "LMCacheMPConnector only works without hybrid kv cache manager. Please pass --disable-hybrid-kv-cache-manager when starting vllm"
+     },
+     "raised_at": "vllm/distributed/kv_transfer/kv_connector/v1/lmcache_mp_connector.py:78",
+     "raised_source": "raise RuntimeError("
+    },
+    {
+     "mode": "upstream",
+     "case": "reformat_block_ids with 1 group",
+     "returned": "[1, 2]",
+     "outcome": "constructed"
+    }
+   ]
+  },
+  "block_size": {
+   "status": "partial",
+   "scope": "실제 Platform._align_hybrid_block_size 호출. FLASHINFER_MLA를 import하지 못해 FLASH_ATTN을 대역으로 썼다. GPU에서 시작 로그로 읽는 N이 아니다(P8-20)",
+   "gpu_value": false,
+   "rows": [
+    {
+     "model": "GLM-5.3-Flash",
+     "backend": "FLASHINFER_MLA",
+     "tp": 1,
+     "architecture": "Glm5NextForConditionalGeneration",
+     "mamba_cache_mode": "align",
+     "status": "not_run",
+     "error": "ModuleNotFoundError: No module named 'flashinfer'"
+    },
+    {
+     "model": "GLM-5.3-Flash",
+     "backend": "FLASHINFER_MLA",
+     "tp": 4,
+     "architecture": "Glm5NextForConditionalGeneration",
+     "mamba_cache_mode": "align",
+     "status": "not_run",
+     "error": "ModuleNotFoundError: No module named 'flashinfer'"
+    },
+    {
+     "model": "GLM-5.3-Flash",
+     "backend": "FLASH_ATTN",
+     "tp": 1,
+     "architecture": "Glm5NextForConditionalGeneration",
+     "mamba_cache_mode": "align",
+     "status": "ran",
+     "block_size": 4352,
+     "mamba_block_size": 4352,
+     "mamba_page_size_padded": 4456448
+    },
+    {
+     "model": "GLM-5.3-Flash",
+     "backend": "FLASH_ATTN",
+     "tp": 4,
+     "architecture": "Glm5NextForConditionalGeneration",
+     "mamba_cache_mode": "align",
+     "status": "ran",
+     "block_size": 1152,
+     "mamba_block_size": 1152,
+     "mamba_page_size_padded": 1179648
+    }
+   ]
+  },
+  "storage": {
+   "status": "ran",
+   "scope": "localhost lmcache server와 실제 ZMQ 클라이언트, 가짜 CPU 텐서. 어떤 모델도 관여하지 않는다",
+   "model_claim": null,
+   "rows": {
+    "roundtrip": {
+     "argv": [
+      "lmcache",
+      "server",
+      "--host",
+      "localhost",
+      "--port",
+      "52886",
+      "--http-port",
+      "52887",
+      "--supported-transfer-mode",
+      "auto",
+      "--disable-observability",
+      "--l1-size-gb",
+      "0.01",
+      "--chunk-size",
+      "16",
+      "--eviction-policy",
+      "LRU",
+      "--no-l1-use-lazy"
+     ],
+     "server_chunk_size": 16,
+     "register": "RegisterEngineDrivenContextResponse(shm_name='', pool_size=0)",
+     "hit_before_store": 0,
+     "stored_chunks": 3,
+     "hit_after_store": 3,
+     "retrieved": [
+      {
+       "start": 0,
+       "success": true,
+       "shape": [
+        2,
+        2,
+        16,
+        16
+       ],
+       "value": 1.0
+      },
+      {
+       "start": 16,
+       "success": true,
+       "shape": [
+        2,
+        2,
+        16,
+        16
+       ],
+       "value": 17.0
+      },
+      {
+       "start": 32,
+       "success": true,
+       "shape": [
+        2,
+        2,
+        16,
+        16
+       ],
+       "value": 33.0
+      }
+     ],
+     "hit_other_salt": 0,
+     "hit_diverging_prefix": 1,
+     "status_keys": [
+      "active_p2p_lookup_jobs",
+      "active_prefetch_jobs",
+      "active_sessions",
+      "cache_context_meta",
+      "chunk_size",
+      "engine_type",
+      "hash_algorithm",
+      "is_healthy",
+      "kv_events",
+      "non_cuda_context_meta",
+      "p2p_enabled",
+      "p2p_peer_count",
+      "p2p_peers",
+      "p2p_state",
+      "registered_gpu_ids",
+      "registered_non_cuda_instance_ids",
+      "storage_manager",
+      "worker_liveness"
+     ],
+     "trailing_partial_tokens_not_stored": 5,
+     "outcome": "ran"
+    },
+    "eviction": {
+     "argv": [
+      "server",
+      "--host",
+      "localhost",
+      "--port",
+      "52905",
+      "--http-port",
+      "52906",
+      "--supported-transfer-mode",
+      "auto",
+      "--disable-observability",
+      "--l1-size-gb",
+      "0.0001",
+      "--chunk-size",
+      "16",
+      "--eviction-policy",
+      "LRU",
+      "--no-l1-use-lazy",
+      "--eviction-trigger-watermark",
+      "0.5",
+      "--eviction-ratio",
+      "0.2"
+     ],
+     "chunk_bytes": 4096,
+     "stored_first": 1,
+     "hit_first_before_pressure": 1,
+     "attempted_chunks": 60,
+     "committed_chunks": 60,
+     "hit_first_after_pressure": 0,
+     "hit_last_after_pressure": 1,
+     "surviving_of_attempted": 12,
+     "presence_by_write_order": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      0,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1,
+      1
+     ],
+     "l1_after": {
+      "total_object_count": 12,
+      "read_locked_count": 0,
+      "memory_used_bytes": 49152,
+      "memory_total_bytes": 107374
+     },
+     "log_allocation_failures": 0,
+     "log_eviction_triggers": 14,
+     "outcome": "ran"
+    },
+    "separate_object_groups": {
+     "argv": [
+      "server",
+      "--host",
+      "localhost",
+      "--port",
+      "52929",
+      "--http-port",
+      "52930",
+      "--supported-transfer-mode",
+      "auto",
+      "--disable-observability",
+      "--l1-size-gb",
+      "0.01",
+      "--chunk-size",
+      "32",
+      "--eviction-policy",
+      "LRU",
+      "--no-l1-use-lazy",
+      "--separate-object-groups"
+     ],
+     "config_keys": {},
+     "server_chunk_size": 32,
+     "stored_chunks": 2,
+     "hit_after_store": 2,
+     "retrieved": [
+      {
+       "start": 0,
+       "success": true,
+       "shape": [
+        2,
+        2,
+        32,
+        16
+       ],
+       "value": 3.0
+      },
+      {
+       "start": 32,
+       "success": true,
+       "shape": [
+        2,
+        2,
+        32,
+        16
+       ],
+       "value": 35.0
+      }
+     ],
+     "outcome": "ran"
+    },
+    "chunk_size_zero": {
+     "argv": [
+      "server",
+      "--host",
+      "localhost",
+      "--port",
+      "52947",
+      "--http-port",
+      "52948",
+      "--supported-transfer-mode",
+      "auto",
+      "--disable-observability",
+      "--l1-size-gb",
+      "0.01",
+      "--chunk-size",
+      "0",
+      "--eviction-policy",
+      "LRU",
+      "--no-l1-use-lazy"
+     ],
+     "server_ready": true,
+     "exit_code": null,
+     "log_tail": [
+      "\u001b[32;20m[2026-11-02 09:41:13,066] LMCache INFO:\u001b[0m  - Total active allocations: 0 \u001b[3m(tensor_memory_allocator.py:298:lmcache.v1.memory_management)\u001b[0m",
+      "\u001b[32;20m[2026-11-02 09:41:13,066] LMCache INFO:\u001b[0m  - Total allocated size: 0.000000 MB \u001b[3m(tensor_memory_allocator.py:299:lmcache.v1.memory_management)\u001b[0m",
+      "\u001b[32;20m[2026-11-02 09:41:13,066] LMCache INFO:\u001b[0m  - Total free size: 10.240000 MB \u001b[3m(tensor_memory_allocator.py:306:lmcache.v1.memory_management)\u001b[0m",
+      "INFO:     127.0.0.1:52955 - \"GET /status HTTP/1.1\" 200 OK"
+     ]
+    }
+   },
+   "separate_object_groups_split_exercised": false
+  },
+  "not_run": [
+   {
+    "item": "PyPI wheel of lmcache 0.5.6 on macOS",
+    "reason": "cause: Because all versions of cupy-cuda13x have no wheels with a matching platform tag (e.g., `macosx_27_0_arm64`) and lmcache==0.5.6 depends on cupy-cuda13x, we can conclude that lmcache==0.5.6 cannot be used."
+   },
+   {
+    "item": "worker-role connector (register_kv_caches, save and load of KV)",
+    "reason": "needs a real KV tensor pool from a running model; this run builds SCHEDULER-role objects only"
+   },
+   {
+    "item": "any KV through a connector from a real model, real weights, a real request",
+    "reason": "no GPU, no weights, no server of vLLM itself"
+   },
+   {
+    "item": "FLASHINFER_MLA and other GPU attention backends",
+    "reason": "ModuleNotFoundError: No module named 'flashinfer'"
+   },
+   {
+    "item": "the layout a GPU worker list resolves to",
+    "reason": "resolve_kv_cache_layout ran with an assumed list of every layout, because get_supported_kv_cache_layouts needs the GPU backends"
+   },
+   {
+    "item": "the block split of --separate-object-groups",
+    "reason": "the fake client registers one group, and LMCache says a single group makes no difference (hybrid_models.rst:138-139)"
+   },
+   {
+    "item": "Kimi-K3 connector constructors",
+    "reason": "no config snapshot in this repo; gating rows use illustrative dims and the result depends on spec types only"
+   },
+   {
+    "item": "FlashKDA checkpoint block store and restore (P8-26)",
+    "reason": "needs a worker-role save and load"
+   },
+   {
+    "item": "L2 tiers, gRPC transport, CacheBlend, PD",
+    "reason": "outside this node; nothing here exercises them"
+   }
+  ]
+ },
+ "cells": [
+  {
+   "model": "GLM-5.2",
+   "run_model": "GLM-5.2",
+   "column": "내장 offloading",
+   "part8_label_at_run": "코드 읽기",
+   "result": "constructed",
+   "proposed_labels": [
+    "코드 읽기",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "LBHNC에서 SCHEDULER 생성까지 실행, offloading group [0]. 저장과 복원은 실행 안 함",
+   "evidence_cases": [
+    "OffloadingConnector SCHEDULER on GLM-5.2 LBHNC"
+   ]
+  },
+  {
+   "model": "GLM-5.2",
+   "run_model": "GLM-5.2",
+   "column": "LMCacheConnectorV1",
+   "part8_label_at_run": "미확인",
+   "result": "constructed",
+   "proposed_labels": [
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "HMA 자동 꺼짐, group 1개, 외부 어댑터로 SCHEDULER 생성까지 실행. 내장 어댑터(use_native)는 LMCache v0.5.6과 ImportError. worker와 데이터 경로는 실행 안 함",
+   "evidence_cases": [
+    "LMCacheConnectorV1 SCHEDULER on GLM-5.2, external adapter",
+    "LMCacheConnectorV1 SCHEDULER on GLM-5.2, use_native"
+   ]
+  },
+  {
+   "model": "GLM-5.2",
+   "run_model": "GLM-5.2",
+   "column": "LMCacheMPConnector",
+   "part8_label_at_run": "문서 검증",
+   "result": "constructed",
+   "proposed_labels": [
+    "문서 검증",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "문서 검증 칸은 그대로(문서의 버전은 vLLM 0.23.0 + LMCache 0.4.7). 덧붙임: v0.32.0 + v0.5.6에서 SCHEDULER 생성까지 실행",
+   "evidence_cases": [
+    "GLM-5.2 LBHNC + chunk = scheduler block + --separate-object-groups"
+   ]
+  },
+  {
+   "model": "GLM-5.3-Flash",
+   "run_model": "GLM-5.3-Flash",
+   "column": "내장 offloading",
+   "part8_label_at_run": "문서 검증",
+   "result": "constructed",
+   "proposed_labels": [
+    "문서 검증",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "문서 검증 칸은 그대로(commit d1b4028d7e). 덧붙임: v0.32.0에서 SCHEDULER 생성까지 실행, scratch tail group은 offloading 대상에서 빠짐",
+   "evidence_cases": [
+    "OffloadingConnector SCHEDULER on GLM-5.3-Flash LBHNC"
+   ]
+  },
+  {
+   "model": "GLM-5.3-Flash",
+   "run_model": "GLM-5.3-Flash",
+   "column": "LMCacheConnectorV1",
+   "part8_label_at_run": "코드가 막음",
+   "result": "refused",
+   "proposed_labels": [
+    "코드가 막음",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "거부 줄 그대로 확인. 기본값 kv_cache_utils.py:1760 ValueError, 명시적 HMA factory.py:57 ValueError",
+   "evidence_cases": []
+  },
+  {
+   "model": "GLM-5.3-Flash",
+   "run_model": "GLM-5.3-Flash",
+   "column": "LMCacheMPConnector",
+   "part8_label_at_run": "코드 읽기",
+   "result": "constructed",
+   "proposed_labels": [
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "외부 구현 v0.5.6의 SCHEDULER 생성까지 실행. 거부 경우(chunk 비배수, --no-enable-prefix-caching, batched token 부족, 내장판)도 실행. checkpoint block 처리(P8-26)는 계속 미확인",
+   "evidence_cases": [
+    "GLM-5.3-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+    "GLM-5.3-Flash + --no-enable-prefix-caching (Mamba none)",
+    "GLM-5.3-Flash + chunk 256 (default)",
+    "GLM-5.3-Flash + max_num_batched_tokens < N"
+   ]
+  },
+  {
+   "model": "DeepSeek-V4",
+   "run_model": "DeepSeek-V4-Flash",
+   "column": "내장 offloading",
+   "part8_label_at_run": "코드 읽기",
+   "result": "layout_contingent",
+   "proposed_labels": [
+    "코드 읽기"
+   ],
+   "proposed_text": "그대로 둔다. BLHNC는 생성, connector가 선호하는 LBHNC는 bf16 산술에서 kv_cache_utils.py:1347 거부. 서빙 dtype을 재현하지 않아 판정 근거가 못 된다",
+   "evidence_cases": [
+    "OffloadingConnector SCHEDULER on DeepSeek-V4-Flash LBHNC",
+    "OffloadingConnector SCHEDULER on DeepSeek-V4-Flash BLHNC"
+   ]
+  },
+  {
+   "model": "DeepSeek-V4",
+   "run_model": "DeepSeek-V4-Flash",
+   "column": "LMCacheConnectorV1",
+   "part8_label_at_run": "미확인",
+   "result": "refused",
+   "proposed_labels": [
+    "코드가 막음",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "SlidingWindowMLASpec 승격에서 TypeError. kv_cache_utils.py:1746이 kv_cache_interface.py:138을 부른다. connector 없이 --disable-hybrid-kv-cache-manager만 줘도 같다. 명시적 HMA면 factory.py:57",
+   "evidence_cases": []
+  },
+  {
+   "model": "DeepSeek-V4",
+   "run_model": "DeepSeek-V4-Flash",
+   "column": "LMCacheMPConnector",
+   "part8_label_at_run": "문서 검증",
+   "result": "layout_contingent",
+   "proposed_labels": [
+    "문서 검증"
+   ],
+   "proposed_text": "문서 검증 칸은 그대로. 덧붙임을 쓴다면 BLHNC 한정: SCHEDULER 생성, group 폭 [64, 64, 256, 4, 8], scheduler block 256. LBHNC는 bf16 산술에서 kv_cache_utils.py:1347 거부",
+   "evidence_cases": [
+    "DeepSeek-V4-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+    "DeepSeek-V4-Flash LBHNC geometry probe"
+   ]
+  },
+  {
+   "model": "DeepSeek-V4.1-Flash",
+   "run_model": "DeepSeek-V4.1-Flash",
+   "column": "내장 offloading",
+   "part8_label_at_run": "문서 검증",
+   "result": "layout_contingent",
+   "proposed_labels": [
+    "문서 검증"
+   ],
+   "proposed_text": "문서 검증 칸은 그대로. 덧붙임을 쓴다면 BLHNC 한정: SCHEDULER 생성, 대상 group은 MLA 하나. LBHNC는 bf16 산술에서 kv_cache_utils.py:1347 거부",
+   "evidence_cases": [
+    "OffloadingConnector SCHEDULER on DeepSeek-V4.1-Flash BLHNC",
+    "OffloadingConnector SCHEDULER on DeepSeek-V4.1-Flash LBHNC"
+   ]
+  },
+  {
+   "model": "DeepSeek-V4.1-Flash",
+   "run_model": "DeepSeek-V4.1-Flash",
+   "column": "LMCacheConnectorV1",
+   "part8_label_at_run": "코드가 막음",
+   "result": "refused",
+   "proposed_labels": [
+    "코드가 막음",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "결과는 같고 원인 줄이 다르다. 먼저 나는 것은 TypeError(kv_cache_utils.py:1746, kv_cache_interface.py:138)이고 표가 적은 CircularBufferSpec ValueError(:1760)까지 가지 않는다. 그 ValueError는 SlidingWindow를 뺀 조합에서만 확인",
+   "evidence_cases": []
+  },
+  {
+   "model": "DeepSeek-V4.1-Flash",
+   "run_model": "DeepSeek-V4.1-Flash",
+   "column": "LMCacheMPConnector",
+   "part8_label_at_run": "문서 검증",
+   "result": "layout_contingent",
+   "proposed_labels": [
+    "문서 검증"
+   ],
+   "proposed_text": "문서 검증 칸은 그대로. 덧붙임을 쓴다면 BLHNC 한정: SCHEDULER 생성, 저장 대상 group은 폭 64인 하나, scheduler block 64. LBHNC는 bf16 산술에서 kv_cache_utils.py:1347 거부",
+   "evidence_cases": [
+    "DeepSeek-V4.1-Flash BLHNC + chunk = scheduler block + --separate-object-groups",
+    "DeepSeek-V4.1-Flash LBHNC geometry probe"
+   ]
+  },
+  {
+   "model": "Kimi-K3",
+   "run_model": "Kimi-K3",
+   "column": "내장 offloading",
+   "part8_label_at_run": "코드 읽기",
+   "result": "gate_passed",
+   "proposed_labels": [
+    "코드 읽기"
+   ],
+   "proposed_text": "그대로 둔다. 관문만 통과했고 생성자는 config 스냅샷이 없어 실행 안 함",
+   "evidence_cases": []
+  },
+  {
+   "model": "Kimi-K3",
+   "run_model": "Kimi-K3",
+   "column": "LMCacheConnectorV1",
+   "part8_label_at_run": "코드가 막음",
+   "result": "refused",
+   "proposed_labels": [
+    "코드가 막음",
+    "실제 클래스 호출"
+   ],
+   "proposed_text": "거부 줄 그대로 확인. 기본값 kv_cache_utils.py:1760 ValueError, 명시적 HMA factory.py:57 ValueError. 치수는 가정이지만 결과는 spec 타입으로 정해진다",
+   "evidence_cases": []
+  },
+  {
+   "model": "Kimi-K3",
+   "run_model": "Kimi-K3",
+   "column": "LMCacheMPConnector",
+   "part8_label_at_run": "문서 검증",
+   "result": "gate_passed",
+   "proposed_labels": [
+    "문서 검증"
+   ],
+   "proposed_text": "그대로 둔다. 관문만 통과했고 생성자는 실행 안 함",
+   "evidence_cases": []
+  }
+ ],
+ "statement_corrections": [
+  {
+   "id": "P8-15",
+   "part8_says": "SlidingWindowMLASpec은 MLA로 승격된다",
+   "observed": "MLAAttentionSpec과 섞이면 승격이 TypeError로 끝난다. replace_as는 drop에 extra_retained_tokens만 넘기고(kv_cache_utils.py:1746) SlidingWindowMLASpec의 bounded_replay는 대상 클래스에 없다(kv_cache_interface.py:956). 값이 True든 False든 같다. 같은 경로의 non-MLA 승격은 성공한다",
+   "evidence": "promotion_probes"
+  },
+  {
+   "id": "P8-05",
+   "part8_says": "lmcache가 없으면 ImportError로 내장으로 물러난다고 읽히는 서술",
+   "observed": "패키지가 아예 없으면 lmcache_mp_connector.py:11의 최상단 import에서 ModuleNotFoundError로 모듈 자체가 실패해 물러나지 못한다. 물러나는 것은 패키지는 있고 외부 connector 하위 모듈만 없을 때다",
+   "evidence": "environments.refrun, fallback_when_submodule_missing"
+  },
+  {
+   "id": "P8-09",
+   "part8_says": "chunk가 group 폭의 배수가 아니면 lmcache_mp_connector.py:811-820에서 ValueError",
+   "observed": "scheduler block의 배수가 아니면 먼저 vllm_multi_process_adapter.py:780에서 다른 문구의 ValueError가 난다. :811-820에는 도달하지 않았다",
+   "evidence": "GLM-5.3-Flash + chunk 256 (default)"
+  },
+  {
+   "id": "P8-19",
+   "part8_says": "--separate-object-groups는 문서상 요구",
+   "observed": "일치. 이 플래그 없이도 SCHEDULER 생성은 성공한다. worker와 데이터 경로는 실행하지 않았으므로 필요 없다는 뜻이 아니다",
+   "evidence": "GLM-5.3-Flash BLHNC + chunk = scheduler block, no --separate-object-groups"
+  },
+  {
+   "id": "P8-04",
+   "part8_says": "use_native가 참이면 vLLM 동봉 구현을 쓴다",
+   "observed": "LMCache v0.5.6과 함께 쓰면 동봉 어댑터가 없는 이름 CudaIPCWrapper를 import하다 ImportError로 멈춘다(lmcache_integration/multi_process_adapter.py:12). v0.5.6의 custom_types.py에는 DeviceIPCWrapper만 있다",
+   "evidence": "LMCacheConnectorV1 SCHEDULER on GLM-5.2, use_native"
+  }
+ ]
+}

@@ -1,0 +1,2 @@
+2. **Session commit fails on unparseable memory extraction (#5171):** before, when the model still returned unparseable extraction output after all retries, the commit task reported success with zero memories. Now the task and archive are marked `failed` and the error contains `failure_kind=parse_error` (`failure_kind=empty_response` for empty responses). A model that confirms no changes returns `sdk.commit()` and still completes successfully. Callers that alert or retry on task status need to handle the new `failed` outcome.
+

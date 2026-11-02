@@ -1,0 +1,22 @@
+{"id": "nokw-pager-threshold", "question": "서버가 이상해서 누군가를 깨워야 하는 기준 수치가 뭔가요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-lodging-proof", "question": "묵은 숙소 비용을 돌려받으려면 어떤 서류를 첨부해야 하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-preservation-order", "question": "조사 때문에 지우지 말라는 지시를 받은 기록은 언제까지 남겨두나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-price-inquiry", "question": "공급사에 가격만 물어봤는데 그게 계약 연장을 거절한 걸로 인정되나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-test-environment", "question": "시험 삼아 쓰는 환경에서 서비스가 끊기면 알파 계약으로 보상받을 수 있나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-change-percent-formula", "question": "전 분기와 비교해 변화한 퍼센트는 어떤 식으로 계산하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "nokw-after-recovery-check", "question": "되돌린 다음 문제가 해소됐는지 몇 분 동안 무엇을 재나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "no-keyword"}
+{"id": "everyday-tax-in-cap", "question": "출장 숙소비 상한에 세금도 들어 있나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "everyday"}
+{"id": "everyday-claim-after-trip", "question": "여행에서 돌아오고 며칠 안에 경비를 청구해야 하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "everyday"}
+{"id": "everyday-proof-of-notice", "question": "연장 안 하겠다고 보낸 메일의 증거는 어디에 남겨두나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "everyday"}
+{"id": "everyday-revert-trigger", "question": "새 버전을 올리고 몇 분 안에 오류가 얼마나 늘면 원래대로 돌리나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "everyday"}
+{"id": "everyday-raw-data-expiry", "question": "고객이 올린 원본 자료는 로그 정책에 따라 며칠 뒤 지워지나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "everyday"}
+{"id": "multi-customer-side-record", "question": "알파 고객이 크레딧을 신청할 때 첨부하는 관측 기록은 누가 남긴 기록인가요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "multi-doc"}
+{"id": "multi-beta-maintenance", "question": "베타 계약에서 점검 시간이 가용률 계산에서 빠지려면 어떤 조건이어야 하나요?", "entity": "베타", "as_of": "2026-09-08", "namespace": "business", "type": "multi-doc"}
+{"id": "multi-which-contract-9999", "question": "월간 가용률 목표가 99.99%인 계약은 어느 고객의 계약인가요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "multi-doc"}
+{"id": "multi-provider-network", "question": "서비스 제공자 쪽 네트워크 문제로 끊긴 시간은 알파 가용률에서 빠지나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "multi-doc"}
+{"id": "multi-amendment-scope-limit", "question": "알파 개별 추가 약정이 가용률 구간과 크레딧 비율까지 바꾸나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "multi-doc"}
+{"id": "multi-old-uptime-target", "question": "6월 30일 시점 알파 월간 가용률 목표 수치는 얼마였나요?", "entity": "알파", "as_of": "2026-06-30", "namespace": "business", "type": "multi-doc"}
+{"id": "rank-draft-longer-deadline", "question": "알파 서비스 크레딧 신청 기한이 15일보다 더 길어질 수 있다는 논의는 어느 문서에 있나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "rank-order"}
+{"id": "rank-old-edition-end", "question": "알파 서비스 SLA의 구판은 마지막으로 어느 날까지 적용되었나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "rank-order"}
+{"id": "rank-thirty-percent-contract", "question": "월간 가용률이 기준에 못 미치면 서비스 크레딧 30%를 주는 계약은 무엇인가요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "rank-order"}
+{"id": "rank-ninety-day-priority", "question": "계약서에 90일 통지가 따로 적혀 있으면 어느 쪽 기준이 우선하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "rank-order"}

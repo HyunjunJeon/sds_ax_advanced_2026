@@ -1,0 +1,323 @@
+{
+ "status": "ran",
+ "vllm": "0.32.0",
+ "reason": null,
+ "parser": {
+  "tool": "glm47",
+  "reasoning": "glm47",
+  "tokenizer": "StubTokenizer (특수 토큰 14개만 가진 가짜 vocab, 진짜 GLM tokenizer 아님)",
+  "limit": "문자열 경로만 검증한다. 진짜 vocab의 token ID 경로(is_reasoning_end, 토큰 ID 기반 종료 판정), chat template 판정(_glm53_always_thinks), 스트리밍은 실행하지 않았다."
+ },
+ "tool_schemas": {
+  "get_temperature": {
+   "type": "object",
+   "properties": {
+    "city": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "city"
+   ]
+  },
+  "set_timer": {
+   "type": "object",
+   "properties": {
+    "minutes": {
+     "type": "integer"
+    },
+    "label": {
+     "type": "string"
+    }
+   },
+   "required": [
+    "minutes"
+   ]
+  }
+ },
+ "cases": [
+  {
+   "id": "clean_call",
+   "candidates": [],
+   "layer": "parser",
+   "title": "깨끗한 호출",
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "error": null,
+    "tools_called": true,
+    "content_after_reasoning_before_tool_parser": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "unified_parse": {
+     "reasoning": null,
+     "content": null,
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\": \"서울\"}"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "reasoning_then_call",
+   "candidates": [],
+   "layer": "parser",
+   "title": "생각 구간 뒤 호출",
+   "constructed": true,
+   "raw_text": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": "사용자가 서울 기온을 묻는다.",
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "error": null,
+    "tools_called": true,
+    "content_after_reasoning_before_tool_parser": "\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "unified_parse": {
+     "reasoning": "사용자가 서울 기온을 묻는다.",
+     "content": null,
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\": \"서울\"}"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "malformed_markup",
+   "candidates": [
+    "C7"
+   ],
+   "layer": "parser",
+   "title": "</tool_call> 없이 다음 <tool_call>",
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"부산\"}"
+     }
+    ],
+    "error": null,
+    "tools_called": true,
+    "content_after_reasoning_before_tool_parser": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+    "unified_parse": {
+     "reasoning": null,
+     "content": null,
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{\"city\": \"부산\"}"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "truncated_call",
+   "candidates": [
+    "C2",
+    "C6"
+   ],
+   "layer": "parser",
+   "title": "닫히지 않은 호출",
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{}"
+     }
+    ],
+    "error": null,
+    "tools_called": true,
+    "content_after_reasoning_before_tool_parser": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+    "unified_parse": {
+     "reasoning": null,
+     "content": null,
+     "tool_calls": [
+      {
+       "name": "get_temperature",
+       "arguments": "{}"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "unknown_tool",
+   "candidates": [
+    "C3"
+   ],
+   "layer": "parser",
+   "title": "tools에 없는 이름",
+   "constructed": true,
+   "raw_text": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "error": null,
+    "tools_called": false,
+    "content_after_reasoning_before_tool_parser": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "unified_parse": {
+     "reasoning": null,
+     "content": null,
+     "tool_calls": []
+    }
+   }
+  },
+  {
+   "id": "bad_arg_type",
+   "candidates": [
+    "C4"
+   ],
+   "layer": "parser",
+   "title": "정수 인자에 숫자 아닌 값",
+   "constructed": true,
+   "raw_text": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+   "tools": [
+    "set_timer"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": \"곧\", \"label\": \"라면\"}"
+     }
+    ],
+    "error": null,
+    "tools_called": true,
+    "content_after_reasoning_before_tool_parser": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+    "unified_parse": {
+     "reasoning": null,
+     "content": null,
+     "tool_calls": [
+      {
+       "name": "set_timer",
+       "arguments": "{\"minutes\": \"곧\", \"label\": \"라면\"}"
+      }
+     ]
+    }
+   }
+  },
+  {
+   "id": "no_call",
+   "candidates": [],
+   "layer": "parser",
+   "title": "호출 없는 일반 답변(생각 구간 포함)",
+   "constructed": true,
+   "raw_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": "도구가 필요한 질문이 아니다.",
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "error": null,
+    "tools_called": false,
+    "content_after_reasoning_before_tool_parser": "안녕하세요, 무엇을 도와드릴까요?",
+    "unified_parse": {
+     "reasoning": "도구가 필요한 질문이 아니다.",
+     "content": "안녕하세요, 무엇을 도와드릴까요?",
+     "tool_calls": []
+    }
+   }
+  },
+  {
+   "id": "no_call_missing_think_end",
+   "candidates": [],
+   "layer": "parser",
+   "title": "호출 없는 일반 답변, </think> 없음(기본 thinking 상태의 결과)",
+   "constructed": true,
+   "raw_text": "안녕하세요, 무엇을 도와드릴까요?",
+   "tools": [
+    "get_temperature"
+   ],
+   "tool_choice": "auto",
+   "mode": "non_stream",
+   "status": "ran",
+   "reason": null,
+   "output": {
+    "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+    "content": null,
+    "tool_calls": [],
+    "error": null,
+    "tools_called": false,
+    "content_after_reasoning_before_tool_parser": null,
+    "unified_parse": {
+     "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+     "content": null,
+     "tool_calls": []
+    }
+   }
+  }
+ ]
+}

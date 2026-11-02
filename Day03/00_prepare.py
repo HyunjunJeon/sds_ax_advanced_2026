@@ -49,6 +49,7 @@ def main():
                 {
                     "keys_set": key_presence(),
                     "backend": settings.backend,
+                    "corpus_name": settings.corpus,
                     "internal_documents": len(registry.rows("internal")),
                     "web_documents": len(registry.rows("web")),
                     "corpus": registry.snapshot(),

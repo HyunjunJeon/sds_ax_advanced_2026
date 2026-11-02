@@ -10,13 +10,15 @@ import hashlib
 import json
 import platform
 
-from .config import DAY03
+from .config import DAY02, DAY03
+from .day02_bridge import load_corpus
 
 
-def run_provenance():
+def run_provenance(corpus="business"):
     # 번호 실행 파일과 공통 구현, 학생 구현을 포함한다. archive/출력/자격 증명은 제외한다.
     # 수정 전후 코드는 같은 파일명이어도 hash가 달라지므로 실험 결과에 연결할 수 있다.
     paths = sorted(set(DAY03.glob("[0-9][0-9]_*.py")) | set((DAY03 / "common").glob("*.py")))
+    paths += sorted((DAY02 / "src/day02").glob("*.py"))
     if (DAY03 / "student_tasks.py").exists():
         paths.append(DAY03 / "student_tasks.py")
     files = {
@@ -25,8 +27,14 @@ def run_provenance():
     }
     assets = {}
     for name in ("uv.lock", "data/cases.jsonl", "data/gold.jsonl"):
-        path = DAY03 / name
+        path = (DAY03.parent if name == "uv.lock" else DAY03) / name
         assets[name] = hashlib.sha256(path.read_bytes()).hexdigest() if path.exists() else None
+    selected = load_corpus(DAY02, corpus)
+    assets["corpus"] = selected.provenance()
+    if corpus != "business":
+        # 선택한 평가 자료의 hash만 기록한다. 정답 내용은 모델에 전달하지 않는다.
+        for name, path in (("data/cases.jsonl", selected.cases_path), ("data/gold.jsonl", selected.gold_path)):
+            assets[name] = hashlib.sha256(path.read_bytes()).hexdigest()
     return {
         "source_sha256": hashlib.sha256(json.dumps(files, sort_keys=True).encode()).hexdigest(),
         "files": files,

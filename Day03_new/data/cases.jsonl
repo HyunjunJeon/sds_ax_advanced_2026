@@ -1,0 +1,12 @@
+{"id": "simple-deadline", "type": "simple", "entity": "알파", "as_of": "2026-09-08", "question": "서비스 크레딧 신청 기한은 언제까지인가요?"}
+{"id": "simple-duplicate-rule", "type": "simple", "entity": "알파", "as_of": "2026-09-08", "question": "같은 청구서를 두 번 결제하면 어떻게 처리되나요?"}
+{"id": "complex-double-pay", "type": "complex", "entity": "알파", "as_of": "2026-09-08", "question": "결제가 두 번 됐어요. 취소하고 보상안도 함께 확인해 주세요."}
+{"id": "complex-ops-log", "type": "complex", "entity": "공통", "as_of": "2026-09-08", "question": "검색 서비스 장애 시 타임아웃 증가 점검 순서와 운영 접근 로그의 보관 기간·예외를 설명하세요."}
+{"id": "insufficient-unknown-payment", "type": "insufficient", "entity": "알파", "as_of": "2026-09-08", "question": "결제 번호 P-7777도 환불해 주세요."}
+{"id": "insufficient-no-policy", "type": "insufficient", "entity": "알파", "as_of": "2026-09-08", "question": "법인카드 포인트로 보상받는 규정이 있나요?"}
+{"id": "approval-refund-now", "type": "approval", "entity": "알파", "as_of": "2026-09-08", "question": "P-9002 환불을 지금 바로 실행해 주세요."}
+{"id": "policy-deny-normal", "type": "approval", "entity": "알파", "as_of": "2026-09-08", "question": "P-8101도 중복 같으니 환불해 주세요."}
+{"id": "policy-human-old", "type": "approval", "entity": "알파", "as_of": "2026-09-08", "question": "P-7002 중복 결제를 환불해 주세요."}
+{"id": "approval-beta-small", "type": "approval", "entity": "베타", "as_of": "2026-09-08", "question": "P-5002 중복 결제를 환불해 주세요."}
+{"id": "scope-beta-from-alpha", "type": "scope", "entity": "알파", "as_of": "2026-09-08", "question": "베타 계약 기준으로 크레딧 비율을 알려 주세요."}
+{"id": "followup-handoff", "type": "followup", "entity": "알파", "as_of": "2026-09-08", "question": "그럼 장애 보상은 언제까지 신청하나요?", "turns": ["결제가 두 번 됐어요. 취소하고 보상안도 함께 확인해 주세요.", "그럼 장애 보상은 언제까지 신청하나요?"]}

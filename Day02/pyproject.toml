@@ -9,7 +9,7 @@ description = "DeepAgents, native OpenViking, and answer Skills RAG classroom"
 readme = "README.md"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-  "deepagents==0.7.13",
+  "deepagents==0.7.32",
   "langchain-openai>=1.1,<2",
   "httpx==0.28.1",
   "pydantic>=2.12,<3",
@@ -43,7 +43,7 @@ markers = ["live: real local OpenViking and paid model APIs"]
 include = ["."]
 extraPaths = ["src"]
 pythonVersion = "3.13"
-venvPath = "."
+venvPath = ".."
 venv = ".venv"
 
 [tool.ruff]

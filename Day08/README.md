@@ -71,12 +71,12 @@
 ```bash
 cd Day08
 cp .env.example .env        # OPENROUTER_API_KEY 를 직접 채운다
-uv sync
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 uv run pytest -q            # 모델 호출 없는 검증. 35 passed
 uv run python 00_baseline_agent.py
 ```
 
-`uv sync`는 LFM PII 탐지기용 `torch`·`transformers`를 함께 받는다. Linux/WSL은 `pyproject.toml`의 CPU 인덱스를 쓴다.
+루트 `uv sync`는 LFM PII 탐지기용 `torch`·`transformers`를 함께 받는다. Linux/WSL은 루트 `pyproject.toml`의 CPU 인덱스를 쓴다.
 `03`에서 `DETECTOR="lfm"`을 처음 쓰면 모델(약 1.3GB)을 `.hf-cache/`에 받는다. `trust_remote_code` 모델이라
 `.env`의 `GUARD_PII_REVISION`으로 커밋을 고정한다. 이것 자체가 슬라이드 12의 공급망 위험 사례다.
 

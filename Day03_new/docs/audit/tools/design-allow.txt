@@ -1,0 +1,5 @@
+# Allowed --strict findings of Day03_new/docs/DESIGN.md. Only labelled historical records belong here; a live claim that fails --strict must be fixed in the document, never listed.
+- **[해소] `hybrid`의 Router가	mas_lab/hybrid.py:61-63	Historical first judgment. Citation is right: the Router prompt text at those lines; the sentence's backticked names are what the prompt does NOT mention, so the identifier rule cannot match.
+- **[해소] 모델이 쓴 `human_review`와 `denied`는	mas_lab/gate.py:87-91	Historical first judgment. Citation is right: the text replacement of _settle; the sentence's names deny and human_review are decision values read elsewhere (gate.py:10).
+- **[미해소] `check_named_payment`가 닿지 않는 곳.**	mas_lab/gate.py:63-64	Historical first judgment. Citation is right: the branch that returns the answer unchecked; answered and insufficient do not occur in gate.py by design.
+- 결과. 그럴듯하게 틀린 행은 0행이다.	mas_lab/ledger.py:61	Historical second judgment. Citation is right: the ledger reason sentence quoted there; denied in the same sentence is the gate's label, not on that line.

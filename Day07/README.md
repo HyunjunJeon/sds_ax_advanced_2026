@@ -19,7 +19,7 @@ RunPod에 띄운 vLLM 서버(GLM-5.3-Flash)를 호출해 보고, 자유 실습 �
 
 ```bash
 cd Day07
-uv sync
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 cp .env.example .env
 ```
 

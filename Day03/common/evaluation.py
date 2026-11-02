@@ -38,12 +38,21 @@ def evaluate(result, gold, judge=None):
         e for c in result.get("answer", {}).get("claims", []) for e in c.get("evidence_ids", [])
     ]
     present = {e["evidence_id"] for e in refs}
+    claims = result.get("answer", {}).get("claims", [])
+    cited_docs = {e["doc_id"] for e in refs if e["evidence_id"] in citations}
     observation = {
+        "evaluation_basis": gold.get("review_status", "provided"),
         "citation_ids_valid": all(e in present for e in citations),
+        "claim_count": len(claims),
+        "claim_citation_coverage": sum(bool(c.get("evidence_ids")) and all(
+            eid in present for eid in c["evidence_ids"]
+        ) for c in claims) / len(claims) if claims else None,
+        "cited_document_recall": len(cited_docs & set(expected)) / len(set(expected)) if expected else None,
         "required_document_recall": len(doc_ids & set(expected)) / len(expected)
         if expected
         else None,
         "expected_abstention": gold.get("abstain", False),
+        "observed_abstention": result.get("status") == "uncertain",
         "status": result.get("status"),
         "pattern_checks": {p: bool(re.search(p, text, re.I)) for p in gold.get("patterns", [])},
         "semantic_quality": None,
@@ -79,6 +88,9 @@ def summarize(rows):
         qualities = [r["evaluation"].get("semantic_quality") for r in runs if r.get("evaluation")]
         qualities = [q for q in qualities if q]
         tokens = [r["metrics"]["input_tokens"] for r in runs]
+        final_runs = [r for r in runs if r.get("evaluation_eligible", "evaluation" in r)]
+        judged_final = [r for r in final_runs if (r.get("evaluation") or {}).get("semantic_quality")]
+        output_tokens = [r["metrics"].get("output_tokens") for r in runs]
         output.append(
             {
                 "architecture": architecture,
@@ -95,6 +107,14 @@ def summarize(rows):
                 "mean_input_tokens": round(statistics.mean(tokens), 1)
                 if tokens and all(t is not None for t in tokens)
                 else None,
+                "mean_output_tokens": round(statistics.mean(output_tokens), 1)
+                if output_tokens and all(t is not None for t in output_tokens) else None,
+                "usage_observed_runs": sum(r["metrics"].get("usage_complete", False) for r in runs),
+                "final_turns": len(final_runs),
+                "judged_final_turns": len(judged_final),
+                "judge_coverage": len(judged_final) / len(final_runs) if final_runs else None,
+                "draft_evaluations": sum((r.get("evaluation") or {}).get("evaluation_basis") == "draft"
+                                         for r in final_runs),
                 "judged_accuracy": sum(q["correct"] for q in qualities) / len(qualities)
                 if qualities
                 else None,

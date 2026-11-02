@@ -1,0 +1,12 @@
+{"id": "tech-blob", "question": "DeepAgents 0.7.21에서 FilesystemMiddleware의 blob 저장 지원은 어떻게 바뀌었나요?", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "simple"}
+{"id": "tech-isolated", "question": "DeepAgents 0.7.13의 SDK subagent mode handoff 이름은 무엇으로 바뀌었나요?", "entity": "공통", "as_of": "2026-09-02", "namespace": "official-2026-10", "type": "versioned"}
+{"id": "tech-future-evidence", "question": "이 기준일에 공개된 자료만으로 DeepAgents 0.7.21의 FilesystemMiddleware blob 지원을 확정할 수 있나요?", "entity": "공통", "as_of": "2026-09-02", "namespace": "official-2026-10", "type": "unknown"}
+{"id": "tech-context", "question": "DeepAgents 0.7.14의 compaction recovery와 0.7.18의 large tool result previews 변경을 비교해주세요.", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "cross"}
+{"id": "tech-state", "question": "DeepAgents 0.7.15에서 subagent middleware의 state keys와 ID 없는 tool result offload 경로를 어떻게 수정했나요?", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "simple"}
+{"id": "tech-cosine", "question": "OpenViking 0.4.22의 local cosine score 변환식과 score_threshold 재설정 필요 여부를 알려주세요.", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "versioned"}
+{"id": "tech-acl", "question": "OpenViking 0.4.22의 ACL 표에서 restricted parent에 write만 가진 Alice는 파일 생성 후 ACL을 바꿀 수 있나요? 적용 조건도 설명해주세요.", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "table"}
+{"id": "tech-api", "question": "OpenViking 0.4.22에서 Session.used() 호출이 404입니다. API 변경 원인과 호출 측 조치는 무엇인가요?", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "procedural"}
+{"id": "tech-commit", "question": "OpenViking 0.4.22에서 memory extraction 파싱 실패와 sdk.commit()의 no changes는 같은 성공 상태인가요?", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "simple"}
+{"id": "tech-parallel", "question": "DeepAgents 0.7.18의 FileInfo.size 단위와 OpenViking 0.4.22 cosine score 범위·예외를 각각 조사해주세요.", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "cross"}
+{"id": "tech-followup", "question": "그렇다면 IP와 L2 점수도 같은 식으로 바꾸나요?", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "cross", "turns": ["OpenViking 0.4.22의 local cosine score는 어떤 식으로 바뀌나요?", "그렇다면 IP와 L2 점수도 같은 식으로 바꾸나요?"]}
+{"id": "tech-unannounced", "question": "2026년 10월 20일 공개될 DeepAgents 0.8.0의 정확한 API와 벤치마크 점수를 알려주세요.", "entity": "공통", "as_of": "2026-10-02", "namespace": "official-2026-10", "type": "unknown"}

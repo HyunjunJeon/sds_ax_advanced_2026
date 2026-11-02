@@ -1,0 +1,74 @@
+[
+ {
+  "repeat": 1,
+  "run_id": "65da339eb6e045b2a7c9646f0c30e21c",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 3,
+  "elapsed_seconds": 7.902
+ },
+ {
+  "repeat": 2,
+  "run_id": "3da387ffd9e343609b5e2e4127ef6a01",
+  "status": "budget_exceeded",
+  "outcome": null,
+  "model_calls": 9,
+  "elapsed_seconds": 21.703
+ },
+ {
+  "repeat": 3,
+  "run_id": "41cf3b5103d642e89aac2b98a03e8af0",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 18.552
+ },
+ {
+  "repeat": 4,
+  "run_id": "e148c903c1e04886a1100fca76b36d34",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 15.799
+ },
+ {
+  "repeat": 5,
+  "run_id": "c7b3653c9fa245cdb73c1b265dbc9634",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 15.492
+ },
+ {
+  "repeat": 6,
+  "run_id": "88029694bab3457f8995b0cfcc1d5761",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 7,
+  "elapsed_seconds": 16.405
+ },
+ {
+  "repeat": 7,
+  "run_id": "8651f08408294378a59fff84a7223377",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 7,
+  "elapsed_seconds": 25.065
+ },
+ {
+  "repeat": 8,
+  "run_id": "0ef56a500fef418d925ce3edf1aa9c34",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 18.237
+ },
+ {
+  "repeat": 9,
+  "run_id": "188d46de36d749788c8637a01fc8e0ef",
+  "status": "ok",
+  "outcome": "answered",
+  "model_calls": 6,
+  "elapsed_seconds": 16.022
+ }
+]

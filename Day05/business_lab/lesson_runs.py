@@ -31,7 +31,7 @@ def execution_contract(mode: str, model_name: str | None) -> dict:
             "max_tool_calls": MAX_TOOL_CALLS, "recursion_limit": RECURSION_LIMIT,
             "temperature": 0.0, "timeout_seconds": 60,
             "code_hashes": {name: hashlib.sha256((PACKAGE / name).read_bytes()).hexdigest() for name in EXECUTION_FILES},
-            "lock_hash": hashlib.sha256((PACKAGE.parent / "uv.lock").read_bytes()).hexdigest()}
+            "lock_hash": hashlib.sha256((PACKAGE.parent.parent / "uv.lock").read_bytes()).hexdigest()}
 
 
 def save_recording(report: dict, out: Path) -> None:

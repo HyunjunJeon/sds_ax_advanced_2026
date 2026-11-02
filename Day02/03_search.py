@@ -46,12 +46,20 @@ class Reranking(BaseModel):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--live", action="store_true")
+    parser.add_argument("--namespace", default="business")
+    parser.add_argument("--question", default="알파 서비스 크레딧 신청 기한과 추가 약정")
+    parser.add_argument("--entity", default="알파")
+    parser.add_argument("--as-of", type=date.fromisoformat, default=date(2026, 9, 8))
+    parser.add_argument("--extra-query", action="append", help="MultiQuery 추가 검색어. 반복 지정 가능")
     args = parser.parse_args()
     settings = Settings.load()
-    question = "알파 서비스 크레딧 신청 기한과 추가 약정"
+    question = args.question
+    extra_queries = args.extra_query if args.extra_query is not None else (
+        ["알파 SLA 개별 추가 약정"] if args.namespace == "business" else []
+    )
     with VikingClient.configured(settings) as client:
-        manifest = load_manifest(settings, client)
-        context = RetrievalContext(client, manifest, entity="알파", as_of=date(2026, 9, 8))
+        manifest = load_manifest(settings, client, args.namespace)
+        context = RetrievalContext(client, manifest, entity=args.entity, as_of=args.as_of)
         documents = {uri: client.read(uri) for uri in manifest["documents"] if context.metadata(uri)}
         dense = [h["uri"] for h in client.find(question, manifest["target_uri"], 12) if h["uri"] in documents]
         bm25 = KoreanBM25(documents, user_words=["크레딧", "추가약정"])
@@ -66,7 +74,7 @@ def main():
             "rrf": rrf([dense, sparse]),
             "multi_query": [
                 uri
-                for uri in multi_query(client, [question, "알파 SLA 개별 추가 약정"], manifest["target_uri"])
+                for uri in multi_query(client, [question, *extra_queries], manifest["target_uri"])
                 if uri in documents
             ],
             "evidence": context.search(question),

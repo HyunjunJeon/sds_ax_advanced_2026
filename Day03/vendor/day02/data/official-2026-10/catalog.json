@@ -1,0 +1,200 @@
+[
+  {
+    "path": "data/official-2026-10/documents/deepagents-0.7.21.md",
+    "metadata": {
+      "doc_id": "deepagents-0.7.21",
+      "title": "DeepAgents 0.7.21 release notes",
+      "source": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.7.21",
+      "valid_from": "2026-09-30",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "source_start_line": 5,
+      "source_end_line": 10,
+      "topics": [
+        "deepagents",
+        "0.7.21"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/deepagents-0.7.18.md",
+    "metadata": {
+      "doc_id": "deepagents-0.7.18",
+      "title": "DeepAgents 0.7.18 release notes",
+      "source": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.7.18",
+      "valid_from": "2026-09-22",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "source_start_line": 25,
+      "source_end_line": 32,
+      "topics": [
+        "deepagents",
+        "0.7.18"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/deepagents-0.7.15.md",
+    "metadata": {
+      "doc_id": "deepagents-0.7.15",
+      "title": "DeepAgents 0.7.15 release notes",
+      "source": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.7.15",
+      "valid_from": "2026-09-16",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "source_start_line": 50,
+      "source_end_line": 58,
+      "topics": [
+        "deepagents",
+        "0.7.15"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/deepagents-0.7.14.md",
+    "metadata": {
+      "doc_id": "deepagents-0.7.14",
+      "title": "DeepAgents 0.7.14 release notes",
+      "source": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.7.14",
+      "valid_from": "2026-09-13",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "source_start_line": 59,
+      "source_end_line": 73,
+      "topics": [
+        "deepagents",
+        "0.7.14"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/deepagents-0.7.13.md",
+    "metadata": {
+      "doc_id": "deepagents-0.7.13",
+      "title": "DeepAgents 0.7.13 release notes",
+      "source": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.7.13",
+      "valid_from": "2026-09-02",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "source_start_line": 74,
+      "source_end_line": 79,
+      "topics": [
+        "deepagents",
+        "0.7.13"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/openviking-session-api.md",
+    "metadata": {
+      "doc_id": "openviking-session-api",
+      "title": "OpenViking 0.4.22 Session `used` reporting API removed (#5252):",
+      "source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.4.22",
+      "valid_from": "2026-09-28",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "9296980485a83bc035a380a45749ba3974fd4376bbc7fc7427d8f72f06a08a88",
+      "source_start_line": 94,
+      "source_end_line": 101,
+      "topics": [
+        "openviking",
+        "0.4.22"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/openviking-commit-failure.md",
+    "metadata": {
+      "doc_id": "openviking-commit-failure",
+      "title": "OpenViking 0.4.22 Session commit fails on unparseable memory extraction (#5171):",
+      "source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.4.22",
+      "valid_from": "2026-09-28",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "9296980485a83bc035a380a45749ba3974fd4376bbc7fc7427d8f72f06a08a88",
+      "source_start_line": 102,
+      "source_end_line": 103,
+      "topics": [
+        "openviking",
+        "0.4.22"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/openviking-acl.md",
+    "metadata": {
+      "doc_id": "openviking-acl",
+      "title": "OpenViking 0.4.22 ACL default permissions (#5266):",
+      "source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.4.22",
+      "valid_from": "2026-09-28",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "9296980485a83bc035a380a45749ba3974fd4376bbc7fc7427d8f72f06a08a88",
+      "source_start_line": 118,
+      "source_end_line": 134,
+      "topics": [
+        "openviking",
+        "0.4.22"
+      ]
+    }
+  },
+  {
+    "path": "data/official-2026-10/documents/openviking-cosine.md",
+    "metadata": {
+      "doc_id": "openviking-cosine",
+      "title": "OpenViking 0.4.22 Local vector engine cosine score range (#5358):",
+      "source": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22",
+      "domain": "기술",
+      "entity": "공통",
+      "version": "0.4.22",
+      "valid_from": "2026-09-28",
+      "valid_until": null,
+      "status": "approved",
+      "extraction_method": "verbatim-release-excerpt",
+      "source_sha256": "9296980485a83bc035a380a45749ba3974fd4376bbc7fc7427d8f72f06a08a88",
+      "source_start_line": 135,
+      "source_end_line": 136,
+      "topics": [
+        "openviking",
+        "0.4.22"
+      ]
+    }
+  }
+]

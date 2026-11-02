@@ -1,17 +1,57 @@
 [project]
 name = "sds-ax-advanced-class"
 version = "0.1.0"
-description = "SDS AX 심화 과정. Day02–Day08은 각각 독립 uv 프로젝트로 구성"
+description = "SDS AX 심화 과정. 저장소 루트에서 uv sync 한 번으로 Day01~Day08 환경을 함께 설치한다"
 readme = "README.md"
-requires-python = ">=3.13"
+requires-python = ">=3.13,<3.14"
+# Day01·02·03·05·07·08 은 아래 멤버로, pyproject.toml 이 없는 Day04 의 패키지는 직접 선언한다.
 dependencies = [
-    "deepagents>=0.7.13",
-    "langchain-openrouter>=0.2.8",
+    "day01-langgraph-tutorial",
+    "day02-deepagents-rag",
+    "day03-agent-architecture-labs",
+    "day05-agent-evaluation-labs",
+    "day07",
+    "day08-agent-guardrails",
+    "deepagents==0.7.32",
+    "langchain",
+    "langchain-core",
+    "langchain-openrouter==0.2.8",
+    "langgraph",
+    "mcp",
+    "openrouter==0.10.8",
+    "pydantic",
     "python-dotenv>=1.2.3",
 ]
 
+[dependency-groups]
+dev = ["pytest>=9,<10", "ruff>=0.16,<0.17"]
+
 [tool.uv]
 package = false
+# 수업 기준일 이후의 패키지가 재해석에 섞이지 않도록 고정한다.
+exclude-newer = "2026-10-31T00:00:00Z"
+# langchain-teddynote 가 선언하는 pinecone-client 는 import 시 예외를 내는 폐기 패키지다.
+# neo4j-graphrag / langchain-neo4j 가 쓰는 공식 pinecone 이 import 되도록 제외한다.
+override-dependencies = ["pinecone-client ; python_version < '0'"]
+
+[tool.uv.workspace]
+members = ["Day01", "Day02", "Day03", "Day05", "Day07", "Day08"]
+# OpenViking 서버는 mcp<2 를 요구해 통합할 수 없다. 자기 uv.lock 으로 따로 실행한다.
+exclude = ["Day02/runtime/*"]
+
+[tool.uv.sources]
+day01-langgraph-tutorial = { workspace = true }
+day02-deepagents-rag = { workspace = true }
+day03-agent-architecture-labs = { workspace = true }
+day05-agent-evaluation-labs = { workspace = true }
+day07 = { workspace = true }
+day08-agent-guardrails = { workspace = true }
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
 
 [tool.pyright]
 pythonVersion = "3.13"

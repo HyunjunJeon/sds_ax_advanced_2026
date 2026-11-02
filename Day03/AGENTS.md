@@ -19,7 +19,7 @@ Supervisor/Handoff)로 확장하고, **어떤 실패가 왜 개선됐고 추가 
 --baseline  --candidate  --changed  --require-same-plan  --out
 ```
 
-실행 조건은 **각 파일 상단의 `실험 = LabConfig(...)`** 에 있다 (정의: `common/lab.py:64`).
+실행 조건은 **각 파일 상단의 `실험 = LabConfig(...)`** 에 있다 (정의: `common/lab.py:65`).
 조건을 바꾸려면 **파일을 편집하고 다시 실행한다.**
 
 ```bash
@@ -80,7 +80,7 @@ uv run python 01_baseline_rag.py     # 파일 안의 설정을 그대로 사용
 
 | 명령 | 대상 | 기대 결과 |
 |---|---|---|
-| `uv run pytest -q` | `tests/` — 제공 예제의 회귀검사 | **30 passed.** 과제 구현 여부와 무관하게 항상 통과해야 한다 |
+| `uv run pytest -q` | `tests/` — 제공 예제의 회귀검사 | **36 passed.** 과제 구현 여부와 무관하게 항상 통과해야 한다 |
 | `uv run pytest challenge_tests -q` | 05/07/A/B/C의 공개 반례 | **구현 전 44 failed가 정상이다** |
 
 `uv run pytest -q`가 깨졌다면 과제 미구현 때문이 아니라 **제공 코드에 회귀가 났다는 뜻**이다.
@@ -98,7 +98,7 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 
 **05/07과 10~12는 실행 방식이 다르다.** 10~12는 `run_challenge`가 안내문을 출력한 뒤 공개
 테스트를 **바로 실행**한다 (`common/challenges.py:14`). 05/07은 `run_lab`이라 **실제 실험 실행을
-시도**하다가 그래프 안에서 `NotImplementedError`가 나고, `common/lab.py:399`가 다음 단계를
+시도**하다가 그래프 안에서 `NotImplementedError`가 나고, `common/lab.py:407`가 다음 단계를
 안내한 뒤 exit code 1로 끝난다 — 테스트가 자동으로 돌지 않으므로 출력된 pytest 명령을 따로 실행한다.
 
 ## 3. 과제 대응 프로토콜
@@ -142,7 +142,7 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 
 | 수강생 질문 | 답이 있는 곳 |
 |---|---|
-| 실험 조건을 어떻게 바꾸나요? | `common/lab.py:64` `LabConfig` (필드마다 주석에 의미가 있다) |
+| 실험 조건을 어떻게 바꾸나요? | `common/lab.py:65` `LabConfig` (필드마다 주석에 의미가 있다) |
 | 구조별 그래프는 어디 있나요? | 번호 파일의 `build(service)` 함수 |
 | 검색·생성·검토는 누가 하나요? | `common/service.py` — `retrieve`/`ensure`/`generate`/`review`/`finish`/`worker`/`plan`/`route`/`synthesize` |
 | State와 합류(reducer)는? | `common/contracts.py:84` `merge_results`, `:93` `State` |
@@ -151,7 +151,7 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 | 웹 문서는 어떻게 적재되나요? | `common/exa_client.py` → `common/ingestion.py` → `common/source_registry.py:89` `reserve` |
 | 평가(judge)는 어떻게 하나요? | `common/evaluation.py` — gold는 **이 모듈에서만** 읽고 Agent 입력에 넣지 않는다 |
 | 짝 비교가 왜 거절되나요? | `common/paired_analysis.py:81` `analyze_pairs` — 미선언 변수, 짝 누락, 반복 부족 |
-| 결과는 어디에 저장되나요? | `outputs/rag-comparison/<run_id>/` (`common/lab.py:364` `output_dir`) |
+| 결과는 어디에 저장되나요? | `outputs/rag-comparison/<run_id>/` (`common/lab.py:372` `output_dir`) |
 | Day02 코드는 어디에? | `vendor/day02/` (`common/day02_bridge.py`가 연결한다) |
 | 재현에 필요한 hash는? | `common/provenance.py` — 코드·자료·lock의 hash만 기록하고 `.env`는 읽지 않는다 |
 
@@ -248,3 +248,11 @@ uv run python 12_ingestion_challenge.py                    # 과제 C
 
 EXA 웹 검색과 모델 호출은 수강생의 크레딧을 사용한다. 이 활동을 실행하기 전에 에이전트는
 **규모를 한 줄로 고지**한다.
+
+## 2026-10 공식 원문 확장
+
+선택 실습과 평가 해석은 `docs/OCTOBER_2026.md`를 먼저 읽는다. 기존 번호 순서와 과제 경계는 같다.
+`LabConfig(corpus="official-2026-10", workspace="work/rag/새-작업영역")`으로 선택한다.
+CLI 플래그를 추가한 것이 아니다. 09의 CASES도 선택 코퍼스의 ID로 바꾼다.
+공식 코퍼스의 `gold.jsonl`도 사후 평가 전용이다. `review_status=draft`는 사람 검수 전 초안이며,
+인용 구조 통과·문서 recall·의미상 정답 여부는 따로 해석한다. 실패·평가 누락·usage 누락을 숨기지 않는다.

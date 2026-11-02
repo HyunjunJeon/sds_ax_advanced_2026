@@ -1,0 +1,70 @@
+{
+  "_note": "수업용 가상 데이터입니다. 실제 고객이나 거래가 아닙니다.",
+  "알파": [
+    {
+      "payment_id": "P-9001",
+      "invoice_id": "INV-2026-08",
+      "approved_at": "2026-09-01T09:00",
+      "amount": 1200000,
+      "base_fee_part": 1000000,
+      "usage_fee_part": 200000,
+      "status": "approved"
+    },
+    {
+      "payment_id": "P-9002",
+      "invoice_id": "INV-2026-08",
+      "approved_at": "2026-09-01T09:02",
+      "amount": 1200000,
+      "base_fee_part": 1000000,
+      "usage_fee_part": 200000,
+      "status": "approved"
+    },
+    {
+      "payment_id": "P-8101",
+      "invoice_id": "INV-2026-07",
+      "approved_at": "2026-08-01T09:00",
+      "amount": 1000000,
+      "base_fee_part": 1000000,
+      "usage_fee_part": 0,
+      "status": "approved"
+    },
+    {
+      "payment_id": "P-7001",
+      "invoice_id": "INV-2026-03",
+      "approved_at": "2026-04-01T09:00",
+      "amount": 1000000,
+      "base_fee_part": 1000000,
+      "usage_fee_part": 0,
+      "status": "approved"
+    },
+    {
+      "payment_id": "P-7002",
+      "invoice_id": "INV-2026-03",
+      "approved_at": "2026-04-01T09:05",
+      "amount": 1000000,
+      "base_fee_part": 1000000,
+      "usage_fee_part": 0,
+      "status": "approved"
+    }
+  ],
+  "베타": [
+    {
+      "payment_id": "P-5001",
+      "invoice_id": "INV-B-2026-08",
+      "approved_at": "2026-09-01T10:00",
+      "amount": 300000,
+      "base_fee_part": 300000,
+      "usage_fee_part": 0,
+      "status": "approved"
+    },
+    {
+      "payment_id": "P-5002",
+      "invoice_id": "INV-B-2026-08",
+      "approved_at": "2026-09-01T10:01",
+      "amount": 300000,
+      "base_fee_part": 300000,
+      "usage_fee_part": 0,
+      "status": "approved"
+    }
+  ]
+}

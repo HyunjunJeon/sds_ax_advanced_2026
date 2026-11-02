@@ -14,6 +14,7 @@ import json
 import platform
 import sys
 
+from day02.corpus import load_corpus
 from day02.settings import Settings, read_json
 
 
@@ -65,6 +66,7 @@ def main():
         "skills": skill_names(settings.root),
         "rhwp_installed": (settings.root / "bin/rhwp").exists(),
         "server": server_state,
+        "official_corpus": load_corpus(settings.root, "official-2026-10").provenance(),
     }
     print(json.dumps(report, ensure_ascii=False, indent=2))
     if not report["python_ok"]:

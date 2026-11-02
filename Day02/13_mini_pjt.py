@@ -24,6 +24,8 @@ import json
 import sys
 from pathlib import Path
 
+from day02.corpus import load_corpus
+
 ROOT = Path(__file__).resolve().parent
 
 # ── 비교 조건 ────────────────────────────────────────────────────────────────
@@ -68,8 +70,9 @@ def main():
     def key(row):
         return row["case_id"], row["repeat"]
 
+    corpus = load_corpus(ROOT, base_config.get("corpus", "business"))
     golds = {g["id"]: g for g in
-             (json.loads(line) for line in (ROOT / "data/gold.jsonl").read_text(encoding="utf-8").splitlines()
+             (json.loads(line) for line in corpus.gold_path.read_text(encoding="utf-8").splitlines()
               if line.strip())}
 
     base_map = {key(r): r for r in base_rows}

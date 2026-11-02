@@ -3,11 +3,11 @@ name = "day03-agent-architecture-labs"
 version = "0.3.0"
 requires-python = ">=3.13,<3.14"
 dependencies = [
-  "deepagents==0.7.13",
-  "langchain==1.4.0",
-  "langchain-core==1.6.2",
-  "langgraph==1.2.11",
-  "langchain-openai==1.6.0",
+  "deepagents==0.7.32",
+  "langchain",
+  "langchain-core",
+  "langgraph",
+  "langchain-openai",
   "python-dotenv>=1.2,<2",
   "httpx==0.28.1",
   "pandas>=2.2,<4",
@@ -24,5 +24,8 @@ pythonpath = ["."]
 [tool.pyright]
 extraPaths = [".", "vendor/day02/src"]
 pythonVersion = "3.13"
-venvPath = "."
+venvPath = ".."
 venv = ".venv"
+
+[tool.uv]
+package = false

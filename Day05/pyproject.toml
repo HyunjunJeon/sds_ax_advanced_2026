@@ -3,13 +3,12 @@ name = "day05-agent-evaluation-labs"
 version = "0.1.0"
 description = "Day05: DeepEval 로 에이전트를 평가하고 Langfuse 와 연동한다"
 requires-python = ">=3.13,<3.14"
-# Day03 과 겹치는 패키지는 같은 버전으로 고정한다.
-# deepeval 은 rich·huggingface-hub 를 내려받게 만들므로 Day05 를 독립 프로젝트로 둔다.
+# 루트 workspace 의 멤버다. 해석 결과는 저장소 루트의 uv.lock 하나로 고정한다.
 dependencies = [
-  "deepagents==0.7.13",
-  "langchain==1.4.0",
-  "langchain-core==1.6.2",
-  "langgraph==1.2.11",
+  "deepagents==0.7.32",
+  "langchain",
+  "langchain-core",
+  "langgraph",
   "langchain-openrouter==0.2.8",
   # 0.11+ 는 pydantic<2.13 을 강제해 deepeval 스택과 어긋난다. Day04 와 같은 0.10.8.
   "openrouter==0.10.8",
@@ -32,5 +31,5 @@ pythonpath = ["."]
 [tool.pyright]
 extraPaths = ["."]
 pythonVersion = "3.13"
-venvPath = "."
+venvPath = ".."
 venv = ".venv"

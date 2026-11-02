@@ -9,14 +9,14 @@
 
 ## 1. 실행 환경
 
-Day04에는 `pyproject.toml`이 없다. Day02·Day03의 가상환경과 섞지 않는다 (`README.md:26-32`).
+Day04에는 `pyproject.toml`이 없다. 패키지는 저장소 루트 `pyproject.toml`에 있고 `uv run`이 루트 환경을 찾는다 (`README.md:26-32`).
 
 ```bash
 cd Day04
-uv venv --python 3.13 .venv
-uv pip install -p .venv/bin/python -r requirements.txt
+# 설치는 저장소 루트의 `uv sync --locked` 한 번으로 끝난다.
+# 여기서 `uv sync`를 실행하지 않는다.
 cp -n .env.example .env
-.venv/bin/python <파일>
+uv run python <파일>
 ```
 
 - `.env`에는 `OPENROUTER_API_KEY`와 `OPENROUTER_MODEL`(기본값 `openai/gpt-5.6-luna`)이 있다 (`README.md:40-41`). **`.env` 내용을 출력하지 않는다.** "설정됨/미설정"만 확인하고, 키가 없으면 `.env.example`을 보고 수강생이 직접 채우게 한다.

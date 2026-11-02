@@ -1,0 +1,117 @@
+{
+  "schema_version": 1,
+  "corpus": "official-2026-10",
+  "as_of": "2026-10-02",
+  "catalog_sha256": "5e982a00afd7dfb92ac04c314204f9c286b60cbfeb5367e9aca13f9717de1c12",
+  "sources": [
+    {
+      "id": "deepagents",
+      "path": "sources/deepagents-changelog.md",
+      "url": "https://raw.githubusercontent.com/langchain-ai/deepagents/4394bcd00b8eb46e7c423939643a0dfcfb5d8773/libs/deepagents/CHANGELOG.md",
+      "version": "0.7.21",
+      "commit": "4394bcd00b8eb46e7c423939643a0dfcfb5d8773",
+      "published_at": "2026-09-30",
+      "retrieved_at": "2026-10-02T10:22:54.269916+00:00",
+      "sha256": "8ec33d18144280e22a74393820a294f2251da189078e9f712c9eb8c0a859b860",
+      "license": "MIT"
+    },
+    {
+      "id": "openviking",
+      "path": "sources/openviking-0.4.22.md",
+      "url": "https://github.com/volcengine/OpenViking/releases/tag/v0.4.22",
+      "api_url": "https://api.github.com/repos/volcengine/OpenViking/releases/tags/v0.4.22",
+      "release_id": 397983577,
+      "version": "0.4.22",
+      "commit": "e8716760934d95ef73414484a45bfe475b9296e2",
+      "published_at": "2026-09-28T05:56:50Z",
+      "upstream_updated_at": "2026-09-28T05:56:50Z",
+      "retrieved_at": "2026-10-02T10:22:54.269916+00:00",
+      "sha256": "9296980485a83bc035a380a45749ba3974fd4376bbc7fc7427d8f72f06a08a88",
+      "license": "Apache-2.0"
+    }
+  ],
+  "documents": [
+    {
+      "doc_id": "deepagents-0.7.21",
+      "source_id": "deepagents",
+      "path": "documents/deepagents-0.7.21.md",
+      "sha256": "c524d693a42a8d393689eb43e093fe46caccbda828abaf25c5079bdea734a1dd",
+      "start_line": 5,
+      "end_line": 10,
+      "published_at": "2026-09-30"
+    },
+    {
+      "doc_id": "deepagents-0.7.18",
+      "source_id": "deepagents",
+      "path": "documents/deepagents-0.7.18.md",
+      "sha256": "d028de6d705518591028c1f910572e9f7f11bc2519371d6ff3e6bd271294dec3",
+      "start_line": 25,
+      "end_line": 32,
+      "published_at": "2026-09-22"
+    },
+    {
+      "doc_id": "deepagents-0.7.15",
+      "source_id": "deepagents",
+      "path": "documents/deepagents-0.7.15.md",
+      "sha256": "a6ef3329e83bf15ad4bd7841fc063402d8fa159ed582423112fec4dcb7c1c2f4",
+      "start_line": 50,
+      "end_line": 58,
+      "published_at": "2026-09-16"
+    },
+    {
+      "doc_id": "deepagents-0.7.14",
+      "source_id": "deepagents",
+      "path": "documents/deepagents-0.7.14.md",
+      "sha256": "850d70b73bf0e8ace0f7e7026a307019c2f1fdf12ce47bea3196080beba17fed",
+      "start_line": 59,
+      "end_line": 73,
+      "published_at": "2026-09-13"
+    },
+    {
+      "doc_id": "deepagents-0.7.13",
+      "source_id": "deepagents",
+      "path": "documents/deepagents-0.7.13.md",
+      "sha256": "2cddea8cf01ca1e508945830d1717e27ba6ab113d5e9df2fd771919b91027c9e",
+      "start_line": 74,
+      "end_line": 79,
+      "published_at": "2026-09-02"
+    },
+    {
+      "doc_id": "openviking-session-api",
+      "source_id": "openviking",
+      "path": "documents/openviking-session-api.md",
+      "sha256": "065f40a6473171a2c752b59ed9d00c5f193d3977cc64518ed958d24edf155857",
+      "start_line": 94,
+      "end_line": 101,
+      "published_at": "2026-09-28T05:56:50Z"
+    },
+    {
+      "doc_id": "openviking-commit-failure",
+      "source_id": "openviking",
+      "path": "documents/openviking-commit-failure.md",
+      "sha256": "d20f1a1f03eaa3fa070cc05bde1c99d6dd3cd284f3dacbca6e0c5aec34445ab8",
+      "start_line": 102,
+      "end_line": 103,
+      "published_at": "2026-09-28T05:56:50Z"
+    },
+    {
+      "doc_id": "openviking-acl",
+      "source_id": "openviking",
+      "path": "documents/openviking-acl.md",
+      "sha256": "98095730cf57f6fd295b45d7678e25ef4cf6fdd1fc2691bd44cfa7c5b62d07ef",
+      "start_line": 118,
+      "end_line": 134,
+      "published_at": "2026-09-28T05:56:50Z"
+    },
+    {
+      "doc_id": "openviking-cosine",
+      "source_id": "openviking",
+      "path": "documents/openviking-cosine.md",
+      "sha256": "1db62695df0f652df0367d7ccedb3f6f0cdfb8d4c122fcb07663231d1ca33803",
+      "start_line": 135,
+      "end_line": 136,
+      "published_at": "2026-09-28T05:56:50Z"
+    }
+  ],
+  "review": "Source bytes and excerpt coordinates verified; no human review claimed."
+}

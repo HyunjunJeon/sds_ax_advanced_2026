@@ -5,6 +5,7 @@ from pathlib import Path
 
 from filelock import FileLock
 
+from day02.corpus import load_corpus
 from day02.errors import ConfigurationError, ServiceError
 from day02.evidence import Metadata, digest
 from day02.ingestion.chunking import bounded_chunks
@@ -53,6 +54,9 @@ def prepare(settings: Settings, path: Path, *, entity: str = "공통", pages: li
 
 
 def load_catalog(settings: Settings, catalog: Path):
+    if (catalog.parent / "manifest.json").is_file():
+        # 공식 원문 묶음은 적재 전에 출처·발췌 좌표·해시를 함께 확인한다.
+        load_corpus(settings.root, catalog.parent.name)
     records = read_json(catalog)
     stems = set()
     for record in records:

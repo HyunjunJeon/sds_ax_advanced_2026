@@ -1,4 +1,4 @@
-"""OpenViking 0.4.16 HTTP adapter; no in-process database globals."""
+"""OpenViking 0.4.22 HTTP adapter; no in-process database globals."""
 from __future__ import annotations
 
 from pathlib import Path

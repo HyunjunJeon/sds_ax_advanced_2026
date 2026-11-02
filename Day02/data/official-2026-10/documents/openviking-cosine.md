@@ -1,0 +1,2 @@
+6. **Local vector engine cosine score range (#5358):** native C++ and cuVS map pure cosine scores from `[-1,1]` to `(cos + 1) / 2` in `[0,1]`; ranking is unchanged (e.g. raw 0 → 0.5, -0.6 → 0.2). IP, L2, and sparse-fusion scores are unchanged, and thresholds are not adjusted automatically. Callers using `score_threshold` or score filters on cosine indexes should recalibrate. Existing indexes need no rebuild; a downgrade restores raw scores.
+

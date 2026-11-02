@@ -3,13 +3,13 @@ name = "day08-agent-guardrails"
 version = "0.1.0"
 description = "Day08: DeepAgents에 Guardrail을 연결하고 공격 유형별 방어 효과를 비교한다"
 requires-python = ">=3.13,<3.14"
-# Day05·Day07 과 겹치는 패키지는 같은 버전으로 고정한다.
-# torch·transformers 는 LFM PII-Detector 로컬 실행용이다. Linux/WSL 은 CPU 인덱스를 쓴다.
+# 루트 workspace 의 멤버다. 해석 결과는 저장소 루트의 uv.lock 하나로 고정한다.
+# torch·transformers 는 LFM PII-Detector 로컬 실행용이다. Linux/WSL 의 CPU 인덱스는 루트 pyproject.toml 에 있다.
 dependencies = [
-  "deepagents==0.7.13",
-  "langchain==1.4.0",
-  "langchain-core==1.6.2",
-  "langgraph==1.2.11",
+  "deepagents==0.7.32",
+  "langchain",
+  "langchain-core",
+  "langgraph",
   "langgraph-checkpoint-sqlite==3.1.1",
   "langchain-openrouter==0.2.8",
   "openrouter==0.10.8",
@@ -21,14 +21,6 @@ dependencies = [
 
 [dependency-groups]
 dev = ["pytest>=9,<10"]
-
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
-[tool.uv.sources]
-torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
 
 [tool.uv]
 package = false
@@ -43,5 +35,5 @@ filterwarnings = ["ignore:Pydantic serializer warnings"]
 [tool.pyright]
 extraPaths = ["."]
 pythonVersion = "3.13"
-venvPath = "."
+venvPath = ".."
 venv = ".venv"

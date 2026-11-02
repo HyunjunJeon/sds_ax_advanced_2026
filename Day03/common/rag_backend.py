@@ -30,6 +30,7 @@ from .day02_bridge import (
     KeywordRetriever,
     OpenVikingRetriever,
     VikingClient,
+    load_corpus,
     make_evidence,
     select_evidence,
     terms,
@@ -145,11 +146,18 @@ class Backend:
         return expected
 
     def prepare(self, ingest=False):
-        catalog = json.loads((DAY02 / "data/business/catalog.json").read_text())
+        corpus = load_corpus(DAY02, self.settings.corpus)
+        catalog = corpus.catalog()
         current = self.registry.rows("internal")
-        if len(current) == len(catalog):
+        expected = {r["metadata"]["doc_id"]: r for r in catalog}
+        if any(r["metadata"]["doc_id"] not in expected for r in current):
+            raise ValueError("다른 내부 코퍼스가 있습니다. 새 workspace로 준비하세요.")
+        if len(current) == len(catalog) and {r["metadata"]["doc_id"] for r in current} == set(expected):
             for row in current:
-                if digest(Path(row["path"]).read_text()) != row["hash"]:
+                item = expected[row["metadata"]["doc_id"]]
+                path = DAY02 / item["path"]
+                if (digest(path.read_text()) != row["hash"] or
+                        row["metadata"] != item["metadata"]):
                     raise ValueError("내부 코퍼스가 변경되었습니다. 새 workspace로 준비하세요.")
             if self.viking:
                 self.viking.read(current[0]["uri"], limit=1)
@@ -157,6 +165,8 @@ class Backend:
         previous = DAY02 / "outputs/ingestion.json"
         manifest = {}
         if self.viking and not ingest:
+            if self.settings.corpus != "business":
+                raise FileNotFoundError("새 공식 코퍼스는 새 workspace와 ingest=True로 먼저 준비하세요.")
             if not previous.exists():
                 raise FileNotFoundError(
                     "초기 적재 기록이 없습니다. 00_prepare.py의 LabConfig에서 "

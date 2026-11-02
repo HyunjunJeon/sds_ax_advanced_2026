@@ -20,6 +20,7 @@
   이후 인용의 원문 무결성 근거가 사라진다.
 """
 import argparse
+from day02.corpus import load_corpus
 from day02.ingestion.pipeline import ingest
 from day02.openviking.client import VikingClient
 from day02.settings import Settings
@@ -28,10 +29,12 @@ from day02.settings import Settings
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--expect-reused", action="store_true")
+    parser.add_argument("--corpus", default="business", help="business 또는 official-2026-10")
     args = parser.parse_args()
     settings = Settings.load()
+    corpus = load_corpus(settings.root, args.corpus)
     with VikingClient.configured(settings) as client:
-        result = ingest(settings, client, settings.root / "data/business/catalog.json")
+        result = ingest(settings, client, corpus.catalog_path, namespace=corpus.name)
     if args.expect_reused:
         assert result["reused"] == len(result["documents"]), "기존 원문이 모두 재사용되지 않았습니다."
     print(f"적재 완료: documents={len(result['documents'])}, reused={result['reused']}")

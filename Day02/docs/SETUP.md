@@ -2,14 +2,14 @@
 
 ## 환경
 
-Day02 앱과 OpenViking 서버는 각각 Python 3.13 환경과 별도 uv.lock을 사용한다.
-상위 과정의 Python 3.14 환경은 변경하지 않는다.
+Day02 앱은 저장소 루트의 Python 3.13 공용 환경과 루트 uv.lock을 사용한다.
+OpenViking 서버는 `mcp<2`를 요구해 `runtime/openviking`의 Python 3.13 환경과 별도 uv.lock을 사용한다.
 
 | 구성 | 기준 |
 |---|---|
 | Python | 3.13 |
-| DeepAgents | 0.7.13 |
-| OpenViking | 0.4.16 |
+| DeepAgents | 0.7.32 |
+| OpenViking | 0.4.22 |
 | rhwp CLI | 0.8.6, 공식 아카이브 SHA256 검증 |
 | 기본 답변 모델 | `google/gemini-3.8-flash` (`.env`의 `DAY02_MODEL`로 변경) |
 | 서버 문서 처리·시각 확인 모델 | `google/gemini-3.8-flash` |
@@ -24,7 +24,7 @@ OpenViking 공식 Quick Start는 Windows를 지원 OS로 표기하지만, Window
 
 실제 실행 검증은 macOS Apple Silicon에서 수행했다. Windows/Linux의 서버 실기동을 이 Mac에서 검증했다고 표시하지 않는다.
 
-OpenViking 0.4.16 wheel과 의존성 해석 결과:
+아래 OS별 wheel/해석 기록은 이전 OpenViking 0.4.16 기준입니다. 0.4.22의 다른 OS 실기동 검증으로 해석하지 않습니다.
 
 - macOS Apple Silicon: OpenViking wheel의 플랫폼 태그는 macOS 14 이상이다. 실기동 검증 환경이다.
 - macOS Intel: 제공된 OpenViking wheel의 태그는 macOS 15 이상이다. 실기동 미검증.
@@ -35,6 +35,12 @@ Windows 네이티브 실행에서 네이티브 의존성 문제가 생기면 WSL
 서버와 앱을 서로 다른 OS 환경에서 띄우기보다 같은 WSL 환경에서 실행하는 것이 경로·포트 관리를 단순하게 한다.
 
 ## 키와 설정
+
+앱 환경은 저장소 루트 `pyproject.toml`의 `exclude-newer`와 루트 `uv.lock`으로, OpenViking 환경은 `runtime/openviking`의 같은 파일로 고정합니다.
+기존 OpenViking 저장소는 복사본에서 새 버전을 확인한 뒤 전환하세요. 새 버전의 cosine 점수
+변환·Session used API 제거·ACL 변경은 [10월 안내](OCTOBER_2026.md)를 참고합니다.
+`uv run python scripts/verify_openviking_contract.py`는 임시 서버와 로컬 모형 모델로 HTTP 계약을 검사하며,
+실제 임베딩·모델 품질은 검증하지 않습니다.
 
 설정 우선순위는 프로세스 환경변수 → Day02/.env → 상위 .env다.
 Day02/.env에 빈 키를 적으면 상위 파일의 키를 덮을 수 있으므로, 상위 키를 재사용할 때는 빈 API 키 항목을 만들지 않는다.

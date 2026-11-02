@@ -1,5 +1,9 @@
 # Day03 — 같은 RAG를 멀티에이전트로 확장하고 개선하기
 
+**2026-10-31 개편:** DeepAgents 0.7.32 기준 저장소 루트 공용 환경과 Day02와 동일한 공식 원문 스냅샷을 제공합니다.
+[10월 공통 코퍼스·구조 비교 안내](docs/OCTOBER_2026.md)에서 `LabConfig.corpus` 선택과
+인용 문서 recall·Judge 커버리지·토큰 사용량 해석을 확인하세요.
+
 **이 폴더에서 `00` → `09`를 읽고 실행한 뒤, `10` → `13`의 고급 구현 과제를 수행합니다.** 번호 파일에 그래프와 설계 주석이 있고, 공통 검색·근거·저장은 `common/`에서 공유합니다. 필요한 Day02 코드와 업무 문서는 `vendor/day02`에 동봉했습니다. 그중 `05`(병렬)와 `07`(Handoff)은 **학생이 직접 구현하는 파일**입니다.
 
 ## 실험 방식: CLI 플래그 없이, 코드를 고쳐 실행한다
@@ -19,7 +23,7 @@ uv run python 01_baseline_rag.py   # 파일 안의 실험 설정을 그대로 �
 모든 명령은 이 README와 `pyproject.toml`이 있는 **Day03 폴더**에서 실행합니다.
 
 ```bash
-uv sync --locked
+# 설치는 저장소 루트의 `uv sync` 한 번으로 끝난다. 여기서 `uv sync`를 실행하지 않는다.
 uv run pytest -q
 uv run python 00_prepare.py   # 기본: backend="local", 환경·코퍼스 점검
 uv run python 01_baseline_rag.py
@@ -91,7 +95,7 @@ uv run python 01_baseline_rag.py
 기존 `.openviking/rag.conf`와 저장소가 있으면 별도 터미널에서 다음 명령을 실행하고 유지합니다(서버 프로세스 자체는 외부 프로그램이다).
 
 ```bash
-uv run --isolated --no-project --python 3.13 --with openviking==0.4.16 openviking-server --config .openviking/rag.conf --host 127.0.0.1 --port 1935
+uv run --isolated --no-project --python 3.13 --with openviking==0.4.22 openviking-server --config .openviking/rag.conf --host 127.0.0.1 --port 1935
 ```
 
 처음 설치하거나 모델 키를 바꿨다면 `native_server.py` 상단의 `ACTION`을 단계별로 바꿔 실행한다: `"configure"`(설정 생성) → 위 서버 명령 실행 → `"init"`(문서 계정 발급). 이후 00_prepare.py의 `LabConfig`에서 `backend="viking"`, `viking_env=".openviking/rag-client.env"`, `workspace="work/rag/class-native"`, `ingest=True`, `seconds=1800`으로 첫 적재를 실행한다. 첫 적재에는 요약·임베딩·색인 대기가 포함된다. 준비 후 같은 workspace를 재사용한다. `.env`, `.openviking`, `.venv`, `work`는 수강생 배포용 소스에 포함하지 않습니다.

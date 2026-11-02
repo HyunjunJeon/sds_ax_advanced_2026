@@ -27,8 +27,8 @@ CSV 프로그램, 세 Skill, `evidence/` 저장 방식은 이번 수업용으로
 [Day04 준비](../README.md#준비)를 마친 뒤 모든 명령을 **Day04에서** 실행한다.
 
 ```bash
-.venv/bin/python coding_skills/prepare.py
-(cd work/coding && ../../.venv/bin/python -m unittest discover -s tests -v)
+uv run python coding_skills/prepare.py
+(cd work/coding && ../../../.venv/bin/python -m unittest discover -s tests -v)
 ```
 
 초기 결과는 **6개 실행, 기간 경계 검사 1개 실패**다. 이 명령은 모델을 호출하지 않는다.
@@ -48,25 +48,25 @@ Day04 첫 실행에서 이미 버그를 고쳤다면 새 사본을 준비하고 
 **개념 설명:** 프로젝트 작업 없이 답하는지 확인한다.
 
 ```bash
-.venv/bin/python coding_skills/agent.py --prompt 'Python의 회귀 테스트가 뭐야? 프로젝트 조사나 수정 요청은 아니야.'
+uv run python coding_skills/agent.py --prompt 'Python의 회귀 테스트가 뭐야? 프로젝트 조사나 수정 요청은 아니야.'
 ```
 
 **수정 없는 리뷰:** 실패를 확인하고 파일·줄·발생 입력을 보고하되 프로젝트는 보존한다.
 
 ```bash
-.venv/bin/python coding_skills/agent.py --prompt 'CSV 매출 집계 프로그램을 README 계약과 실제 테스트로 리뷰해 줘. 코드·테스트·README는 수정하지 말고 리뷰 파일을 남겨 줘.'
+uv run python coding_skills/agent.py --prompt 'CSV 매출 집계 프로그램을 README 계약과 실제 테스트로 리뷰해 줘. 코드·테스트·README는 수정하지 말고 리뷰 파일을 남겨 줘.'
 ```
 
 **버그 수정:** 실패 재현, 최소 수정, 새 반례, 실제 재검사를 확인한다.
 
 ```bash
-.venv/bin/python coding_skills/agent.py --prompt 'CSV 매출 집계의 기간 경계 테스트가 실패해. 실제 실패를 재현하고 원인을 고쳐 줘. 기존 tests/test_report.py는 보존하고 새 반례를 추가한 뒤 검사 결과를 보고서에 남겨 줘.'
+uv run python coding_skills/agent.py --prompt 'CSV 매출 집계의 기간 경계 테스트가 실패해. 실제 실패를 재현하고 원인을 고쳐 줘. 기존 tests/test_report.py는 보존하고 새 반례를 추가한 뒤 검사 결과를 보고서에 남겨 줘.'
 ```
 
 **기능 추가:** 버그 수정이 끝난 작업 폴더에 실행한다.
 
 ```bash
-.venv/bin/python coding_skills/agent.py --prompt 'CLI에 선택 옵션 --customer를 추가해 줘. 이름이 정확히 일치하는 고객만 집계하고, 미지정하면 기존 전체 결과를 유지해. 없는 고객은 customers={}, total="0.00"이야. 기간 양끝 포함·paid 조건·환불 합산을 유지하고, 기존 테스트는 보존해. 새 테스트 실패를 먼저 확인한 뒤 구현하고 전체 테스트와 CLI를 실행해 줘. README와 기능 보고서도 작성해 줘.'
+uv run python coding_skills/agent.py --prompt 'CLI에 선택 옵션 --customer를 추가해 줘. 이름이 정확히 일치하는 고객만 집계하고, 미지정하면 기존 전체 결과를 유지해. 없는 고객은 customers={}, total="0.00"이야. 기간 양끝 포함·paid 조건·환불 합산을 유지하고, 기존 테스트는 보존해. 새 테스트 실패를 먼저 확인한 뒤 구현하고 전체 테스트와 CLI를 실행해 줘. README와 기능 보고서도 작성해 줘.'
 ```
 
 | 요청 | 선택할 Skill | 필요한 보조 파일 | 결과 파일 |
@@ -148,7 +148,7 @@ Skill metadata 발견
 ## 실제 에이전트 검사
 
 ```bash
-.venv/bin/python coding_skills/verify_agent.py
+uv run python coding_skills/verify_agent.py
 ```
 
 실제 모델 약 25–45회, 약 2–5분 예상이다. 네 개의 새 에이전트 프로세스에서

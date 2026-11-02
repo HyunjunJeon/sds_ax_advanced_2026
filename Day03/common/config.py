@@ -50,6 +50,7 @@ def viking_url() -> str:
 @dataclass
 class Settings:
     backend: str = "viking"
+    corpus: str = "business"
     workspace: Path = DAY03 / "work/rag/default"
     web: str = "off"  # off / transient / persist
     model: str = ""

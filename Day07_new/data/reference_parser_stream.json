@@ -1,0 +1,3812 @@
+{
+ "status": "ran",
+ "reason": null,
+ "vllm": "0.32.0",
+ "tokenizer": {
+  "status": "real",
+  "source": "zai-org/GLM-5.3-Flash",
+  "revision": "46a050bec13002ad29ee795c16e61cf4fa3c4a9c",
+  "files_sha256": {
+   "tokenizer.json": "19e773648cb4e65de8660ea6365e10acca112d42a854923df93db4a6f333a82d",
+   "tokenizer_config.json": "98b1271574f41abf89427ae2dda030d94dc9478f0edc5a8bd240db213c6fd5fc",
+   "chat_template.jinja": "2614a3c896d53e265f564c23701173c0049f985dacfbae79fc4bcd9f5ba083f4"
+  },
+  "weights_downloaded": false,
+  "gated": false,
+  "xgrammar": "0.2.8",
+  "class": "CachedTokenizersBackend",
+  "fast_detokenizer": true,
+  "transformers": "5.22.1",
+  "tokenizers": "0.23.3"
+ },
+ "structural_tag": [
+  {
+   "tools": [
+    "get_temperature"
+   ],
+   "skip_special_tokens_before": true,
+   "error": null,
+   "skip_special_tokens_after": false,
+   "structural_tag": {
+    "type": "structural_tag",
+    "format": {
+     "type": "triggered_tags",
+     "triggers": [
+      "<tool_call>"
+     ],
+     "tags": [
+      {
+       "type": "tag",
+       "begin": "<tool_call>get_temperature",
+       "content": {
+        "type": "star",
+        "content": {
+         "type": "sequence",
+         "elements": [
+          {
+           "type": "const_string",
+           "value": "<arg_key>city</arg_key><arg_value>"
+          },
+          {
+           "type": "any_text",
+           "excludes": [
+            "<think>",
+            "</think>",
+            "<tool_call>",
+            "</tool_call>",
+            "<arg_key>",
+            "</arg_key>",
+            "<arg_value>",
+            "</arg_value>"
+           ],
+           "max_tokens": null,
+           "max_chars": null
+          },
+          {
+           "type": "const_string",
+           "value": "</arg_value>"
+          }
+         ]
+        }
+       },
+       "end": "</tool_call>"
+      }
+     ],
+     "at_least_one": false,
+     "stop_after_first": false,
+     "excludes": [
+      "<think>",
+      "</think>",
+      "</tool_call>",
+      "<arg_key>",
+      "</arg_key>",
+      "<arg_value>",
+      "</arg_value>"
+     ]
+    }
+   }
+  },
+  {
+   "tools": [
+    "set_timer"
+   ],
+   "skip_special_tokens_before": true,
+   "error": null,
+   "skip_special_tokens_after": false,
+   "structural_tag": {
+    "type": "structural_tag",
+    "format": {
+     "type": "triggered_tags",
+     "triggers": [
+      "<tool_call>"
+     ],
+     "tags": [
+      {
+       "type": "tag",
+       "begin": "<tool_call>set_timer",
+       "content": {
+        "type": "star",
+        "content": {
+         "type": "or",
+         "elements": [
+          {
+           "type": "sequence",
+           "elements": [
+            {
+             "type": "const_string",
+             "value": "<arg_key>minutes</arg_key><arg_value>"
+            },
+            {
+             "type": "json_schema",
+             "json_schema": {
+              "type": "integer"
+             },
+             "style": "json",
+             "any_order": false,
+             "max_whitespace_cnt": null,
+             "excludes": []
+            },
+            {
+             "type": "const_string",
+             "value": "</arg_value>"
+            }
+           ]
+          },
+          {
+           "type": "sequence",
+           "elements": [
+            {
+             "type": "const_string",
+             "value": "<arg_key>label</arg_key><arg_value>"
+            },
+            {
+             "type": "any_text",
+             "excludes": [
+              "<think>",
+              "</think>",
+              "<tool_call>",
+              "</tool_call>",
+              "<arg_key>",
+              "</arg_key>",
+              "<arg_value>",
+              "</arg_value>"
+             ],
+             "max_tokens": null,
+             "max_chars": null
+            },
+            {
+             "type": "const_string",
+             "value": "</arg_value>"
+            }
+           ]
+          }
+         ]
+        }
+       },
+       "end": "</tool_call>"
+      }
+     ],
+     "at_least_one": false,
+     "stop_after_first": false,
+     "excludes": [
+      "<think>",
+      "</think>",
+      "</tool_call>",
+      "<arg_key>",
+      "</arg_key>",
+      "<arg_value>",
+      "</arg_value>"
+     ]
+    }
+   }
+  }
+ ],
+ "token_id_checks": {
+  "count_reasoning_tokens": [
+   {
+    "raw": "도구가 필요한 질문이 아니다.</think>안녕하세요",
+    "tokens_before_think_end": 12,
+    "empty_text_tokens_before_think_end": 1,
+    "stream": 11,
+    "non_stream": 12
+   },
+   {
+    "raw": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature</tool_call>",
+    "tokens_before_think_end": 15,
+    "empty_text_tokens_before_think_end": 2,
+    "stream": 13,
+    "non_stream": 15
+   }
+  ],
+  "vocab": {
+   "<think>": {
+    "id": 154841,
+    "in_all_special_tokens": false
+   },
+   "</think>": {
+    "id": 154842,
+    "in_all_special_tokens": false
+   },
+   "<tool_call>": {
+    "id": 154843,
+    "in_all_special_tokens": false
+   },
+   "</tool_call>": {
+    "id": 154844,
+    "in_all_special_tokens": false
+   },
+   "<arg_key>": {
+    "id": 154847,
+    "in_all_special_tokens": false
+   },
+   "</arg_key>": {
+    "id": 154848,
+    "in_all_special_tokens": false
+   },
+   "<arg_value>": {
+    "id": 154849,
+    "in_all_special_tokens": false
+   },
+   "</arg_value>": {
+    "id": 154850,
+    "in_all_special_tokens": false
+   },
+   "[gMASK]": {
+    "id": 154822,
+    "in_all_special_tokens": true
+   },
+   "<sop>": {
+    "id": 154824,
+    "in_all_special_tokens": true
+   },
+   "<|system|>": {
+    "id": 154826,
+    "in_all_special_tokens": true
+   },
+   "<|user|>": {
+    "id": 154827,
+    "in_all_special_tokens": true
+   },
+   "<|assistant|>": {
+    "id": 154828,
+    "in_all_special_tokens": true
+   },
+   "<|observation|>": {
+    "id": 154829,
+    "in_all_special_tokens": true
+   }
+  },
+  "num_all_special_tokens": 18,
+  "reasoning_end_token_ids": [
+   154842,
+   154843
+  ],
+  "reasoning_end_tokens": [
+   "</think>",
+   "<tool_call>"
+  ],
+  "rows": [
+   {
+    "input": "프롬프트만 (끝이 <think>)",
+    "last_token": "<think>",
+    "is_reasoning_end": false,
+    "generated_len": 0,
+    "find_reasoning_end_on_generated": {
+     "offset": 0,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "프롬프트 + 생각 중",
+    "last_token": "을",
+    "is_reasoning_end": false,
+    "generated_len": 6,
+    "find_reasoning_end_on_generated": {
+     "offset": 6,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "프롬프트 + 생각 + </think>",
+    "last_token": "</think>",
+    "is_reasoning_end": true,
+    "generated_len": 7,
+    "find_reasoning_end_on_generated": {
+     "offset": 6,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "프롬프트 + 생각 + </think> + 답",
+    "last_token": "음",
+    "is_reasoning_end": true,
+    "generated_len": 10,
+    "find_reasoning_end_on_generated": {
+     "offset": 6,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "프롬프트 + <tool_call> (</think> 없음)",
+    "last_token": "_temperature",
+    "is_reasoning_end": true,
+    "generated_len": 3,
+    "find_reasoning_end_on_generated": {
+     "offset": 0,
+     "token_is_content": true
+    }
+   },
+   {
+    "input": "이전 턴에 </think>가 있고 새 프롬프트가 <think>로 끝남",
+    "last_token": "<think>",
+    "is_reasoning_end": false,
+    "generated_len": 0,
+    "find_reasoning_end_on_generated": {
+     "offset": 0,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "<|assistant|>로 끝남 (<think> 없음)",
+    "last_token": "<|assistant|>",
+    "is_reasoning_end": false,
+    "generated_len": 0,
+    "find_reasoning_end_on_generated": {
+     "offset": 0,
+     "token_is_content": false
+    }
+   },
+   {
+    "input": "빈 목록",
+    "last_token": null,
+    "is_reasoning_end": false,
+    "generated_len": 0,
+    "find_reasoning_end_on_generated": {
+     "offset": 0,
+     "token_is_content": false
+    }
+   }
+  ],
+  "skip_special_tokens_true_keeps_markup": "<tool_call>x<arg_key>a</arg_key></tool_call>",
+  "skip_special_tokens_true_on_observation": ""
+ },
+ "always_thinks": {
+  "chat_template_type": "str",
+  "chat_template_len": 10830,
+  "always_thinks": true,
+  "conditions": {
+   "[gMASK]<sop>": true,
+   "Reasoning Effort:": true,
+   "<tool_call>": true,
+   "<arg_key>": true,
+   "<arg_value>": true,
+   "enable_thinking 없음": true
+  },
+  "prompt_render": {
+   "기본": {
+    "tail": ">x<|assistant|><think>",
+    "ends_with_think": true
+   },
+   "enable_thinking=False": {
+    "tail": ">x<|assistant|><think>",
+    "ends_with_think": true
+   },
+   "thinking=False": {
+    "tail": ">x<|assistant|><think>",
+    "ends_with_think": true
+   }
+  },
+  "parser_with_real_template": {
+   "지정 안 함": {
+    "thinking_enabled": true,
+    "initial_state": "ParserState.REASONING"
+   },
+   "enable_thinking=False": {
+    "thinking_enabled": true,
+    "initial_state": "ParserState.REASONING"
+   },
+   "thinking=False": {
+    "thinking_enabled": true,
+    "initial_state": "ParserState.REASONING"
+   }
+  },
+  "warning_captured": [
+   "Ignoring enable_thinking/thinking: the GLM-5.3 chat template has no thinking switch, so reasoning is always on and disabling extraction would leak it into the content."
+  ],
+  "control_template_with_switch": {
+   "always_thinks": false,
+   "thinking_enabled": false
+  },
+  "enable_thinking_false_on_plain_answer": {
+   "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+   "content": null
+  }
+ },
+ "tool_parser_without_reasoning_parser": [
+  {
+   "id": "reasoning_then_call",
+   "stream": {
+    "reasoning": null,
+    "content": "사용자가 서울 기온을 묻는다.</think>\n",
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": "사용자가 서울 기온을 묻는다.</think>",
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null
+   }
+  },
+  {
+   "id": "no_call",
+   "stream": {
+    "reasoning": null,
+    "content": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null
+   }
+  },
+  {
+   "id": "no_call_missing_think_end",
+   "stream": {
+    "reasoning": null,
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null
+   }
+  }
+ ],
+ "evidence": "실제 GLM 파서, 실제 tokenizer, 실제 serving 제너레이터, 구성 문자열, 모델 출력 아님, 라이브 서버 아님",
+ "limit": "엔진과 모델을 돌리지 않았다. RequestOutput 조각과 엔진 종료(stop, length), 종료 토큰은 사람이 정했다. Python 파서만 돌렸고 Rust 파서는 돌리지 않았다. 구조화 태그는 xgrammar로 컴파일해 입력 토큰을 대 봤을 뿐 엔진의 sampling 마스크로 집행하지 않았다.",
+ "tools_empty_array_request": {
+  "rejected": true,
+  "error": "VLLMValidationError: `tools` must not be an empty array. Either provide at least one tool or omit the field entirely. (parameter=tools)"
+ },
+ "tools_empty_parser_direct": {
+  "tools_arg": [],
+  "reasoning": null,
+  "content": null,
+  "tool_calls": [
+   {
+    "name": "get_humidity",
+    "arguments": "{\"city\": \"서울\"}"
+   }
+  ]
+ },
+ "cases": [
+  {
+   "id": "clean_call",
+   "candidates": [],
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    53168,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_temperature",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "get_temperature",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"city\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "서"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "울"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "\"}"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 12,
+     "extract_tool_calls_streaming": 12
+    },
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "reasoning_then_call",
+   "candidates": [],
+   "constructed": true,
+   "raw_text": "사용자가 서울 기온을 묻는다.</think>\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    54685,
+    26613,
+    25635,
+    19931,
+    89118,
+    139966,
+    53754,
+    34818,
+    101,
+    17851,
+    130402,
+    119,
+    16544,
+    13138,
+    13,
+    154842,
+    198,
+    154843,
+    455,
+    53168,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "사",
+    "용",
+    "자",
+    "가",
+    " 서",
+    "울",
+    " 기",
+    "�",
+    "�",
+    "을",
+    " �",
+    "�",
+    "는",
+    "다",
+    ".",
+    "</think>",
+    "\n",
+    "<tool_call>",
+    "get",
+    "_temperature",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      54685
+     ],
+     "text": "사"
+    },
+    {
+     "ids": [
+      26613
+     ],
+     "text": "용"
+    },
+    {
+     "ids": [
+      25635
+     ],
+     "text": "자"
+    },
+    {
+     "ids": [
+      19931
+     ],
+     "text": "가"
+    },
+    {
+     "ids": [
+      89118
+     ],
+     "text": " 서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      53754
+     ],
+     "text": " 기"
+    },
+    {
+     "ids": [
+      34818
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      101
+     ],
+     "text": "온"
+    },
+    {
+     "ids": [
+      17851
+     ],
+     "text": "을"
+    },
+    {
+     "ids": [
+      130402
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      119
+     ],
+     "text": " 묻"
+    },
+    {
+     "ids": [
+      16544
+     ],
+     "text": "는"
+    },
+    {
+     "ids": [
+      13138
+     ],
+     "text": "다"
+    },
+    {
+     "ids": [
+      13
+     ],
+     "text": "."
+    },
+    {
+     "ids": [
+      154842
+     ],
+     "text": "</think>"
+    },
+    {
+     "ids": [
+      198
+     ],
+     "text": "\n"
+    },
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": "사용자가 서울 기온을 묻는다.",
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "deltas": [
+     {
+      "reasoning": "사"
+     },
+     {
+      "reasoning": "용"
+     },
+     {
+      "reasoning": "자"
+     },
+     {
+      "reasoning": "가"
+     },
+     {
+      "reasoning": " 서"
+     },
+     {
+      "reasoning": "울"
+     },
+     {
+      "reasoning": " 기"
+     },
+     {
+      "reasoning": "온"
+     },
+     {
+      "reasoning": "을"
+     },
+     {
+      "reasoning": " 묻"
+     },
+     {
+      "reasoning": "는"
+     },
+     {
+      "reasoning": "다"
+     },
+     {
+      "reasoning": "."
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "get_temperature",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"city\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "서"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "울"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "\"}"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 29,
+     "extract_tool_calls_streaming": 14
+    },
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "non_stream": {
+    "reasoning": "사용자가 서울 기온을 묻는다.",
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울\"}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "\n<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "malformed_markup",
+   "candidates": [
+    "C7"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    53168,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966,
+    154850,
+    154843,
+    455,
+    53168,
+    154847,
+    8923,
+    154848,
+    154849,
+    62641,
+    84359,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_temperature",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울",
+    "</arg_value>",
+    "<tool_call>",
+    "get",
+    "_temperature",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "부",
+    "산",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      62641
+     ],
+     "text": "부"
+    },
+    {
+     "ids": [
+      84359
+     ],
+     "text": "산"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "get_temperature",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"city\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "서"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "울"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 22,
+     "extract_tool_calls_streaming": 22
+    },
+    "arguments_json_valid": [
+     false
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"부산\"}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": false,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value><tool_call>get_temperature<arg_key>city</arg_key><arg_value>부산</arg_value></tool_call>",
+    "accepted": false,
+    "rejected_at": 10,
+    "rejected_token_id": 154843,
+    "rejected_token": "<tool_call>",
+    "prefix": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울</arg_value>"
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "truncated_call",
+   "candidates": [
+    "C2",
+    "C6"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    53168,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_temperature",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울"
+   ],
+   "engine_finish": "length",
+   "stop_token_id": null,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{\"city\": \"서울"
+     }
+    ],
+    "finish_reason": "length",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "get_temperature",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"city\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "서"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "울"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 9,
+     "extract_tool_calls_streaming": 9
+    },
+    "arguments_json_valid": [
+     false
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": false,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": false
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_temperature<arg_key>city</arg_key><arg_value>서울",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "unknown_tool",
+   "candidates": [
+    "C3"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    1523,
+    73352,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_h",
+    "umidity",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      1523
+     ],
+     "text": "_h"
+    },
+    {
+     "ids": [
+      73352
+     ],
+     "text": "umidity"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null,
+    "deltas": [],
+    "tools_streamed": false,
+    "calls": {
+     "parse_delta": 13,
+     "extract_tool_calls_streaming": 13
+    },
+    "arguments_json_valid": []
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "tools_called": false,
+    "finish_reason": "stop",
+    "error": null,
+    "arguments_json_valid": []
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+    "accepted": false,
+    "rejected_at": 2,
+    "rejected_token_id": 1523,
+    "rejected_token": "_h",
+    "prefix": "<tool_call>get"
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "stop",
+     "non_stream": "stop"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "length"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "bad_arg_type",
+   "candidates": [
+    "C4"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+   "tools": [
+    "set_timer"
+   ],
+   "token_ids": [
+    154843,
+    746,
+    16241,
+    154847,
+    36843,
+    154848,
+    154849,
+    21955,
+    100,
+    154850,
+    154847,
+    1502,
+    154848,
+    154849,
+    50015,
+    32146,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "<tool_call>",
+    "set",
+    "_timer",
+    "<arg_key>",
+    "minutes",
+    "</arg_key>",
+    "<arg_value>",
+    "�",
+    "�",
+    "</arg_value>",
+    "<arg_key>",
+    "label",
+    "</arg_key>",
+    "<arg_value>",
+    "라",
+    "면",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      746
+     ],
+     "text": "set"
+    },
+    {
+     "ids": [
+      16241
+     ],
+     "text": "_timer"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      36843
+     ],
+     "text": "minutes"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      21955
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      100
+     ],
+     "text": "곧"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      1502
+     ],
+     "text": "label"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      50015
+     ],
+     "text": "라"
+    },
+    {
+     "ids": [
+      32146
+     ],
+     "text": "면"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": \"곧\", \"label\": \"라면\"}"
+     }
+    ],
+    "finish_reason": "tool_calls",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "set_timer",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"minutes\": "
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "\"곧\", \"label\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "라"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "면"
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "\"}"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 19,
+     "extract_tool_calls_streaming": 19
+    },
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": \"곧\", \"label\": \"라면\"}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>곧</arg_value><arg_key>label</arg_key><arg_value>라면</arg_value></tool_call>",
+    "accepted": false,
+    "rejected_at": 7,
+    "rejected_token_id": 21955,
+    "rejected_token": "�",
+    "prefix": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>"
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "no_call",
+   "candidates": [],
+   "constructed": true,
+   "raw_text": "도구가 필요한 질문이 아니다.</think>안녕하세요, 무엇을 도와드릴까요?",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    47683,
+    87528,
+    19931,
+    150641,
+    23508,
+    47610,
+    230,
+    51248,
+    12796,
+    48104,
+    21899,
+    13,
+    154842,
+    133420,
+    73588,
+    243,
+    90385,
+    11,
+    135577,
+    13558,
+    229,
+    17851,
+    135455,
+    79920,
+    29237,
+    20058,
+    112,
+    132694,
+    35533,
+    30
+   ],
+   "tokens": [
+    "도",
+    "구",
+    "가",
+    " 필요",
+    "한",
+    " �",
+    "�",
+    "문",
+    "이",
+    " 아",
+    "니다",
+    ".",
+    "</think>",
+    "안",
+    "�",
+    "�",
+    "하세요",
+    ",",
+    " 무",
+    "�",
+    "�",
+    "을",
+    " 도",
+    "와",
+    "드",
+    "�",
+    "�",
+    "까",
+    "요",
+    "?"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154827,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      47683
+     ],
+     "text": "도"
+    },
+    {
+     "ids": [
+      87528
+     ],
+     "text": "구"
+    },
+    {
+     "ids": [
+      19931
+     ],
+     "text": "가"
+    },
+    {
+     "ids": [
+      150641
+     ],
+     "text": " 필요"
+    },
+    {
+     "ids": [
+      23508
+     ],
+     "text": "한"
+    },
+    {
+     "ids": [
+      47610
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      230
+     ],
+     "text": " 질"
+    },
+    {
+     "ids": [
+      51248
+     ],
+     "text": "문"
+    },
+    {
+     "ids": [
+      12796
+     ],
+     "text": "이"
+    },
+    {
+     "ids": [
+      48104
+     ],
+     "text": " 아"
+    },
+    {
+     "ids": [
+      21899
+     ],
+     "text": "니다"
+    },
+    {
+     "ids": [
+      13
+     ],
+     "text": "."
+    },
+    {
+     "ids": [
+      154842
+     ],
+     "text": "</think>"
+    },
+    {
+     "ids": [
+      133420
+     ],
+     "text": "안"
+    },
+    {
+     "ids": [
+      73588
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      243
+     ],
+     "text": "녕"
+    },
+    {
+     "ids": [
+      90385
+     ],
+     "text": "하세요"
+    },
+    {
+     "ids": [
+      11
+     ],
+     "text": ","
+    },
+    {
+     "ids": [
+      135577
+     ],
+     "text": " 무"
+    },
+    {
+     "ids": [
+      13558
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      229
+     ],
+     "text": "엇"
+    },
+    {
+     "ids": [
+      17851
+     ],
+     "text": "을"
+    },
+    {
+     "ids": [
+      135455
+     ],
+     "text": " 도"
+    },
+    {
+     "ids": [
+      79920
+     ],
+     "text": "와"
+    },
+    {
+     "ids": [
+      29237
+     ],
+     "text": "드"
+    },
+    {
+     "ids": [
+      20058
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      112
+     ],
+     "text": "릴"
+    },
+    {
+     "ids": [
+      132694
+     ],
+     "text": "까"
+    },
+    {
+     "ids": [
+      35533
+     ],
+     "text": "요"
+    },
+    {
+     "ids": [
+      30
+     ],
+     "text": "?"
+    },
+    {
+     "ids": [
+      154827
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": "도구가 필요한 질문이 아니다.",
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null,
+    "deltas": [
+     {
+      "reasoning": "도"
+     },
+     {
+      "reasoning": "구"
+     },
+     {
+      "reasoning": "가"
+     },
+     {
+      "reasoning": " 필요"
+     },
+     {
+      "reasoning": "한"
+     },
+     {
+      "reasoning": " 질"
+     },
+     {
+      "reasoning": "문"
+     },
+     {
+      "reasoning": "이"
+     },
+     {
+      "reasoning": " 아"
+     },
+     {
+      "reasoning": "니다"
+     },
+     {
+      "reasoning": "."
+     },
+     {
+      "content": "안"
+     },
+     {
+      "content": "녕"
+     },
+     {
+      "content": "하세요"
+     },
+     {
+      "content": ","
+     },
+     {
+      "content": " 무"
+     },
+     {
+      "content": "엇"
+     },
+     {
+      "content": "을"
+     },
+     {
+      "content": " 도"
+     },
+     {
+      "content": "와"
+     },
+     {
+      "content": "드"
+     },
+     {
+      "content": "릴"
+     },
+     {
+      "content": "까"
+     },
+     {
+      "content": "요"
+     },
+     {
+      "content": "?"
+     }
+    ],
+    "tools_streamed": false,
+    "calls": {
+     "parse_delta": 31,
+     "extract_tool_calls_streaming": 19
+    },
+    "arguments_json_valid": []
+   },
+   "non_stream": {
+    "reasoning": "도구가 필요한 질문이 아니다.",
+    "content": "안녕하세요, 무엇을 도와드릴까요?",
+    "tool_calls": [],
+    "tools_called": false,
+    "finish_reason": "stop",
+    "error": null,
+    "arguments_json_valid": []
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "안녕하세요, 무엇을 도와드릴까요?",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "stop",
+     "non_stream": "stop"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "length"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "no_call_missing_think_end",
+   "candidates": [],
+   "constructed": true,
+   "raw_text": "안녕하세요, 무엇을 도와드릴까요?",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    133420,
+    73588,
+    243,
+    90385,
+    11,
+    135577,
+    13558,
+    229,
+    17851,
+    135455,
+    79920,
+    29237,
+    20058,
+    112,
+    132694,
+    35533,
+    30
+   ],
+   "tokens": [
+    "안",
+    "�",
+    "�",
+    "하세요",
+    ",",
+    " 무",
+    "�",
+    "�",
+    "을",
+    " 도",
+    "와",
+    "드",
+    "�",
+    "�",
+    "까",
+    "요",
+    "?"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154827,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      133420
+     ],
+     "text": "안"
+    },
+    {
+     "ids": [
+      73588
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      243
+     ],
+     "text": "녕"
+    },
+    {
+     "ids": [
+      90385
+     ],
+     "text": "하세요"
+    },
+    {
+     "ids": [
+      11
+     ],
+     "text": ","
+    },
+    {
+     "ids": [
+      135577
+     ],
+     "text": " 무"
+    },
+    {
+     "ids": [
+      13558
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      229
+     ],
+     "text": "엇"
+    },
+    {
+     "ids": [
+      17851
+     ],
+     "text": "을"
+    },
+    {
+     "ids": [
+      135455
+     ],
+     "text": " 도"
+    },
+    {
+     "ids": [
+      79920
+     ],
+     "text": "와"
+    },
+    {
+     "ids": [
+      29237
+     ],
+     "text": "드"
+    },
+    {
+     "ids": [
+      20058
+     ],
+     "text": ""
+    },
+    {
+     "ids": [
+      112
+     ],
+     "text": "릴"
+    },
+    {
+     "ids": [
+      132694
+     ],
+     "text": "까"
+    },
+    {
+     "ids": [
+      35533
+     ],
+     "text": "요"
+    },
+    {
+     "ids": [
+      30
+     ],
+     "text": "?"
+    },
+    {
+     "ids": [
+      154827
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+    "content": null,
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null,
+    "deltas": [
+     {
+      "reasoning": "안"
+     },
+     {
+      "reasoning": "녕"
+     },
+     {
+      "reasoning": "하세요"
+     },
+     {
+      "reasoning": ","
+     },
+     {
+      "reasoning": " 무"
+     },
+     {
+      "reasoning": "엇"
+     },
+     {
+      "reasoning": "을"
+     },
+     {
+      "reasoning": " 도"
+     },
+     {
+      "reasoning": "와"
+     },
+     {
+      "reasoning": "드"
+     },
+     {
+      "reasoning": "릴"
+     },
+     {
+      "reasoning": "까"
+     },
+     {
+      "reasoning": "요"
+     },
+     {
+      "reasoning": "?"
+     }
+    ],
+    "tools_streamed": false,
+    "calls": {
+     "parse_delta": 18,
+     "extract_tool_calls_streaming": 0
+    },
+    "arguments_json_valid": []
+   },
+   "non_stream": {
+    "reasoning": "안녕하세요, 무엇을 도와드릴까요?",
+    "content": null,
+    "tool_calls": [],
+    "tools_called": false,
+    "finish_reason": "stop",
+    "error": null,
+    "arguments_json_valid": []
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "non_stream_equals_stub_record": true,
+   "grammar": {
+    "status": "ran",
+    "body": "안녕하세요, 무엇을 도와드릴까요?",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "stop",
+     "non_stream": "stop"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "length"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  }
+ ],
+ "extra_cases": [
+  {
+   "id": "truncated_mid_name",
+   "candidates": [
+    "C2"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_temp",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    11765
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_temp"
+   ],
+   "engine_finish": "length",
+   "stop_token_id": null,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      11765
+     ],
+     "text": "_temp"
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "finish_reason": "length",
+    "error": null,
+    "deltas": [],
+    "tools_streamed": false,
+    "calls": {
+     "parse_delta": 3,
+     "extract_tool_calls_streaming": 3
+    },
+    "arguments_json_valid": []
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "tools_called": false,
+    "finish_reason": "length",
+    "error": null,
+    "arguments_json_valid": []
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_temp",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "stop",
+     "non_stream": "stop"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "length"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "truncated_after_name",
+   "candidates": [
+    "C2"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_temperature",
+   "tools": [
+    "get_temperature"
+   ],
+   "token_ids": [
+    154843,
+    455,
+    53168
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_temperature"
+   ],
+   "engine_finish": "length",
+   "stop_token_id": null,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      53168
+     ],
+     "text": "_temperature"
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{}"
+     }
+    ],
+    "finish_reason": "length",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "get_temperature",
+        "arguments": "{}"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 3,
+     "extract_tool_calls_streaming": 3
+    },
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "get_temperature",
+      "arguments": "{}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": false
+   },
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>get_temperature",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "truncated_after_closed_pair",
+   "candidates": [
+    "C2",
+    "C6"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>5</arg_value><arg_key>label</arg_key><arg_value>라",
+   "tools": [
+    "set_timer"
+   ],
+   "token_ids": [
+    154843,
+    746,
+    16241,
+    154847,
+    36843,
+    154848,
+    154849,
+    20,
+    154850,
+    154847,
+    1502,
+    154848,
+    154849,
+    50015
+   ],
+   "tokens": [
+    "<tool_call>",
+    "set",
+    "_timer",
+    "<arg_key>",
+    "minutes",
+    "</arg_key>",
+    "<arg_value>",
+    "5",
+    "</arg_value>",
+    "<arg_key>",
+    "label",
+    "</arg_key>",
+    "<arg_value>",
+    "라"
+   ],
+   "engine_finish": "length",
+   "stop_token_id": null,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      746
+     ],
+     "text": "set"
+    },
+    {
+     "ids": [
+      16241
+     ],
+     "text": "_timer"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      36843
+     ],
+     "text": "minutes"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      20
+     ],
+     "text": "5"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      1502
+     ],
+     "text": "label"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      50015
+     ],
+     "text": "라"
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": 5, \"label\": \"라"
+     }
+    ],
+    "finish_reason": "length",
+    "error": null,
+    "deltas": [
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": "set_timer",
+        "arguments": null
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "{\"minutes\": "
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "5, \"label\": \""
+       }
+      ]
+     },
+     {
+      "tool_calls": [
+       {
+        "index": 0,
+        "name": null,
+        "arguments": "라"
+       }
+      ]
+     }
+    ],
+    "tools_streamed": true,
+    "calls": {
+     "parse_delta": 14,
+     "extract_tool_calls_streaming": 14
+    },
+    "arguments_json_valid": [
+     false
+    ]
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [
+     {
+      "name": "set_timer",
+      "arguments": "{\"minutes\": 5}"
+     }
+    ],
+    "tools_called": true,
+    "finish_reason": "tool_calls",
+    "error": null,
+    "arguments_json_valid": [
+     true
+    ]
+   },
+   "same": {
+    "tool_calls_same": false,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": false
+   },
+   "grammar": {
+    "status": "ran",
+    "body": "<tool_call>set_timer<arg_key>minutes</arg_key><arg_value>5</arg_value><arg_key>label</arg_key><arg_value>라",
+    "accepted": true,
+    "rejected_at": null,
+    "rejected_token_id": null,
+    "rejected_token": null,
+    "prefix": null
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "tool_calls",
+     "non_stream": "tool_calls"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "tool_calls"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  },
+  {
+   "id": "omitted_tools_call",
+   "candidates": [
+    "C3"
+   ],
+   "constructed": true,
+   "raw_text": "<tool_call>get_humidity<arg_key>city</arg_key><arg_value>서울</arg_value></tool_call>",
+   "tools": [],
+   "token_ids": [
+    154843,
+    455,
+    1523,
+    73352,
+    154847,
+    8923,
+    154848,
+    154849,
+    26612,
+    139966,
+    154850,
+    154844
+   ],
+   "tokens": [
+    "<tool_call>",
+    "get",
+    "_h",
+    "umidity",
+    "<arg_key>",
+    "city",
+    "</arg_key>",
+    "<arg_value>",
+    "서",
+    "울",
+    "</arg_value>",
+    "</tool_call>"
+   ],
+   "engine_finish": "stop",
+   "stop_token_id": 154829,
+   "decoded_equals_raw": true,
+   "deltas_in": [
+    {
+     "ids": [
+      154843
+     ],
+     "text": "<tool_call>"
+    },
+    {
+     "ids": [
+      455
+     ],
+     "text": "get"
+    },
+    {
+     "ids": [
+      1523
+     ],
+     "text": "_h"
+    },
+    {
+     "ids": [
+      73352
+     ],
+     "text": "umidity"
+    },
+    {
+     "ids": [
+      154847
+     ],
+     "text": "<arg_key>"
+    },
+    {
+     "ids": [
+      8923
+     ],
+     "text": "city"
+    },
+    {
+     "ids": [
+      154848
+     ],
+     "text": "</arg_key>"
+    },
+    {
+     "ids": [
+      154849
+     ],
+     "text": "<arg_value>"
+    },
+    {
+     "ids": [
+      26612
+     ],
+     "text": "서"
+    },
+    {
+     "ids": [
+      139966
+     ],
+     "text": "울"
+    },
+    {
+     "ids": [
+      154850
+     ],
+     "text": "</arg_value>"
+    },
+    {
+     "ids": [
+      154844
+     ],
+     "text": "</tool_call>"
+    },
+    {
+     "ids": [
+      154829
+     ],
+     "text": ""
+    }
+   ],
+   "stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "finish_reason": "stop",
+    "error": null,
+    "deltas": [],
+    "tools_streamed": false,
+    "calls": {
+     "parse_delta": 13,
+     "extract_tool_calls_streaming": 13
+    },
+    "arguments_json_valid": []
+   },
+   "non_stream": {
+    "reasoning": null,
+    "content": null,
+    "tool_calls": [],
+    "tools_called": false,
+    "finish_reason": "stop",
+    "error": null,
+    "arguments_json_valid": []
+   },
+   "same": {
+    "tool_calls_same": true,
+    "tools_called_same": true,
+    "reasoning_same": true,
+    "content_same": true,
+    "finish_reason_same": true
+   },
+   "grammar": {
+    "status": "not_run",
+    "reason": "tools가 없으면 태그를 만들지 않는다"
+   },
+   "finish_reason_by_engine_finish": {
+    "stop": {
+     "stream": "stop",
+     "non_stream": "stop"
+    },
+    "length": {
+     "stream": "length",
+     "non_stream": "length"
+    }
+   },
+   "variants": [
+    {
+     "chunk_tokens": 4,
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": "all",
+     "delta_token_ids": true,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "finish_reason",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    },
+    {
+     "chunk_tokens": 1,
+     "delta_token_ids": false,
+     "compared": [
+      "reasoning",
+      "content",
+      "tool_calls",
+      "error"
+     ],
+     "same_as_primary": true,
+     "result": null
+    }
+   ],
+   "status": "ran",
+   "reason": null
+  }
+ ]
+}

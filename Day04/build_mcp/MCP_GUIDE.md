@@ -1,7 +1,7 @@
 # MCP 서버, Stateless 요청, 저장된 업무 상태
 
 이 문서는 MCP 서버 실습을 이해하기 위한 설명이다. 구현 순서는 [README의 1–6단계](README.md)를 따른다.
-기준 환경은 `mcp==2.1.1`이며, 실제 stdio 연결에서 확인한 프로토콜은 **`2026-07-28`**이다.
+기준 환경은 `mcp==2.3.0`이며, 실제 stdio 연결에서 확인한 프로토콜은 **`2026-07-28`**이다.
 프로토콜 설명은 해당 버전의 [공식 명세](https://modelcontextprotocol.io/specification/2026-07-28/basic/transports),
 구현 방법은 [공식 서버 가이드](https://modelcontextprotocol.io/docs/develop/build-server)와
 [Python SDK](https://github.com/modelcontextprotocol/python-sdk)를 참고한다.
@@ -211,9 +211,9 @@ SQLite 저장과 파일 저장은 하나의 원자적 작업이 아니다. DB는
 
 ```bash
 # 모델 없이 실제 서버 프로세스·재시작·근거 파일 검사
-.venv/bin/python build_mcp/verify.py
+uv run python build_mcp/verify.py
 # 실제 모델과 별도 에이전트·서버 프로세스로 네 사례 검사 (유료)
-.venv/bin/python build_mcp/verify_agent.py
+uv run python build_mcp/verify_agent.py
 ```
 
 첫 검사는 서버 계약, 둘째는 Skill 읽기와 실제 에이전트의 도구 사용·파일 재개를 확인한다.

@@ -1,0 +1,14 @@
+{"id": "para-claim-window", "question": "장애 때문에 생긴 손해를 보상받으려고 서류를 접수하려면 최종 마감이 언제인가요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "paraphrase"}
+{"id": "para-lodging-cap", "question": "회사 일로 다른 도시에 가서 하룻밤 묵을 때 최대 얼마까지 돌려받을 수 있나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "paraphrase"}
+{"id": "para-contract-opt-out", "question": "계약이 저절로 연장되는 걸 막으려면 며칠 전에 알려야 하고, 법무에는 무엇을 넘기나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "paraphrase"}
+{"id": "para-search-growth", "question": "검색 쪽 매출은 직전 분기보다 얼마나 늘었나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "paraphrase"}
+{"id": "abbr-log-ttl", "question": "운영 접근 로그 TTL은 얼마이고 예외가 있나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "abbreviation"}
+{"id": "abbr-rollback-rb", "question": "검색 API 배포 직후 RB 여부는 어떤 조건으로 정하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "abbreviation"}
+{"id": "two-ratio-and-deadline", "question": "알파 고객의 한 달 가용률이 98.7%였다면 이용료를 몇 % 돌려받고, 언제까지 청구해야 하나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "two-doc"}
+{"id": "two-incident-and-logs", "question": "검색 장애 원인을 조사할 때 접속 기록을 얼마나 오래 거슬러 볼 수 있고, 스키마가 안 맞는 롤백은 누가 승인하나요?", "entity": "공통", "as_of": "2026-09-08", "namespace": "business", "type": "two-doc"}
+{"id": "version-old-ratio", "question": "6월 30일 시점에 알파 고객 가용률이 99.2%였던 달의 보상 비율은 얼마였나요?", "entity": "알파", "as_of": "2026-06-30", "namespace": "business", "type": "version-trap"}
+{"id": "version-before-amendment", "question": "7월 15일 현재 알파 고객이 장애 보상을 청구할 수 있는 마지막 날은 장애 다음 달 며칠인가요?", "entity": "알파", "as_of": "2026-07-15", "namespace": "business", "type": "version-trap"}
+{"id": "decoy-draft-ratio", "question": "알파 고객의 월간 가용률이 99.9%에 못 미치면 현재 계약상 보상 비율은 얼마인가요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "decoy"}
+{"id": "decoy-maintenance-notice", "question": "알파 고객 계약에서 정기 점검 시간이 가용률 계산에서 빠지려면 며칠 전에 알려야 하나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "decoy"}
+{"id": "decoy-beta-window", "question": "베타 고객은 장애 후 며칠 안에 보상을 청구해야 하나요?", "entity": "베타", "as_of": "2026-09-08", "namespace": "business", "type": "decoy"}
+{"id": "abstain-draft-deadline", "question": "알파 SLA의 보상 청구 기한이 90일로 확정되었나요?", "entity": "알파", "as_of": "2026-09-08", "namespace": "business", "type": "abstain-trap"}

@@ -52,8 +52,8 @@ flowchart LR
 고정한 Python SDK를 사용한다. 직접 호출과 자동 검사에는 모델/API 키가 필요 없다.
 
 ```bash
-.venv/bin/python build_mcp/client.py list
-.venv/bin/python build_mcp/verify.py
+uv run python build_mcp/client.py list
+uv run python build_mcp/verify.py
 ```
 
 첫 명령은 일곱 도구의 이름·설명·입력 형식을 출력한다. 두 번째는 실제 stdio 연결로 1–5단계를 검사한다.
@@ -97,7 +97,7 @@ mkdir -p work/my-mcp/skills/requirements-interview
 이 환경에서는 반환 타입을 `dict[str, Any]`로 적어 구조화된 객체 응답을 제공한다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py --server work/my-mcp/server.py --stage 1
+uv run python build_mcp/verify.py --server work/my-mcp/server.py --stage 1
 ```
 
 **정리:** 함수가 업무를 처리하고 MCP가 외부 호출을 연결했다. 모델 없이도 검사할 수 있다.
@@ -112,7 +112,7 @@ mkdir -p work/my-mcp/skills/requirements-interview
 두 항목에 답하면 `status=ready`, `missing_fields=[]`, `next_question=null`이 된다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py --server work/my-mcp/server.py --stage 2
+uv run python build_mcp/verify.py --server work/my-mcp/server.py --stage 2
 ```
 
 **정리:** 세션 ID가 여러 호출을 같은 작업으로 묶는다.
@@ -133,7 +133,7 @@ draft ── 필수 답변이 모임 ──> ready ── 확정 호출 ──> 
 `ready`는 항목이 채워졌다는 뜻이다. “잘 되면 완료”처럼 모호한 답변의 품질을 보장하지 않는다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py --server work/my-mcp/server.py --stage 3
+uv run python build_mcp/verify.py --server work/my-mcp/server.py --stage 3
 ```
 
 **정리:** Skill 지침과 별개로 서버가 확정 조건을 검사한다.
@@ -148,7 +148,7 @@ draft ── 필수 답변이 모임 ──> ready ── 확정 호출 ──> 
 조회·실패·중복 답변·재확정은 이 수를 늘리지 않는다. 다음 단계의 호출 기록 파일 수와는 다르다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py --server work/my-mcp/server.py --stage 4
+uv run python build_mcp/verify.py --server work/my-mcp/server.py --stage 4
 ```
 
 검사기는 실제 서버 프로세스를 종료하고 같은 DB로 다시 시작한다. 확정 명세와 미완료 세션을 모두 조회한다.
@@ -202,7 +202,7 @@ middleware는 일곱 도구의 입력과 결과를 응답 전에 기록한다. S
 후속 작업에서는 원본의 본문을 먼저 읽고, 이를 바탕으로 만든 산출물에 원본 ID를 넣는다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py --server work/my-mcp/server.py --stage 5
+uv run python build_mcp/verify.py --server work/my-mcp/server.py --stage 5
 ```
 
 이 단계는 질문·답변 수정 이력·명세·실패 기록을 실제 파일에서 확인한다. 이어서 **근거 폴더만 복사하고 새 DB**로 실행해
@@ -241,7 +241,7 @@ Skill 폴더에는 읽기 도구를 제공하고, 업무 산출물은 MCP의 `sa
 아래 실행은 모델을 여러 번 호출하며 계정 사용량이 발생한다. 기존 Day04의 `.env`와 고정 패키지를 그대로 사용한다.
 
 ```bash
-.venv/bin/python build_mcp/agent.py --server work/my-mcp/server.py --skills-dir work/my-mcp/skills --prompt '주간 CSV 매출 요약 도구의 명세를 만들어 줘. 제약은 외부 전송 금지이고, 완료 기준은 CSV 합계와 보고서 합계가 일치하는 것이야. 최종 요약도 근거 파일로 저장해 줘.'
+uv run python build_mcp/agent.py --server work/my-mcp/server.py --skills-dir work/my-mcp/skills --prompt '주간 CSV 매출 요약 도구의 명세를 만들어 줘. 제약은 외부 전송 금지이고, 완료 기준은 CSV 합계와 보고서 합계가 일치하는 것이야. 최종 요약도 근거 파일로 저장해 줘.'
 ```
 
 기준 서버와 Skill을 실행하려면 `--server`와 `--skills-dir`를 생략한다.
@@ -262,9 +262,9 @@ Skill 폴더에는 읽기 도구를 제공하고, 업무 산출물은 MCP의 `sa
 **모델 호출 약 20~35회, 2~5분 예상이다.** 검사 중인 사례와 결과가 터미널에 표시된다.
 
 ```bash
-.venv/bin/python build_mcp/verify_agent.py
+uv run python build_mcp/verify_agent.py
 # 내가 작성한 서버와 Skill 검사
-.venv/bin/python build_mcp/verify_agent.py --server work/my-mcp/server.py --skills-dir work/my-mcp/skills
+uv run python build_mcp/verify_agent.py --server work/my-mcp/server.py --skills-dir work/my-mcp/skills
 ```
 
 | 사례 | 에이전트에 주는 요청 | 실제로 대조할 것 |
@@ -302,16 +302,16 @@ DB는 별도 `work/agent-validation/<검사 ID>/`에 둔다. 재실행할 때마
 다음은 모델 없이 도구를 호출하는 방법이다. 기준 서버를 기본 사용한다. 실제 출력의 ID로 `SESSION_ID`, `SEED_EVIDENCE_ID`를 바꾼다.
 
 ```bash
-.venv/bin/python build_mcp/client.py call list_evidence
-.venv/bin/python build_mcp/client.py call list_evidence '{"session_id":"SESSION_ID"}'
-.venv/bin/python build_mcp/client.py call read_evidence '{"session_id":"SESSION_ID","evidence_id":"SEED_EVIDENCE_ID"}'
-.venv/bin/python build_mcp/client.py call save_evidence '{"session_id":"SESSION_ID","title":"구현 계획","content":"1. CSV 읽기\n2. 합계 계산\n3. 보고서 합계 비교","source_evidence_id":"SEED_EVIDENCE_ID"}'
+uv run python build_mcp/client.py call list_evidence
+uv run python build_mcp/client.py call list_evidence '{"session_id":"SESSION_ID"}'
+uv run python build_mcp/client.py call read_evidence '{"session_id":"SESSION_ID","evidence_id":"SEED_EVIDENCE_ID"}'
+uv run python build_mcp/client.py call save_evidence '{"session_id":"SESSION_ID","title":"구현 계획","content":"1. CSV 읽기\n2. 합계 계산\n3. 보고서 합계 비교","source_evidence_id":"SEED_EVIDENCE_ID"}'
 ```
 
 다른 위치로 전달받은 폴더를 사용할 때:
 
 ```bash
-.venv/bin/python build_mcp/client.py --db work/handoff.sqlite3 --evidence-dir work/received/evidence call list_evidence
+uv run python build_mcp/client.py --db work/handoff.sqlite3 --evidence-dir work/received/evidence call list_evidence
 ```
 
 `work/received/evidence`에는 전달받은 폴더 전체를 둔다. 파일 목록·본문 조회는 기존 DB 없이 동작한다.

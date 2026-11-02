@@ -1,0 +1,31 @@
+{
+  "_note": "수업용 가상 데이터입니다. 실제 고객이나 거래가 아닙니다.",
+  "알파": {
+    "2026-08": {
+      "availability_percent": 99.3,
+      "incidents": [
+        {
+          "incident_id": "INC-311",
+          "date": "2026-08-19",
+          "cause": "서비스 제공자 네트워크 장애"
+        }
+      ]
+    },
+    "2026-07": {
+      "availability_percent": 99.95,
+      "incidents": []
+    }
+  },
+  "베타": {
+    "2026-08": {
+      "availability_percent": 99.7,
+      "incidents": [
+        {
+          "incident_id": "INC-402",
+          "date": "2026-08-22",
+          "cause": "서비스 제공자 네트워크 장애"
+        }
+      ]
+    }
+  }
+}

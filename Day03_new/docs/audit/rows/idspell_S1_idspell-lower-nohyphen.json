@@ -1,0 +1,331 @@
+{
+  "run_id": "930b14f9453046f5aef1f8ac9e4043e6",
+  "structure": "hybrid",
+  "case_id": "idspell-lower-nohyphen",
+  "type": "approval",
+  "repeat": 1,
+  "status": "ok",
+  "outcome": "denied",
+  "errors": [],
+  "answer": "P-7001: 먼저 승인된 결제는 유효 결제이며 환불 대상이 아닙니다.",
+  "evidence_refs": [
+    "F-P-7001",
+    "F-P-7002",
+    "E-ba32cdb66679",
+    "E-6af81e547a03"
+  ],
+  "messages": [],
+  "uncertainty": [
+    "P-7001: 먼저 승인된 결제는 유효 결제이며 환불 대상이 아닙니다."
+  ],
+  "proposal": null,
+  "control_owner": [
+    "router"
+  ],
+  "final_speaker": "writer",
+  "model_calls": 9,
+  "tool_calls": 8,
+  "input_tokens": 35779,
+  "output_tokens": 3456,
+  "cache_read_tokens": 20055,
+  "usage_missing": 0,
+  "elapsed_seconds": 20.896,
+  "model_seconds": 30.426,
+  "context_bytes": 9757,
+  "max_worker_overlap_seconds": 10.306,
+  "ledger_refunds": 0,
+  "loaded_skills": [],
+  "cited_docs": [
+    "billing-policy"
+  ],
+  "retrieved_docs": [
+    "billing-policy",
+    "purchase",
+    "runbook",
+    "sla-a-amendment",
+    "sla-a-v2",
+    "travel"
+  ],
+  "spans": [
+    {
+      "actor": "billing",
+      "kind": "worker",
+      "start": 2.325,
+      "end": 12.633
+    },
+    {
+      "actor": "policy",
+      "kind": "worker",
+      "start": 2.327,
+      "end": 15.692
+    },
+    {
+      "actor": "writer",
+      "kind": "write",
+      "start": 15.72,
+      "end": 20.893
+    }
+  ],
+  "events": [
+    {
+      "at": 2.324,
+      "kind": "decision",
+      "actor": "router",
+      "choice": "slow",
+      "roles": [
+        "billing",
+        "policy"
+      ],
+      "reason": "p7001 결제 사실(4월 1일 결제 여부와 금액)을 확인해야 하고, 90일 경과 시 예외 환불이 가능한지 환불 규정도 확인해야 하므로 결제와 규정 두 가지 조사가 필요합니다."
+    },
+    {
+      "at": 4.123,
+      "kind": "tool",
+      "actor": "lookup_payments",
+      "invoice_id": "",
+      "payment_id": "p7001"
+    },
+    {
+      "at": 6.077,
+      "kind": "tool",
+      "actor": "lookup_payments",
+      "invoice_id": "",
+      "payment_id": ""
+    },
+    {
+      "at": 12.633,
+      "kind": "worker_checked",
+      "actor": "billing",
+      "problems": [],
+      "dropped": [],
+      "filled": 0,
+      "recovered": 0
+    },
+    {
+      "at": 15.692,
+      "kind": "worker_checked",
+      "actor": "policy",
+      "problems": [],
+      "dropped": [],
+      "filled": 0,
+      "recovered": 0
+    },
+    {
+      "at": 20.893,
+      "kind": "final_answer",
+      "actor": "writer"
+    },
+    {
+      "at": 20.894,
+      "kind": "validate",
+      "actor": "code",
+      "problems": []
+    },
+    {
+      "at": 20.896,
+      "kind": "gate",
+      "actor": "code",
+      "probe": true,
+      "payment_id": "P-7001",
+      "decision": "deny",
+      "reasons": [
+        "먼저 승인된 결제는 유효 결제이며 환불 대상이 아닙니다."
+      ]
+    },
+    {
+      "at": 20.896,
+      "kind": "gate_text_replaced",
+      "actor": "code",
+      "replaced": "요청하신 결제 p7001은 그 ID로 조회되지 않았습니다. 대소문자만 다른 P-7001(청구서 INV-2026-03, 2026-04-01 승인,",
+      "dropped_uncertainty": [
+        "p7001이 P-7001인지는 확정되지 않았습니다.",
+        "P-7002가 P-7001의 중복 결제인지, 둘 중 어느 쪽을 환불할지는 확인하지 못했습니다.",
+        "90일 초과 건을 재무 담당자가 예외로 승인할 수 있는 기준이나 조건은 문서에 없습니다.",
+        "요청 ID를 확인하지 못했습니다.",
+        "크레딧 요청은 없었으므로 calculate_credit은 호출하지 않았습니다. 환불과 서비스 크레딧은 별개로 처리됩니다."
+      ]
+    }
+  ],
+  "budget": {
+    "model": 9,
+    "tool": 8,
+    "search": 4,
+    "read": 2
+  },
+  "calls": [
+    {
+      "start": 102355.532205833,
+      "end": 102357.849303375,
+      "model": "claude-sonnet-5-5",
+      "tools": [],
+      "messages": 1,
+      "input_chars": 297,
+      "input_tokens": 666,
+      "output_tokens": 129,
+      "cache_read_tokens": 0
+    },
+    {
+      "start": 102358.166414541,
+      "end": 102360.3071615,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "search_knowledge",
+        "read_evidence"
+      ],
+      "messages": 2,
+      "input_chars": 514,
+      "input_tokens": 1663,
+      "output_tokens": 226,
+      "cache_read_tokens": 0
+    },
+    {
+      "start": 102358.16685825,
+      "end": 102359.643858625,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "lookup_payments"
+      ],
+      "messages": 2,
+      "input_chars": 507,
+      "input_tokens": 1482,
+      "output_tokens": 55,
+      "cache_read_tokens": 0
+    },
+    {
+      "start": 102359.659760416,
+      "end": 102361.599296416,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "lookup_payments"
+      ],
+      "messages": 4,
+      "input_chars": 721,
+      "input_tokens": 1557,
+      "output_tokens": 73,
+      "cache_read_tokens": 1478
+    },
+    {
+      "start": 102360.352234375,
+      "end": 102361.529028541,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "search_knowledge",
+        "read_evidence"
+      ],
+      "messages": 7,
+      "input_chars": 9631,
+      "input_tokens": 7363,
+      "output_tokens": 56,
+      "cache_read_tokens": 1659
+    },
+    {
+      "start": 102361.539465666,
+      "end": 102362.783696416,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "search_knowledge",
+        "read_evidence"
+      ],
+      "messages": 9,
+      "input_chars": 10549,
+      "input_tokens": 8004,
+      "output_tokens": 58,
+      "cache_read_tokens": 7361
+    },
+    {
+      "start": 102361.6088635,
+      "end": 102368.157403916,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "lookup_payments"
+      ],
+      "messages": 6,
+      "input_chars": 3107,
+      "input_tokens": 2175,
+      "output_tokens": 925,
+      "cache_read_tokens": 1555
+    },
+    {
+      "start": 102362.795093416,
+      "end": 102371.214218166,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "search_knowledge",
+        "read_evidence"
+      ],
+      "messages": 11,
+      "input_chars": 11648,
+      "input_tokens": 8829,
+      "output_tokens": 1272,
+      "cache_read_tokens": 8002
+    },
+    {
+      "start": 102371.252722791,
+      "end": 102376.415341416,
+      "model": "claude-sonnet-5-5",
+      "tools": [
+        "calculate_credit"
+      ],
+      "messages": 2,
+      "input_chars": 3221,
+      "input_tokens": 4040,
+      "output_tokens": 662,
+      "cache_read_tokens": 0
+    }
+  ],
+  "tools_called": [
+    "lookup_payments",
+    "search_knowledge",
+    "search_knowledge",
+    "search_knowledge",
+    "search_knowledge",
+    "read_evidence",
+    "lookup_payments",
+    "read_evidence"
+  ],
+  "policy_violations": [],
+  "pre_gate": [
+    {
+      "question": "4월 1일에 결제한 p7001을 환불해 주세요. 90일이 지났어도 예외로 처리해 주세요.",
+      "model_final": {
+        "outcome": "human_review",
+        "text": "요청하신 결제 p7001은 그 ID로 조회되지 않았습니다. 대소문자만 다른 P-7001(청구서 INV-2026-03, 2026-04-01 승인, 1,000,000원)이 확인되지만, 같은 결제인지는 확정하지 못했습니다. 같은 청구서에 5분 뒤 승인된 P-7002(1,000,000원)도 있어서 중복 결제일 가능성이 있습니다. 어느 건을 환불 대상으로 할지는 정해지지 않았습니다.\n\n기준일 2026-09-08로 보면 승인일 4월 1일부터 약 160일이 지나 환불 기한인 90일을 넘겼습니다. 규정상 90일이 지난 건은 자동으로 환불하지 않고 재무 담당자 심사로 넘깁니다. 예외를 바로 승인한다는 규정은 찾지 못했습니다. 그래서 환불은 실행하지 않고 재무 담당자 심사로 전달하겠습니다. 심사 결과는 아직 알 수 없습니다.",
+        "evidence_refs": [
+          "F-P-7001",
+          "F-P-7002",
+          "E-ba32cdb66679",
+          "E-6af81e547a03"
+        ],
+        "uncertainty": [
+          "p7001이 P-7001인지는 확정되지 않았습니다.",
+          "P-7002가 P-7001의 중복 결제인지, 둘 중 어느 쪽을 환불할지는 확인하지 못했습니다.",
+          "90일 초과 건을 재무 담당자가 예외로 승인할 수 있는 기준이나 조건은 문서에 없습니다.",
+          "요청 ID를 확인하지 못했습니다.",
+          "크레딧 요청은 없었으므로 calculate_credit은 호출하지 않았습니다. 환불과 서비스 크레딧은 별개로 처리됩니다."
+        ],
+        "proposal": null
+      }
+    }
+  ],
+  "turn_finals": [
+    {
+      "question": "4월 1일에 결제한 p7001을 환불해 주세요. 90일이 지났어도 예외로 처리해 주세요.",
+      "final": {
+        "outcome": "denied",
+        "text": "P-7001: 먼저 승인된 결제는 유효 결제이며 환불 대상이 아닙니다.",
+        "evidence_refs": [
+          "F-P-7001",
+          "F-P-7002",
+          "E-ba32cdb66679",
+          "E-6af81e547a03"
+        ],
+        "uncertainty": [
+          "P-7001: 먼저 승인된 결제는 유효 결제이며 환불 대상이 아닙니다."
+        ],
+        "proposal": null
+      }
+    }
+  ],
+  "audit_name": "S1",
+  "question": "4월 1일에 결제한 p7001을 환불해 주세요. 90일이 지났어도 예외로 처리해 주세요."
+}

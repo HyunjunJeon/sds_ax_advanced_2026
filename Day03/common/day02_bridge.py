@@ -25,6 +25,7 @@ if "day02" not in sys.modules:
 _environment_before = set(os.environ)
 
 from day02.adaptive import QueryPlan, Review
+from day02.corpus import load_corpus
 from day02.evidence import (
     ANSWER_SYSTEM,
     BusinessMetadata,
@@ -67,4 +68,5 @@ __all__ = [
     "QueryPlan",
     "Review",
     "VikingClient",
+    "load_corpus",
 ]

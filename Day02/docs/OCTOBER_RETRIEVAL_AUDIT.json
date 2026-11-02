@@ -1,0 +1,1634 @@
+{
+  "corpus": {
+    "name": "official-2026-10",
+    "catalog_sha256": "5e982a00afd7dfb92ac04c314204f9c286b60cbfeb5367e9aca13f9717de1c12",
+    "documents": {
+      "deepagents-0.7.21": "c524d693a42a8d393689eb43e093fe46caccbda828abaf25c5079bdea734a1dd",
+      "deepagents-0.7.18": "d028de6d705518591028c1f910572e9f7f11bc2519371d6ff3e6bd271294dec3",
+      "deepagents-0.7.15": "a6ef3329e83bf15ad4bd7841fc063402d8fa159ed582423112fec4dcb7c1c2f4",
+      "deepagents-0.7.14": "850d70b73bf0e8ace0f7e7026a307019c2f1fdf12ce47bea3196080beba17fed",
+      "deepagents-0.7.13": "2cddea8cf01ca1e508945830d1717e27ba6ab113d5e9df2fd771919b91027c9e",
+      "openviking-session-api": "065f40a6473171a2c752b59ed9d00c5f193d3977cc64518ed958d24edf155857",
+      "openviking-commit-failure": "d20f1a1f03eaa3fa070cc05bde1c99d6dd3cd284f3dacbca6e0c5aec34445ab8",
+      "openviking-acl": "98095730cf57f6fd295b45d7678e25ef4cf6fdd1fc2691bd44cfa7c5b62d07ef",
+      "openviking-cosine": "1db62695df0f652df0367d7ccedb3f6f0cdfb8d4c122fcb07663231d1ca33803"
+    },
+    "as_of": "2026-10-02",
+    "manifest_sha256": "e9d0a9652ce0a951c73f0baeae3c7b337223f3fd3559832b387bd2b27f053daa"
+  },
+  "cases_sha256": "9497165b10dacdc8d2466c34a5b9584d73621a569f2f90e60a1a80609d2227b4",
+  "gold_sha256": "a1edd6b031525f77c2f3c0339246d992d74f63237cf6ad1c8a72535f3e773357",
+  "k": 6,
+  "lock_sha256": "fb855ba7ae7c35b351c8175ab8f902abe41e216cc8377fb89c134fc4bf84b126",
+  "rows": [
+    {
+      "case_id": "tech-blob",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "deepagents-0.7.21"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 2.8343627082623497,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [
+          "filesystemmiddleware"
+        ],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "filesystemmiddleware",
+        "blob",
+        "저장",
+        "지원",
+        "어떻",
+        "바뀌"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.21"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-blob",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.14",
+        "deepagents-0.7.18"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 3.9528998729236107,
+        "deepagents-0.7.18": 2.1566290784402864,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 2.594852861077259,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [
+          "filesystemmiddleware"
+        ],
+        "deepagents-0.7.18": [
+          "deepagents"
+        ],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [
+          "deepagents"
+        ],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "filesystemmiddleware",
+        "blob",
+        "저장",
+        "지원",
+        "어떻",
+        "바뀌"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.21"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-isolated",
+      "chunking": "bounded",
+      "as_of": "2026-09-02",
+      "eligible_docs": [
+        "deepagents-0.7.13"
+      ],
+      "chunk_count": 1,
+      "retrieved": [],
+      "scores": {
+        "deepagents-0.7.13": -1.0986122886681093
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.13": [
+          "handoff",
+          "mode",
+          "sdk",
+          "subagent"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "sdk",
+        "subagent",
+        "mode",
+        "handoff",
+        "이름",
+        "무엇",
+        "바뀌"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.13"
+      ],
+      "missing_docs": [
+        "deepagents-0.7.13"
+      ],
+      "recall": 0.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-isolated",
+      "chunking": "fixed",
+      "as_of": "2026-09-02",
+      "eligible_docs": [
+        "deepagents-0.7.13"
+      ],
+      "chunk_count": 1,
+      "retrieved": [],
+      "scores": {
+        "deepagents-0.7.13": -1.0986122886681093
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.13": [
+          "handoff",
+          "mode",
+          "sdk",
+          "subagent"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "sdk",
+        "subagent",
+        "mode",
+        "handoff",
+        "이름",
+        "무엇",
+        "바뀌"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.13"
+      ],
+      "missing_docs": [
+        "deepagents-0.7.13"
+      ],
+      "recall": 0.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-future-evidence",
+      "chunking": "bounded",
+      "as_of": "2026-09-02",
+      "eligible_docs": [
+        "deepagents-0.7.13"
+      ],
+      "chunk_count": 1,
+      "retrieved": [],
+      "scores": {
+        "deepagents-0.7.13": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.13": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "기준",
+        "일",
+        "공개",
+        "자료",
+        "deepagents",
+        "filesystemmiddleware",
+        "blob",
+        "지원",
+        "확정",
+        "수",
+        "있"
+      ],
+      "expected_docs": [],
+      "missing_docs": [],
+      "recall": null,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-future-evidence",
+      "chunking": "fixed",
+      "as_of": "2026-09-02",
+      "eligible_docs": [
+        "deepagents-0.7.13"
+      ],
+      "chunk_count": 1,
+      "retrieved": [],
+      "scores": {
+        "deepagents-0.7.13": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.13": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "기준",
+        "일",
+        "공개",
+        "자료",
+        "deepagents",
+        "filesystemmiddleware",
+        "blob",
+        "지원",
+        "확정",
+        "수",
+        "있"
+      ],
+      "expected_docs": [],
+      "missing_docs": [],
+      "recall": null,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-context",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "deepagents-0.7.18",
+        "deepagents-0.7.14",
+        "deepagents-0.7.15"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 6.433617212229402,
+        "deepagents-0.7.15": 2.0634979676774083,
+        "deepagents-0.7.14": 4.147393570061757,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "large",
+          "previews",
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.15": [
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.14": [
+          "compaction",
+          "recovery",
+          "tool"
+        ],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "compaction",
+        "recovery",
+        "large",
+        "tool",
+        "result",
+        "previews",
+        "변경",
+        "비교",
+        "주"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.14",
+        "deepagents-0.7.18"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-context",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "deepagents-0.7.18",
+        "deepagents-0.7.14",
+        "deepagents-0.7.15"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 8.19657877551708,
+        "deepagents-0.7.15": 3.0598000712505535,
+        "deepagents-0.7.14": 6.3519755919773395,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "deepagents",
+          "large",
+          "previews",
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.15": [
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.14": [
+          "compaction",
+          "deepagents",
+          "recovery",
+          "tool"
+        ],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "compaction",
+        "recovery",
+        "large",
+        "tool",
+        "result",
+        "previews",
+        "변경",
+        "비교",
+        "주"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.14",
+        "deepagents-0.7.18"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-state",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "deepagents-0.7.15",
+        "deepagents-0.7.18",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "deepagents-0.7.14"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 3.4262428685847404,
+        "deepagents-0.7.15": 7.250060035699506,
+        "deepagents-0.7.14": 0.8521979620552749,
+        "deepagents-0.7.13": 1.7556299109575986,
+        "openviking-session-api": 1.527664825235088,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "keys",
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.15": [
+          "keys",
+          "result",
+          "state",
+          "subagent",
+          "tool"
+        ],
+        "deepagents-0.7.14": [
+          "tool"
+        ],
+        "deepagents-0.7.13": [
+          "subagent"
+        ],
+        "openviking-session-api": [
+          "id"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "subagent",
+        "middleware",
+        "state",
+        "keys",
+        "id",
+        "없",
+        "tool",
+        "result",
+        "offload",
+        "경로",
+        "어떻",
+        "수정"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.15"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-state",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "deepagents-0.7.15",
+        "deepagents-0.7.18",
+        "deepagents-0.7.13",
+        "deepagents-0.7.14",
+        "openviking-session-api"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 4.964924582305057,
+        "deepagents-0.7.15": 11.443477029084654,
+        "deepagents-0.7.14": 2.594852861077259,
+        "deepagents-0.7.13": 3.0014456924103663,
+        "openviking-session-api": 1.977569738125523,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "deepagents",
+          "keys",
+          "result",
+          "tool"
+        ],
+        "deepagents-0.7.15": [
+          "keys",
+          "result",
+          "state",
+          "subagent",
+          "tool"
+        ],
+        "deepagents-0.7.14": [
+          "deepagents",
+          "tool"
+        ],
+        "deepagents-0.7.13": [
+          "subagent"
+        ],
+        "openviking-session-api": [
+          "id"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "subagent",
+        "middleware",
+        "state",
+        "keys",
+        "id",
+        "없",
+        "tool",
+        "result",
+        "offload",
+        "경로",
+        "어떻",
+        "수정"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.15"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-cosine",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-cosine"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 11.668390144777554
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": [
+          "cosine",
+          "local",
+          "score",
+          "threshold"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "local",
+        "cosine",
+        "score",
+        "변환",
+        "식",
+        "score",
+        "threshold",
+        "설정",
+        "필요",
+        "여부",
+        "알리",
+        "주"
+      ],
+      "expected_docs": [
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-cosine",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "openviking-cosine"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 12.05004910697732
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": [
+          "cosine",
+          "local",
+          "score",
+          "threshold"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "local",
+        "cosine",
+        "score",
+        "변환",
+        "식",
+        "score",
+        "threshold",
+        "설정",
+        "필요",
+        "여부",
+        "알리",
+        "주"
+      ],
+      "expected_docs": [
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-acl",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 14.596561447155663,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "acl",
+          "alice",
+          "parent",
+          "restricted",
+          "write"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "acl",
+        "표",
+        "restricted",
+        "parent",
+        "write",
+        "가지",
+        "alice",
+        "파일",
+        "생성",
+        "후",
+        "acl",
+        "바꾸",
+        "수",
+        "있",
+        "적용",
+        "조건",
+        "설명",
+        "주"
+      ],
+      "expected_docs": [
+        "openviking-acl"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-acl",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 12.09595348740097,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "acl",
+          "alice",
+          "parent",
+          "restricted",
+          "write"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "acl",
+        "표",
+        "restricted",
+        "parent",
+        "write",
+        "가지",
+        "alice",
+        "파일",
+        "생성",
+        "후",
+        "acl",
+        "바꾸",
+        "수",
+        "있",
+        "적용",
+        "조건",
+        "설명",
+        "주"
+      ],
+      "expected_docs": [
+        "openviking-acl"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-api",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-session-api",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 6.464615522817875,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 1.1436887987196889,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [
+          "404",
+          "api",
+          "se",
+          "ssion.used"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "api"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "se",
+        "ssion.used",
+        "호출",
+        "404",
+        "이",
+        "api",
+        "변경",
+        "원인",
+        "호출",
+        "측",
+        "조치",
+        "무엇",
+        "이"
+      ],
+      "expected_docs": [
+        "openviking-session-api"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-api",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "openviking-session-api",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 5.574125132856012,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 1.6448507600872577,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [
+          "404",
+          "api",
+          "se",
+          "ssion.used"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "api"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "se",
+        "ssion.used",
+        "호출",
+        "404",
+        "이",
+        "api",
+        "변경",
+        "원인",
+        "호출",
+        "측",
+        "조치",
+        "무엇",
+        "이"
+      ],
+      "expected_docs": [
+        "openviking-session-api"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-commit",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-commit-failure",
+        "deepagents-0.7.13",
+        "openviking-cosine",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 1.7556299109575986,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 9.660629449961329,
+        "openviking-acl": 0.40694846502639526,
+        "openviking-cosine": 0.5841679578604707
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [
+          "sdk"
+        ],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [
+          "changes",
+          "commit",
+          "extraction",
+          "memory",
+          "no",
+          "sdk"
+        ],
+        "openviking-acl": [
+          "no"
+        ],
+        "openviking-cosine": [
+          "no"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "memory",
+        "extraction",
+        "파싱",
+        "실패",
+        "sdk",
+        "commit",
+        "no",
+        "changes",
+        "같",
+        "성공",
+        "상태",
+        "이"
+      ],
+      "expected_docs": [
+        "openviking-commit-failure"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-commit",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "openviking-commit-failure",
+        "deepagents-0.7.13",
+        "openviking-cosine",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 3.0014456924103663,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 9.960351332690632,
+        "openviking-acl": 1.106402056724094,
+        "openviking-cosine": 1.686281569620434
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [
+          "sdk"
+        ],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [
+          "changes",
+          "commit",
+          "extraction",
+          "memory",
+          "no",
+          "sdk"
+        ],
+        "openviking-acl": [
+          "no"
+        ],
+        "openviking-cosine": [
+          "no"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "openviking",
+        "memory",
+        "extraction",
+        "파싱",
+        "실패",
+        "sdk",
+        "commit",
+        "no",
+        "changes",
+        "같",
+        "성공",
+        "상태",
+        "이"
+      ],
+      "expected_docs": [
+        "openviking-commit-failure"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-parallel",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-cosine",
+        "deepagents-0.7.18"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 3.3168956766445743,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 5.5964083433097755
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "einfo.size",
+          "fil"
+        ],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": [
+          "cosine",
+          "score"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "fil",
+        "einfo.size",
+        "단위",
+        "openviking",
+        "cosine",
+        "score",
+        "범위",
+        "예외",
+        "조사",
+        "주"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.18",
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-parallel",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "deepagents-0.7.18",
+        "openviking-cosine",
+        "deepagents-0.7.14"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 7.614659708294154,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 2.594852861077259,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 5.59550290540828
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "deepagents",
+          "einfo.size",
+          "fil"
+        ],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [
+          "deepagents"
+        ],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": [
+          "cosine",
+          "score"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "deepagents",
+        "fil",
+        "einfo.size",
+        "단위",
+        "openviking",
+        "cosine",
+        "score",
+        "범위",
+        "예외",
+        "조사",
+        "주"
+      ],
+      "expected_docs": [
+        "deepagents-0.7.18",
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-followup",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-cosine"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 0.0,
+        "openviking-cosine": 5.650441781201001
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [],
+        "openviking-cosine": [
+          "2",
+          "ip",
+          "l"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "그렇",
+        "ip",
+        "l",
+        "2",
+        "점수",
+        "같",
+        "식",
+        "바꾸"
+      ],
+      "expected_docs": [
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-followup",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "openviking-cosine",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 0.0,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 3.0014456924103663,
+        "openviking-cosine": 6.142099859626873
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "l"
+        ],
+        "openviking-cosine": [
+          "2",
+          "ip",
+          "l"
+        ]
+      },
+      "status": "ok",
+      "query_tokens": [
+        "그렇",
+        "ip",
+        "l",
+        "2",
+        "점수",
+        "같",
+        "식",
+        "바꾸"
+      ],
+      "expected_docs": [
+        "openviking-cosine"
+      ],
+      "missing_docs": [],
+      "recall": 1.0,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-unannounced",
+      "chunking": "bounded",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 9,
+      "retrieved": [
+        "openviking-session-api",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 0.0,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 0.0,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 1.8816210471126114,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 1.1436887987196889,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [
+          "api"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "api"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "2026",
+        "년",
+        "10",
+        "월",
+        "20",
+        "일",
+        "공개",
+        "deepagents",
+        "정확",
+        "api",
+        "벤치마크",
+        "점수",
+        "알리",
+        "주"
+      ],
+      "expected_docs": [],
+      "missing_docs": [],
+      "recall": null,
+      "evaluation_basis": "draft"
+    },
+    {
+      "case_id": "tech-unannounced",
+      "chunking": "fixed",
+      "as_of": "2026-10-02",
+      "eligible_docs": [
+        "deepagents-0.7.21",
+        "deepagents-0.7.18",
+        "deepagents-0.7.15",
+        "deepagents-0.7.14",
+        "deepagents-0.7.13",
+        "openviking-session-api",
+        "openviking-commit-failure",
+        "openviking-acl",
+        "openviking-cosine"
+      ],
+      "chunk_count": 22,
+      "retrieved": [
+        "deepagents-0.7.14",
+        "deepagents-0.7.18",
+        "openviking-session-api",
+        "openviking-acl"
+      ],
+      "scores": {
+        "deepagents-0.7.21": 0.0,
+        "deepagents-0.7.18": 2.1566290784402864,
+        "deepagents-0.7.15": 0.0,
+        "deepagents-0.7.14": 2.594852861077259,
+        "deepagents-0.7.13": 0.0,
+        "openviking-session-api": 1.8858835186772218,
+        "openviking-commit-failure": 0.0,
+        "openviking-acl": 1.6448507600872577,
+        "openviking-cosine": 0.0
+      },
+      "overlap_tokens": {
+        "deepagents-0.7.21": [],
+        "deepagents-0.7.18": [
+          "deepagents"
+        ],
+        "deepagents-0.7.15": [],
+        "deepagents-0.7.14": [
+          "deepagents"
+        ],
+        "deepagents-0.7.13": [],
+        "openviking-session-api": [
+          "api"
+        ],
+        "openviking-commit-failure": [],
+        "openviking-acl": [
+          "api"
+        ],
+        "openviking-cosine": []
+      },
+      "status": "ok",
+      "query_tokens": [
+        "2026",
+        "년",
+        "10",
+        "월",
+        "20",
+        "일",
+        "공개",
+        "deepagents",
+        "정확",
+        "api",
+        "벤치마크",
+        "점수",
+        "알리",
+        "주"
+      ],
+      "expected_docs": [],
+      "missing_docs": [],
+      "recall": null,
+      "evaluation_basis": "draft"
+    }
+  ]
+}

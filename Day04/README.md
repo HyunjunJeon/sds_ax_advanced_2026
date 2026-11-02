@@ -23,16 +23,16 @@ MCP는 에이전트가 별도 서버의 도구 목록을 읽고 호출·응답�
 
 ## 준비
 
-아래 명령은 저장소의 **Day04 폴더에서** 실행한다. Day02·Day03의 가상환경과 섞지 않는다.
+아래 명령은 저장소의 **Day04 폴더에서** 실행한다. 가상환경은 저장소 루트 공용 환경을 쓴다.
 
 ```bash
 cd Day04
-uv venv --python 3.13 .venv
-uv pip install -p .venv/bin/python -r requirements.txt
+# 설치는 저장소 루트의 `uv sync --locked` 한 번으로 끝난다.
+# 여기서 `uv sync`를 실행하지 않는다.
 cp -n .env.example .env
 ```
 
-기존 `.venv`가 있으면 생성은 건너뛴다. `.env`에 `OPENROUTER_API_KEY`를 직접 입력한다.
+`.env`에 `OPENROUTER_API_KEY`를 직접 입력한다.
 모델 설정은 [.env.example](.env.example)을 확인한다.
 각 실습 폴더의 [코딩 모델 연결](coding_skills/llm.py)과 [MCP 모델 연결](build_mcp/llm.py)이
 공통 `Day04/.env`를 읽는다. 파이썬 실행 코드는 각 실습 폴더 안에 두고 가상환경·설정은 Day04에서 함께 사용한다.
@@ -68,8 +68,8 @@ model = init_chat_model(
 [OpenRouter 연동 가이드](https://docs.langchain.com/oss/python/integrations/chat/openrouter)
 
 ```bash
-.venv/bin/python coding_skills/prepare.py
-.venv/bin/python coding_skills/agent.py --prompt 'CSV 매출 집계의 기간 경계 테스트가 실패해. 원인을 재현하고 고쳐 줘. 기존 테스트는 보존하고 새 반례를 추가한 뒤 실제 검사 결과를 보고서에 남겨 줘.'
+uv run python coding_skills/prepare.py
+uv run python coding_skills/agent.py --prompt 'CSV 매출 집계의 기간 경계 테스트가 실패해. 원인을 재현하고 고쳐 줘. 기존 테스트는 보존하고 새 반례를 추가한 뒤 실제 검사 결과를 보고서에 남겨 줘.'
 ```
 
 준비 명령은 `work/coding/`에 새 작업 사본을 만든다. 초기 테스트는 6개 중 1개가 실패한다.
@@ -84,8 +84,8 @@ model = init_chat_model(
 두 번째는 실제 모델을 호출해 부족한 요구사항을 질문한다.
 
 ```bash
-.venv/bin/python build_mcp/verify.py
-.venv/bin/python build_mcp/agent.py --prompt '주간 CSV 매출 요약 도구를 만들고 싶어. 부족한 요구사항을 질문으로 구체화해 줘.'
+uv run python build_mcp/verify.py
+uv run python build_mcp/agent.py --prompt '주간 CSV 매출 요약 도구를 만들고 싶어. 부족한 요구사항을 질문으로 구체화해 줘.'
 ```
 
 에이전트가 알려준 세션 ID로 답변을 이어가고, 정리한 명세와 후속 계획을 근거 파일로 남긴다.

@@ -66,7 +66,7 @@ def configure(port: int) -> None:
     path.chmod(0o600)
     print("설정 생성 완료. 다음 명령으로 서버를 별도 터미널에서 실행하세요:")
     print(
-        f"uv run --isolated --no-project --python 3.13 --with openviking==0.4.16 "
+        f"uv run --isolated --no-project --python 3.13 --with openviking==0.4.22 "
         f"openviking-server --config .openviking/rag.conf --host 127.0.0.1 --port {port}"
     )
 
