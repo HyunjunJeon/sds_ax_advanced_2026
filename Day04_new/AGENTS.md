@@ -232,7 +232,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
   | holdout B | 40 | 187 | 1,266,960 / 46,718 | 65 이상 | 552초 (16:44:47-16:53:59) |
   | 합계 | 170 | 820 | 5,687,976 / 216,000 | 125 이상 | 2,539초 |
 
-  Jev 하한은 B의 `gate_decisions` 줄 수(dev h2 40 + h1 20, holdout h2 40 + h1 25)다. 판정마다 Jev를 한 번 이상 부르므로 실제 호출은 이보다 많을 수 있고, 호출 수를 직접 세지는 않았다. A·A2는 게이트가 꺼져 Jev가 0이다. Claude 호출은 `model_calls` 점수의 합이다. 예고 범위(Claude 약 860-1,550회, Jev 약 180-540회) 안이다. 이 저자 측정은 07 수업 측정이 아니다.
+  Jev 하한은 B의 `gate_decisions` 줄 수(dev h2 40 + h1 20, holdout h2 40 + h1 25)다. 판정마다 Jev를 한 번 이상 부르므로 실제 호출은 이보다 많을 수 있고, 호출 수를 직접 세지는 않았다. A·A2는 게이트가 꺼져 Jev가 0이다. Claude 호출은 `model_calls` 점수의 합이다. 이 측정 전에 예고한 범위는 Claude 약 860-1,550회, Jev 약 180-540회였다. 실제 Claude 호출은 측정 실행 820회(루프 정리 실제 확인 8회를 더하면 828회)로 예고 하한보다 적다. Jev 하한 125회도 예고 하한보다 적고, 실제 Jev 호출 수는 세지 않았으므로 예고 범위 안이었는지는 알 수 없다. 이 저자 측정은 07 수업 측정이 아니다.
 - 셀 번호는 0부터 센 노트북 셀 순서다. 예고 숫자는 `announce` 인자를 읽은 값이라 노트북이 바뀌면 달라진다. 숫자를 말하기 전에 해당 셀의 `announce` 줄을 다시 본다.
 - 02·05의 두 변형 × 2 사례 × 3 반복 = 12실행, 03의 에이전트 한 턴, 04의 H1 한 번은 모두 위 5~9회 추정에서 온 상한 쪽 숫자였고 실측은 그보다 적었다. 실측도 한 번의 관찰이라 수강생 환경에서 다를 수 있다.
 - 설계서의 계획 규모(`docs/DESIGN.md` 8절): 저자 dev 150회, holdout 120회(개정 1: 사례 8 × 5 반복 × 3 변형), 수업 36회, Part 2·5 각각 12회. 저자 dev·holdout 측정은 수업 노트북이 아니라 저자가 한 번씩만 돌린다.
@@ -285,5 +285,5 @@ uv run jupyter lab          # 실행은 이 폴더에서
 3b 단계에서 `cap_lab/experiment.py`, `agent.py`, `middleware.py`, `notebook.py`의 줄이 밀려 다시 확인했고, 3c 단계에서 `with_own_anthropic_client` 추가로 `experiment.py`와 `notebook.py`의 줄이 다시 밀려 고쳤다.
 코드를 고친 뒤에는 같은 방법으로 다시 확인하고, 줄이 밀렸으면 이 문서를 고친다. 시험을 고치거나 한도를 올려서 맞추지 않는다.
 노트북 안의 `파일:줄` 인용은 저자용 도구 `nb_citations.py`로 검사했다(저장소 밖 작업 폴더에 있어 이 저장소에는 없다. 확인이 필요하면 저자에게 묻는다).
-확인된 것: 노트북 00~06을 수정(캐시·루프) 뒤에 실제 키로 끝까지 실행했고 호출 오류가 0건이었다. 07은 셀 48의 Langfuse 확인까지만 실행했고 거기서 설계대로 멈췄다(`outputs/live/summary.json`). 저자 dev 기준선 A·A2를 로컬 사본으로 측정했다(`outputs/runs/dev-baseline-summary.json`) 변형 B와 holdout(A·A2·B)도 2026-11-03에 로컬 사본으로 측정했다(`outputs/decisions/dev-decision.json`, `outputs/decisions/holdout-decision.json`).
+확인된 것: 노트북 00~06을 수정(캐시·루프) 뒤에 실제 키로 끝까지 실행했고 호출 오류가 0건이었다. 07은 셀 48의 Langfuse 확인까지만 실행했고 거기서 설계대로 멈췄다(`outputs/live/summary.json`). 저자 dev 기준선 A·A2를 로컬 사본으로 측정했다(`outputs/runs/dev-baseline-summary.json`). 변형 B와 holdout(A·A2·B)도 2026-11-03에 로컬 사본으로 측정했다(`outputs/decisions/dev-decision.json`, `outputs/decisions/holdout-decision.json`).
 확인되지 않은 것: 07의 측정 셀 전부(Langfuse 기록 포함)와 그 실제 비용(07의 수업 측정은 아직 측정하지 않았다), 고친 `with_own_anthropic_client`의 실제 Langfuse 경로 실행, `RUN_EXERCISE`·`RUN_OPTIONAL`을 켠 셀, 캐시 적중률과 캐시 쓰기 토큰, USD, Streamable HTTP의 장시간 동작, 위 7장에서 "추정"이라고 표시한 항목.
