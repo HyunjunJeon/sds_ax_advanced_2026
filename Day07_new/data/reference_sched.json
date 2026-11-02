@@ -127,7 +127,7 @@
    "allocate_slots_returned_none": true
   },
   "isl_prototype": {
-   "what": "scratch에서 sched_sim의 schedule_waiting에 전체 입력 검사 한 줄(ceil(num_tokens/block_size) - held > free면 멈춤)을 넣어 isl=on|prefix=off의 core_sha256과 비교한 결과. 저장소 sched_sim.py는 바꾸지 않았다",
+   "what": "scratch에서 sched_sim의 schedule_waiting에 전체 입력 검사 한 줄(ceil(num_tokens/block_size) - held > free면 멈춤)을 넣어 isl=on|prefix=off의 core_sha256과 비교한 결과. 저장소 sched_sim.py는 바꾸지 않았다. 이 검사는 이후 sched_sim.py에 reserve_full_isl로 들어갔다",
    "replayed": 37,
    "not_replayed": 0
   }

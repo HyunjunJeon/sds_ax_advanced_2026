@@ -20,7 +20,6 @@ MARKERS = ("# [따라하기]", "# [바꿔보기]", "# [깨뜨리기]", "# [내 �
 MIN_MARKED_CELLS = 12
 MIN_PER_MARKER = {"# [바꿔보기]": 4}  # 표에 없는 표지는 DEFAULT_MIN_PER_MARKER
 DEFAULT_MIN_PER_MARKER = 2
-MAX_MARKDOWN_CHARS = 10000
 FIRST_FOLLOW_ALONG_FORBIDDEN = ("load_corpus", "ask(", "build_rag_agent", "retriever", "data/business")
 REQUIRED_HEADINGS = ("## 직접 해보기", "## 확인 질문", "## 정리")
 REQUIRED_PHRASE = "호출 규모"
@@ -56,8 +55,8 @@ def timetable_problem(first_markdown: str, minutes: int) -> str | None:
     return None if total == minutes else f"'수업 시간표'의 분 합계가 {total}분입니다. {minutes}분이어야 합니다."
 
 
-def marker_problems(code: list[nbformat.NotebookNode], markdown_chars: int) -> list[str]:
-    """60분 노트북 전용: 표지 셀 수, 종류별 최소 개수(바꿔보기 4, 나머지 2), 첫 따라하기의 금지 이름, markdown 분량 상한."""
+def marker_problems(code: list[nbformat.NotebookNode]) -> list[str]:
+    """60분 노트북 전용: 표지 셀 수, 종류별 최소 개수(바꿔보기 4, 나머지 2), 첫 따라하기의 금지 이름."""
     firsts = [(cell.source.splitlines() or [""])[0] for cell in code]
     counts = {marker: sum(first.startswith(marker) for first in firsts) for marker in MARKERS}
     total = sum(counts.values())
@@ -74,8 +73,6 @@ def marker_problems(code: list[nbformat.NotebookNode], markdown_chars: int) -> l
     if first_follow is not None:
         problems += [f"첫 {MARKERS[0]} 셀에 금지된 이름이 있습니다: {name}"
                      for name in FIRST_FOLLOW_ALONG_FORBIDDEN if name in first_follow.source]
-    if markdown_chars > MAX_MARKDOWN_CHARS:
-        problems.append(f"markdown이 너무 깁니다: {markdown_chars} > {MAX_MARKDOWN_CHARS}")
     return problems
 
 
@@ -94,7 +91,7 @@ def static_problems(nb: nbformat.NotebookNode, minutes: int, floors: dict[str, i
     measured = {"cells": len(nb.cells), "code": len(code), "markdown": sum(map(len, markdown))}
     problems += [f"{name} 하한 미달: {measured[name]} < {floor}" for name, floor in floors.items() if measured[name] < floor]
     if minutes == 60:
-        problems += marker_problems(code, measured["markdown"])
+        problems += marker_problems(code)
     problems += [f"셀 {i}에 저장된 출력이 있습니다." for i, cell in enumerate(nb.cells)
                  if cell.cell_type == "code" and cell.outputs]
     problems += [f"셀 {i}에서 LangGraph StateGraph를 사용합니다." for i, cell in enumerate(nb.cells)

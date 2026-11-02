@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import json
+import re
 
 import pytest
 
@@ -564,3 +565,24 @@ def test_modules_import_no_vllm_torch_or_network_package(name):
         elif isinstance(node, ast.ImportFrom):
             imported.add(node.module.split(".")[0])
     assert imported <= {"__future__", "collections", "dataclasses", "functools", "json", "math", "typing", "vllm_lab"}
+
+
+def test_block_size_error_has_no_wrong_particle_after_model_name():
+    with pytest.raises(ValueError) as err:
+        capacity_estimate(V4, block_size=16, **BUDGET)
+    assert "Flash은" not in str(err.value)
+    assert f"model={V4}" in str(err.value)
+
+
+def test_unknown_value_messages_put_no_particle_after_the_quoted_value():
+    from vllm_lab.kv_cases import glm_kda_fixed_state
+
+    with pytest.raises(ValueError) as unknown_model:
+        real_block_size("Kimi-K3")
+    with pytest.raises(ValueError) as unknown_mode:
+        glm_kda_fixed_state(mamba_cache_mode="bogus")
+    with pytest.raises(ValueError) as no_snapshot:
+        global_kv_per_token("Kimi-K3")
+    for error in (unknown_model, unknown_mode, no_snapshot):
+        assert "'Kimi-K3'" in str(error.value) or "'bogus'" in str(error.value)
+        assert not re.search(r"'[은는이가을를]", str(error.value))

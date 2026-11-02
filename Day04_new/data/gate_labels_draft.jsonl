@@ -1,0 +1,50 @@
+{"id": "h1-01", "gate": "H1", "split": "dev", "text": "샘플 문의 100건 중 정답 라벨과 일치하는 건이 90건 이상이다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-02", "gate": "H1", "split": "dev", "text": "응답 시간이 빠르다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-03", "gate": "H1", "split": "dev", "text": "주문 50건을 처리하는 데 10초 이내에 끝나고 타이머로 측정한다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-04", "gate": "H1", "split": "dev", "text": "사용자가 만족한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-05", "gate": "H1", "split": "dev", "text": "재고 알림이 3분 이내에 담당자 메일함에 도착한다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-06", "gate": "H1", "split": "dev", "text": "성능이 충분히 좋다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-07", "gate": "H1", "split": "dev", "text": "오류가 적어야 한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-08", "gate": "H1", "split": "dev", "text": "테스트 20건이 모두 통과하고 실패 건은 0건이다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-09", "gate": "H1", "split": "dev", "text": "UI가 직관적이고 보기 좋다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-10", "gate": "H1", "split": "dev", "text": "월 마감 표의 합계가 수기 장부와 1원 단위까지 일치한다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-11", "gate": "H1", "split": "dev", "text": "정확도가 높고 속도도 빠르며 사용하기 편하다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-12", "gate": "H1", "split": "dev", "text": "로그인 실패 5회 뒤 계정이 잠기는 것을 화면에서 확인한다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-13", "gate": "H1", "split": "dev", "text": "처리량이 초당 100건이다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-14", "gate": "H1", "split": "dev", "text": "잘 동작하면 완료한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-15", "gate": "H1", "split": "dev", "text": "예약 취소 시 참석자 전원에게 취소 메일이 발송되고 발송 로그에 건수가 남는다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-16", "gate": "H1", "split": "dev", "text": "가능한 한 많은 오류를 잡아낸다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-17", "gate": "H1", "split": "dev", "text": "CSV 업로드 후 중복 행 0건이 화면의 중복 검사 결과에 표시된다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-18", "gate": "H1", "split": "dev", "text": "데이터가 정확해야 한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-19", "gate": "H1", "split": "dev", "text": "담당자 3명에게 알림이 가고 각자 확인 버튼을 누른 기록이 남는다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-20", "gate": "H1", "split": "dev", "text": "가용성 99.9퍼센트를 달성한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-21", "gate": "H1", "split": "dev", "text": "빈 입력을 넣으면 '입력 필요' 오류 메시지가 표시되고 저장되지 않는다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-22", "gate": "H1", "split": "dev", "text": "관리자가 쓰기에 편해야 한다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-23", "gate": "H1", "split": "dev", "text": "요약문이 300자 이내이고 원문에 없는 숫자가 하나도 없다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-24", "gate": "H1", "split": "dev", "text": "전반적으로 안정적이다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-25", "gate": "H1", "split": "dev", "text": "조회 화면에서 부서 필터를 선택하면 해당 부서 행만 남는 것을 확인한다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-26", "gate": "H1", "split": "dev", "text": "고객 불만이 줄어든다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-27", "gate": "H1", "split": "dev", "text": "신청서 10건을 입력하면 접수 목록에 10건이 중복 없이 나오고 가장 빠르게 처리된다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-28", "gate": "H1", "split": "dev", "text": "배정 결과가 합리적이다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-29", "gate": "H1", "split": "dev", "text": "한 달치 데이터 2000행을 넣어도 오류 없이 보고서가 생성된다", "draft_label": "testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h1-30", "gate": "H1", "split": "dev", "text": "충분한 수준의 보안이 확보된다", "draft_label": "not_testable", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-01", "gate": "H2", "split": "dev", "user_goal": "회의실 예약 알림 기능을 만들고 싶어요", "goal_arg": "회의실 예약 알림 기능", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-02", "gate": "H2", "split": "dev", "user_goal": "재고 부족 알림 도구를 만들어 줘", "goal_arg": "재고 부족 알림 명세 만들기", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-03", "gate": "H2", "split": "dev", "user_goal": "출장비 정산표를 월별로 자동 생성하는 도구", "goal_arg": "출장비 정산표 월별 자동 생성 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-04", "gate": "H2", "split": "dev", "user_goal": "고객 문의를 유형별로 분류하는 도구를 만들고 싶어요", "goal_arg": "고객 문의 분류 요구사항 명세 만들기", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-05", "gate": "H2", "split": "dev", "user_goal": "비품 대여 현황 대시보드를 만들려고 해요", "goal_arg": "비품 대여 현황 대시보드", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-06", "gate": "H2", "split": "dev", "user_goal": "전 직원의 연차 신청을 팀별로 모아 보는 화면", "goal_arg": "연차 신청 현황 화면", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-07", "gate": "H2", "split": "dev", "user_goal": "설비 점검 기록을 남기는 앱", "goal_arg": "설비 점검 기록 앱", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-08", "gate": "H2", "split": "dev", "user_goal": "주간 매출을 요약하는 보고 도구", "goal_arg": "매출 요약 및 분석 전체 시스템", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-09", "gate": "H2", "split": "dev", "user_goal": "차량 배차 요청에 빈 차량을 배정하는 도구", "goal_arg": "차량 배차 요청 시 빈 차량 배정 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-10", "gate": "H2", "split": "dev", "user_goal": "본사 영업팀의 주간 매출을 요약하는 보고 도구", "goal_arg": "주간 매출 요약 보고 도구", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-11", "gate": "H2", "split": "dev", "user_goal": "사내 교육 신청 접수 도구", "goal_arg": "교육 신청 접수 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-12", "gate": "H2", "split": "dev", "user_goal": "협력사 계약 만료 30일 전 팀장 메일 알림", "goal_arg": "계약 만료 알림", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-13", "gate": "H2", "split": "dev", "user_goal": "신입 온보딩 체크리스트를 관리하는 도구", "goal_arg": "신입 온보딩 체크리스트 관리 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-14", "gate": "H2", "split": "dev", "user_goal": "폐기물 수거 일정을 평일 오전에 공지하는 기능", "goal_arg": "폐기물 수거 일정 공지 기능", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-15", "gate": "H2", "split": "dev", "user_goal": "창고 재고가 안전재고 아래면 담당자에게 알림", "goal_arg": "창고 재고 안전재고 미만 시 담당자 알림 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-16", "gate": "H2", "split": "dev", "user_goal": "회의록을 요약해서 참석자에게 메일로 보내는 도구", "goal_arg": "회의록 요약 도구 요구사항 정리", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-17", "gate": "H2", "split": "dev", "user_goal": "지점별 비품 요청을 승인하는 흐름", "goal_arg": "지점별 비품 요청 승인 흐름", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-18", "gate": "H2", "split": "dev", "user_goal": "출장 영수증을 모아 월별 정산표를 만드는 도구", "goal_arg": "출장 정산 업무 전반을 관리하는 플랫폼", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-19", "gate": "H2", "split": "dev", "user_goal": "고객 문의 접수 도구", "goal_arg": "고객 문의 접수 도구", "draft_label": "preserved", "status": "초안 — 저자 확인 필요"}
+{"id": "h2-20", "gate": "H2", "split": "dev", "user_goal": "프로젝트 일정 지연을 팀장에게 알리는 도구", "goal_arg": "프로젝트 일정 지연 알림 명세 만들기", "draft_label": "changed", "status": "초안 — 저자 확인 필요"}

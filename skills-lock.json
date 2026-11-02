@@ -89,7 +89,7 @@
       "source": "langfuse/skills",
       "sourceType": "github",
       "skillPath": "skills/langfuse/SKILL.md",
-      "computedHash": "edf3a6ec935b6956629b94156a8fc310fcb0723eef849ff5ae9ad3dc1831d530"
+      "computedHash": "ff5c606d22961ae0c70968e8944c73ce576a3a0a8422415861d6d7839a45539d"
     },
     "langgraph-cli": {
       "source": "langchain-ai/langchain-skills",
@@ -97,11 +97,17 @@
       "skillPath": "config/skills/langgraph-cli/SKILL.md",
       "computedHash": "dec48033a9a80c8d8826d0d4303dfc339a0a9145f3266035663104357b2d9c8f"
     },
+    "langgraph-decision-models": {
+      "source": "langchain-ai/langchain-skills",
+      "sourceType": "github",
+      "skillPath": "config/skills/langgraph-decision-models/SKILL.md",
+      "computedHash": "f637b77143c156438510e0fdc87f471d149b26304ac54dde7b444c8c73483422"
+    },
     "langgraph-fundamentals": {
       "source": "langchain-ai/langchain-skills",
       "sourceType": "github",
       "skillPath": "config/skills/langgraph-fundamentals/SKILL.md",
-      "computedHash": "790dd42d79190a6db6a7a82ac9b03fa371402a47d91ff88c1e2731b1ceff1d29"
+      "computedHash": "71a81a229a520f2a887e12d9114684243eae6d910e951a316c4c8f81b3444dd8"
     },
     "langgraph-human-in-the-loop": {
       "source": "langchain-ai/langchain-skills",
@@ -127,17 +133,11 @@
       "skillPath": "config/skills/langgraph-typescript-quickstart/SKILL.md",
       "computedHash": "ae3745d29e53b8d8f74057a82b8404bf97039ed71eb598f7c8c97a1a74fb2681"
     },
-    "langsmith-online-eval-engineering": {
-      "source": "langchain-ai/langchain-skills",
-      "sourceType": "github",
-      "skillPath": "config/skills/langsmith-online-eval-engineering/SKILL.md",
-      "computedHash": "8937a7bc6ee36c4ae02375f1f9c5d00dded7fe2c9f6e0926414e391e8dc40711"
-    },
     "managed-deep-agents": {
       "source": "langchain-ai/langchain-skills",
       "sourceType": "github",
       "skillPath": "config/skills/managed-deep-agents/SKILL.md",
-      "computedHash": "37afd87c6895844a4ca2d14095730b128aa3510accf3bdc69863f618c31208a9"
+      "computedHash": "4e03ec82e79fe392a1ea9a278fd2484dce1f6bcc9589f0abdb1c0bd35b45f053"
     },
     "swarm": {
       "source": "langchain-ai/langchain-skills",

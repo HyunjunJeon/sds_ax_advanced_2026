@@ -34,7 +34,7 @@
 
 ### 시간표
 
-`00`은 수업 전 10분이고, 01~04의 합 240분이 이론 블록이다.
+`00`은 수업 전 10분이고, 01~04의 합 240분이 처음 설계의 이론 블록이다(02c와 04b를 더한 뒤의 330분은 "구축 후 정정"을 본다).
 
 | 파일 | Part | 분 | 묶음 |
 |---|---|---:|---|
@@ -82,7 +82,7 @@ running을 먼저 돌면 `chat` 1, `doc` 22(새 block `[6, 7]`), 남은 9는 `fa
 | `seq_lens` | `[34, 54, 9]` |
 | slot 예 | `chat` 33 → 49, `doc` 32 → 96, `doc` 37 → 101, `doc` 48 → 112, `doc` 53 → 117, `faq` 0 → 128, `faq` 8 → 136 |
 
-packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서다. 실제 순서는 대장에 없으므로 "확인이 필요합니다"라고 적는다.
+packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서(chat, doc, faq)다. 처음에는 실제 순서가 대장에 없어 "확인이 필요합니다"라고 적기로 했으나, 02a 셀 40이 MRV2의 `sort_batch_req_ids`(`vllm/v1/worker/gpu/model_runner.py:2435-2447`, 호출 `:1291`)를 읽어 draft가 있는 요청, token 수가 decode 길이와 같은 요청, 그다음 token 수가 적은 요청 순이라고 쓴다(코드 읽기). 그래서 실제 배열의 순서는 다를 수 있다고 쓰고 읽는 법은 같다고 덧붙인다.
 
 **E2, hash (02b, 05).** `doc`(54 token)을 끝낸 뒤 같은 프롬프트: 적중 3 block 48 token, 다시 계산 6 token. 프롬프트가 정확히 48 token이면 상한 47 때문에 적중 2 block 32 token, 다시 계산 16 token. 20번째 token부터 다르면 적중 1 block. salt가 다르면 적중 0.
 
@@ -120,7 +120,7 @@ packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서다
 7. **강사 메모.** Day07 README의 2026년 9월 값(`Day07/README.md:78-80` 등: 78초 크래시 루프, 15~20분 기동, 다운로드 약 300초)은 반드시 `2026-09-15 강사 메모, v0.28 dev`라는 표지와 함께만 쓴다. 약 306 GiB 가중치는 레시피에도 있으므로 R-06으로 인용해도 된다.
 8. **Python frontend와 수업 서버.** 본문의 경로 설명은 v0.32.0의 Python frontend 기준이다. 수업 Pod는 `Day07/README.md:75` 기준 v0.28.1rc1 dev 빌드이고(R-01), 레시피 기본 명령은 Rust frontend를 켠다(P1-49). 수업 Pod의 frontend는 확인되지 않았다(`part6.md` 적용 범위 전제). `01`, `05`, `06`은 이 차이를 처음 나오는 곳에 callout으로 적는다. 노트북은 "수업 서버가 이렇게 동작한다"고 쓰지 않는다. 이 차이는 `### 문서와 코드가 다를 때`와 별개로 `### 수업 서버와의 차이` 제목으로 적는다.
 9. **시뮬레이터는 교육용 모델이다.** `vllm_lab`의 결과를 보여 주는 첫 셀 앞 문단에 "이것은 vLLM이 아니라 수업용 모델입니다"라고 쓰고, 무엇을 모델링하지 않았는지 적는다. 시뮬레이터 출력은 "vLLM이 이렇게 동작했다"가 아니다. `reference_kv.json`이 `status: ran`이면 그 범위에서만 "실제 클래스와 같은 결과"라고 쓴다.
-10. **네트워크와 키.** 코드 셀은 네트워크를 부르지 않고 키가 필요 없다. 예외는 `05`와 `06`의 `RUN_POD = False` 보호 셀뿐이다. 보호 셀 앞 문단에 "저자는 이 셀을 서버에 대고 실행해 본 적이 없습니다"라고 쓴다. `01`의 실패 재현은 루프백 소켓 `bind`만 하고 접속하지 않는다.
+10. **네트워크와 키.** 코드 셀은 네트워크를 부르지 않고 키가 필요 없다. 예외는 `05`와 `06`의 `RUN_POD = False` 보호 셀뿐이다(06은 설정 셀 53과 요청 셀 54를 함께 보호 셀이라 부른다). 보호 셀 앞 문단에 "저자는 이 셀을 서버에 대고 실행해 본 적이 없습니다"라고 쓴다. `01`의 실패 재현은 루프백 소켓 `bind`만 하고 접속하지 않는다.
 11. **슬라이드 비의존.** 노트북은 PDF 없이 읽혀야 한다. `### PDF에서는` 표로 장 번호를 가리킬 수 있고, 대장 `pdf-diff.md`와 다른 곳은 어느 쪽이 맞는지 쓴다.
 12. **`.env`.** 값을 출력하지 않는다. `view.env_status`로 설정됨과 미설정만 말한다. 실제 RunPod 호스트 문자열은 자리 표시자로도 쓰지 않는다.
 13. **용어.** 루트 `AGENTS.md` 2절의 한국어 용어를 쓴다. 근거, 원문, 적재, 예산, 인용 등이다. 대장 용어(`prefill`, `decode`, `preempt`, `token`, `block`, `slot`)는 영어 그대로 쓴다. 코드 이름은 번역하지 않는다.
@@ -264,7 +264,7 @@ packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서다
 - 코드: `vllm/entrypoints/cli/serve.py:54`, `vllm/entrypoints/launchers/launcher.py:378`, `vllm/entrypoints/launchers/launcher.py:391`, `vllm/entrypoints/launchers/api_server/entry.py:165`, `vllm/entrypoints/launchers/api_server/entry.py:36`, `vllm/engine/arg_utils.py:2205`, `vllm/v1/engine/core_client.py:660`, `vllm/v1/engine/utils.py:1198`, `vllm/v1/engine/utils.py:1361`, `vllm/v1/engine/core.py:1363`, `vllm/v1/engine/core.py:1340`, `vllm/v1/engine/core.py:144`, `vllm/v1/engine/core.py:261`, `vllm/v1/engine/core.py:1547`, `vllm/v1/worker/gpu_worker.py:634`, `vllm/v1/worker/gpu/model_runner.py:991`, `vllm/envs.py:328`, `vllm/entrypoints/launchers/api_server/entry.py:116`, `vllm/entrypoints/launchers/launcher.py:45`, `vllm/entrypoints/launchers/launcher.py:175`.
 - 근거: P1-10, P1-12(미확인), P1-13, P1-14, P1-15, P1-16, P1-18, P1-19, P1-20, P1-21, P1-22, P1-23, P1-24, P1-25, P1-26, P1-51, D-02, D-03.
 - 주의: listen 호출은 대장이 확인하지 못했다. "vLLM은 bind까지 하고 그 뒤는 Uvicorn"까지만 말한다(P1-12(미확인)). PDF 시작 로그는 설명용이고 세 숫자가 맞지 않는다는 점을 실제 로그 형식 `GPU KV cache size: N tokens, Maximum concurrency for M tokens per request: X.XXx`와 함께 보여 준다(D-02).
-- 왜: 코드 주석이 Ray와의 race를 밝히고 이슈 #8204를 가리킨다(`launcher.py:391-393`, 이슈 본문은 시작 시 address in use 실패 보고). 호출 순서에서 포트 충돌이 무거운 초기화 전에 드러난다는 것이 따라 나온다. KV 크기 자동 결정은 PR #6(제목만 인용, 2023-03-12 병합), CUDA graph 메모리 반영은 PR #30515(처음엔 기본 꺼짐, v0.32.0은 `vllm/envs.py:328`에서 켜짐). Uvicorn signal은 PR #49668(race). 시작 대기 한도 600초와 레시피의 3600(P1-51). 기동 시간을 말하려면 `2026-09-15 강사 메모, v0.28 dev` 표지와 함께 15~20분을 적는다.
+- 왜: 코드 주석이 Ray와의 race를 밝히고 이슈 #8204를 가리킨다(`launcher.py:391-393`, 이슈 본문은 시작 시 address in use 실패 보고). 호출 순서에서 포트 충돌이 무거운 초기화 전에 드러난다는 것이 따라 나온다. KV 크기 자동 결정은 PR #6(처음 설계는 제목만 인용, 2023-03-12 병합. 본문 인용은 "구축 후 정정"), CUDA graph 메모리 반영은 PR #30515(처음엔 기본 꺼짐, v0.32.0은 `vllm/envs.py:328`에서 켜짐). Uvicorn signal은 PR #49668(race). 시작 대기 한도 600초와 레시피의 3600(P1-51). 기동 시간을 말하려면 `2026-09-15 강사 메모, v0.28 dev` 표지와 함께 15~20분을 적는다.
 
 **절 4, request 경로.** 표로 객체 사슬을 잇는다: `ChatCompletionRequest` → `EngineInput` → `EngineCoreRequest` → `Request` → `SchedulerOutput` → `ModelRunnerOutput` → `EngineCoreOutputs` → `RequestOutput`. 각 행은 클래스 위치, 사는 프로세스, 만드는 함수다. tokenize는 API server(`render_chat_request` → `render_chat` → `get_max_tokens` → `to_sampling_params` → `generate`). 출력 쪽은 `output_handler` → `OutputProcessor.process_outputs` → `IncrementalDetokenizer`. 정상 종료는 EngineCore가, stop string과 연결 끊김은 API server가 abort로 알린다. `get_max_tokens`는 네 항의 최솟값 한 줄이고 항을 고르는 일은 생성자와 `get_diff_sampling_param`에 흩어져 있다.
 - 코드: `vllm/entrypoints/openai/chat_completion/protocol.py:220`, `vllm/inputs/engine.py:266`, `vllm/v1/engine/__init__.py:109`, `vllm/v1/request.py:60`, `vllm/v1/core/sched/output.py:232`, `vllm/v1/outputs.py:267`, `vllm/v1/engine/__init__.py:259`, `vllm/outputs.py:129`, `vllm/entrypoints/openai/chat_completion/api_router.py:42`, `vllm/entrypoints/openai/chat_completion/serving.py:258`, `vllm/renderers/online_renderer.py:224`, `vllm/entrypoints/serve/utils/api_utils.py:169`, `vllm/v1/engine/async_llm.py:569`, `vllm/v1/engine/core.py:1089`, `vllm/v1/engine/async_llm.py:845`, `vllm/v1/engine/output_processor.py:412`, `vllm/v1/engine/detokenizer.py:62`, `vllm/v1/core/sched/scheduler.py:2714`.
@@ -581,7 +581,7 @@ packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서다
 
 **절 5.** salt는 시작 위치 0인 block의 추가 key에만 들어간다. 다른 salt는 아무 block도 공유하지 못한다. 실제 제한은 검증기 기준으로 128자 이하, `@ / \ NUL` 금지이고 필드 정의의 1024와 다르다. 비용: 사용자별 salt는 공통 system prompt 재사용도 없앤다(`salt_change` 시나리오). 코드: `vllm/entrypoints/generate/base/protocol.py:39`, `vllm/entrypoints/openai/chat_completion/protocol.py:485`, `vllm/v1/core/kv_cache_utils.py:647`. 공식 문서: `docs/design/prefix_caching.md:87`, `docs/usage/security.md:596`. 근거: P5-09, P5-10, P2-28. 왜: 문서의 보안 절이 격리 목적을 밝힌다.
 
-**절 6.** v0.32.0 응답 필드는 `reasoning` 하나다. `reasoning_content`는 요청 쪽에서 바꿔 받는 호환 처리에만 있다. `ChatOpenAI`는 비표준 필드를 버리며 이것은 vLLM 버그가 아니라 클라이언트 설계다(P5-16). 그래서 사고 과정은 openai SDK로 본다. `extra_body`는 최상위로 합쳐진다. effort: 레시피 규칙(기본 max, low와 high 외는 max), `chat_template_kwargs`와 최상위 필드(P5-13(미확인), R-08, R-10). `clear_thinking`의 뜻은 설명하지 않는다(P5-14(미확인), R-09(미확인)). 수업 서버의 필드 이름은 응답으로 확인해야 한다(R-11). 첫 chunk가 `reasoning`일 수 있어 첫 visible과 TTFT가 다르다(D-36). 코드: `vllm/entrypoints/openai/chat_completion/protocol.py:79`, `vllm/entrypoints/generate/base/protocol.py:356`, `vllm/entrypoints/openai/chat_completion/protocol.py:576`, `vllm/renderers/params.py:36`. 공식 문서: `docs/features/reasoning_outputs.md:8`. 근거: P5-13(미확인), P5-14(미확인), P5-15, P5-16, P5-18, P5-22(미확인), R-08, R-09(미확인), R-10, R-11, R-12(미확인), D-36. R-12(미확인)는 P5-16의 실측으로 대체됐다고 쓴다. 왜: 문서의 이름 변경 경고.
+**절 6.** v0.32.0 응답 필드는 `reasoning` 하나다. `reasoning_content`는 요청 쪽에서 바꿔 받는 호환 처리에만 있다. `ChatOpenAI`는 비표준 필드를 버리며 이것은 vLLM 버그가 아니라 클라이언트 설계다(P5-16). 그래서 사고 과정은 openai SDK로 본다. `extra_body`는 최상위로 합쳐진다. effort: 레시피 규칙(기본 max, low와 high 외는 max), `chat_template_kwargs`와 최상위 필드(P5-13(미확인), R-08, R-10). `clear_thinking`의 뜻은 처음에는 설명하지 않기로 했으나, 05 셀 50이 체크포인트 chat template이 선언한 변수이며 참이면 마지막 user 메시지보다 앞선 assistant의 생각을 비운다고 쓴다(P5-14는 `코드 전용`). 두 스크립트는 user 메시지 하나만 보내 prompt가 바뀌지 않는다. Pod의 template이 같은 변수를 읽는지는 R-09(미확인)로 남는다. 수업 서버의 필드 이름은 응답으로 확인해야 한다(R-11). 첫 chunk가 `reasoning`일 수 있어 첫 visible과 TTFT가 다르다(D-36). 코드: `vllm/entrypoints/openai/chat_completion/protocol.py:79`, `vllm/entrypoints/generate/base/protocol.py:356`, `vllm/entrypoints/openai/chat_completion/protocol.py:576`, `vllm/renderers/params.py:36`. 공식 문서: `docs/features/reasoning_outputs.md:8`. 근거: P5-13(미확인), P5-14(미확인), P5-15, P5-16, P5-18, P5-22(미확인), R-08, R-09(미확인), R-10, R-11, R-12(미확인), D-36. R-12(미확인)는 P5-16의 실측으로 대체됐다고 쓴다. 왜: 문서의 이름 변경 경고.
 
 **절 7, `RUN_POD`.** 셀 앞 문단에 "저자는 이 셀을 서버에 대고 실행해 본 적이 없습니다"를 쓴다. 첫 코드 셀은 정확히 `RUN_POD = False`로 시작한다. 뒤 셀은 전체를 `if RUN_POD:` 안에 둔다. 주소는 `view.read_env_value("RUNPOD_BASE_URL")`로만 읽고 출력하지 않는다. `ChatOpenAI(base_url=..., model="GLM-5.3-Flash", stream_usage=True, api_key="unused", timeout=95)`. `/v1/models`로 이름부터 확인하라고 쓴다(R-03). 프록시 100초는 강사 메모이고 대장에서 미확인이다(P5-24(미확인), R-13(미확인)). 파서 플래그 기록이 없다(R-04(미확인)). 왜: 수업 Pod 구성이 문서화되지 않았기 때문에 켜기 전에 확인할 항목을 `SOURCES.md` Pod 점검 항목으로 안내한다.
 
@@ -625,7 +625,7 @@ packed 배열 안의 요청 순서는 이 시뮬레이터가 배정한 순서다
 
 **절 2.** `glm47_moe_tool_parser.py`는 14줄이고 세 값만 정한다. 파싱은 `ParserEngine` 위의 `Glm47MoeParser`다. 형식 `<tool_call>함수명<arg_key>키</arg_key><arg_value>값</arg_value></tool_call>`. `glm45`와 `glm47`은 Python에서 같은 클래스다. 파서는 API server에서 detokenize 뒤에 돈다. 엔진 기반 파서는 `skip_special_tokens`를 거짓으로 바꾼다. 인자 JSON은 파서가 만든다. 코드: `vllm/tool_parsers/__init__.py:61`, `vllm/reasoning/__init__.py:59`, `vllm/tool_parsers/glm47_moe_tool_parser.py:10`, `vllm/parser/glm47_moe.py:3`, `vllm/parser/glm47_moe.py:203`, `vllm/parser/engine/registered_adapters.py:95`, `vllm/parser/engine/adapters.py:235`, `vllm/parser/engine/parser_engine.py:227`, `vllm/entrypoints/openai/chat_completion/serving.py:666`, `vllm/entrypoints/openai/chat_completion/serving.py:997`. 근거: P6-01, P6-02, P6-05, P6-06, P6-18, P6-31, P6-32, P6-36. `hermes_tool_parser.py`로 설명하지 않는다. 왜: 선언형 엔진 위의 얇은 껍질 구조는 코드 사실. 이유 문장은 없다고 쓴다.
 
-**절 3.** `agent_sim.reference_status()`로 상태를 먼저 본다. `status`가 `ran` 또는 `partial`이면 `parser_case_table()`을 보이고 각 행에 위 표지를 붙인다. `not_run`이면 그 이유를 그대로 출력하고 코드 읽기 표로 대신한다. 케이스 7개와 후보의 대응은 `vllm_lab 계약`의 표를 따른다. 설명: 전이표에 없는 조합은 현재 상태의 텍스트, 잘리면 `finish()`가 닫는다, 선언 안 된 이름은 조용히 버린다, 값 변환 실패는 문자열로 둔다, 필수 인자를 거절하는 코드는 읽은 범위에서 못 찾았다. 비스트리밍과 스트리밍이 같은 결과라는 보장은 없다. 코드: `vllm/parser/engine/streaming_parser_engine.py:294`, `vllm/parser/engine/streaming_parser_engine.py:310`, `vllm/parser/engine/streaming_parser_engine.py:412`, `vllm/parser/engine/parser_engine.py:415`, `vllm/parser/engine/parser_engine.py:1105`, `vllm/parser/engine/parser_engine.py:1130`, `vllm/parser/glm47_moe.py:54`, `vllm/parser/glm47_moe.py:66`, `vllm/tool_parsers/utils.py:356`, `vllm/tool_parsers/utils.py:1153`, `vllm/parser/abstract_parser.py:833`, `vllm/parser/abstract_parser.py:849`. 공식 문서: `docs/features/tool_calling.md:200`. 근거: P6-16, P6-17, P6-18, P6-19, P6-20, C2, C3, C4, C5, C6, C7. 잘린 호출을 "버려진다"고 단정하지 않는다(소스 주석과 코드 읽기가 다르다). 왜: 서버가 검증을 해 주지 않을 수 있으므로 client 쪽 검증을 설계한다(`agent_sim.validate_tool_args`).
+**절 3.** `agent_sim.reference_status()`로 상태를 먼저 본다. `status`가 `ran` 또는 `partial`이면 `parser_case_table()`을 보이고 각 행에 위 표지를 붙인다. `not_run`이면 그 이유를 그대로 출력하고 코드 읽기 표로 대신한다. 케이스와 후보의 대응은 `vllm_lab 계약`의 표를 따른다. 설명: 전이표에 없는 조합은 현재 상태의 텍스트, 잘리면 `finish()`가 닫는다, 선언 안 된 이름은 조용히 버린다, 값 변환 실패는 문자열로 둔다, 필수 인자를 거절하는 코드는 읽은 범위에서 못 찾았다. 비스트리밍과 스트리밍이 같은 결과라는 보장은 없다. 코드: `vllm/parser/engine/streaming_parser_engine.py:294`, `vllm/parser/engine/streaming_parser_engine.py:310`, `vllm/parser/engine/streaming_parser_engine.py:412`, `vllm/parser/engine/parser_engine.py:415`, `vllm/parser/engine/parser_engine.py:1105`, `vllm/parser/engine/parser_engine.py:1130`, `vllm/parser/glm47_moe.py:54`, `vllm/parser/glm47_moe.py:66`, `vllm/tool_parsers/utils.py:356`, `vllm/tool_parsers/utils.py:1153`, `vllm/parser/abstract_parser.py:833`, `vllm/parser/abstract_parser.py:849`. 공식 문서: `docs/features/tool_calling.md:200`. 근거: P6-16, P6-17, P6-18, P6-19, P6-20, C2, C3, C4, C5, C6, C7. 잘린 호출을 "버려진다"고 단정하지 않는다(소스 주석과 코드 읽기가 다르다). 왜: 서버가 검증을 해 주지 않을 수 있으므로 client 쪽 검증을 설계한다(`agent_sim.validate_tool_args`).
 
 **절 4.** `auto`, `required`, 이름 지정, `none`을 표로 비교한다. GLM은 `supports_required_and_named=False`라 `adjust_request`가 JSON 스키마 강제를 걸지 않는다. 대신 구조화 태그가 유일한 제약이다. `auto`도 파서 기본이 FUNCTION이라 껍데기가 제약된다. strict 도구만 인자 스키마가 고정된다. `--tool-strict-level`. `VLLM_ENFORCE_STRICT_TOOL_CALLING=0`이면 GLM의 required/named에 제약이 남지 않는다. 문법 마스크는 temperature와 무관하다. `tool_choice="none"`도 기본은 도구 정의를 프롬프트에 넣는다. 코드: `vllm/tool_parsers/abstract_tool_parser.py:50`, `vllm/tool_parsers/abstract_tool_parser.py:144`, `vllm/tool_parsers/abstract_tool_parser.py:189`, `vllm/parser/abstract_parser.py:394`, `vllm/parser/abstract_parser.py:503`, `vllm/parser/abstract_parser.py:521`, `vllm/parser/abstract_parser.py:597`, `vllm/tool_parsers/structural_tag_registry.py:175`, `vllm/tool_parsers/structural_tag_registry.py:1080`, `vllm/tool_parsers/tool_strict_level.py:7`, `vllm/envs.py:1861`, `vllm/entrypoints/launchers/cli_args.py:119`, `vllm/entrypoints/launchers/cli_args.py:131`. 공식 문서: `docs/features/tool_calling.md:88`, `docs/features/tool_calling.md:105`, `docs/features/tool_calling.md:116`, `docs/features/tool_calling.md:125`, `docs/features/tool_calling.md:137`, `docs/features/tool_calling.md:143`. 근거: P6-07, P6-11, P6-12, P6-13, P6-24, P6-25, P6-26, P6-27, P6-34, C9. 왜: 문서가 왜 그 경로를 두는지(`docs/features/tool_calling.md:112-125`).
 
@@ -1169,7 +1169,7 @@ SCENARIOS = ("append_only", "system_change", "tool_added", "tool_order_change",
 def run_scenario(name: str, *, user_words: int = 40, turns: int = 4, block_size: int = 16,
                  num_blocks: int = 512) -> list[dict]:
     """TurnResult.to_row() 목록. 없는 이름은 ValueError. tool_added, tool_order_change, effort_in_system의 assumption 칸에는
-    'toy 렌더링 가정, 실제 template은 확인되지 않음(미확인)'을 넣는다. pressure_evict는 num_blocks를 줄이고 사이에 다른 요청을 넣는다."""
+    'toy 렌더링 가정, 실제 template과 tool 위치가 다름(P5-08)'을 넣는다. pressure_evict는 num_blocks를 줄이고 사이에 다른 요청을 넣는다."""
 
 def reuse_from_recorded(calls: list[dict], *, block_size: int = 16, num_blocks: int = 512) -> list[dict]:
     """calls[i]: {"system": str, "tools": list, "messages": [{"role", "content"}]}. 기록을 render_prompt에 넣어 TurnResult 행을 낸다. output은 빈 문자열."""
@@ -1285,9 +1285,11 @@ def parser_case_table(path: pathlib.Path | None = None) -> list[dict]:
 |---|---|
 | `view` | 00~06 전부 |
 | `kv_sim` | 00, 02a, 02b |
-| `sched_sim` | 01, 03 |
-| `kv_math` | 02a, 03, 04 |
-| `agent_sim` | 05, 06 |
+| `sched_sim` | 00, 01, 03 |
+| `kv_math` | 00, 02a, 03, 04 |
+| `agent_sim` | 00, 05, 06 |
+| `kv_cases` | 02c, 04b |
+| `tier_sim` | 04b |
 
 ---
 
@@ -1302,7 +1304,7 @@ def parser_case_table(path: pathlib.Path | None = None) -> list[dict]:
 | Gemma4 MTP의 KV 공유, MTP가 target KV를 어떻게 쓰는가 | **뺐다.** 대장은 lookahead K, 추가 slot 0까지만 준다 | P2-55(미확인) |
 | chat template의 특수 token, 재tokenize 어긋남, tool 목록의 렌더링 위치 | 미확인으로 표시, toy는 가정이라고 쓴다 | P2-46(미확인), P5-07(미확인), P5-08(미확인) |
 | effort 값이 prefix를 바꾸는가 | 미확인으로 표시 | P5-13(미확인) |
-| `clear_thinking`의 뜻 | **뺐다.** "강사 스크립트가 쓰는 값"까지만 | P5-14(미확인), R-09(미확인) |
+| `clear_thinking`의 뜻 | 처음엔 **뺐다.** 지금은 05 셀 50이 template 변수라는 뜻까지 설명한다. Pod의 template은 미확인으로 남는다 | P5-14, R-09(미확인) |
 | Counter의 `_total` 이름 | 미확인으로 표시, 파서는 두 형태를 받는다 | P3-38(미확인) |
 | replica(DP) 내부 동작 | 미확인으로 표시, 문서 안내까지만 | P3-17(미확인) |
 | `listen`을 누가 부르는가 | 미확인으로 표시, "bind까지"만 말한다 | P1-12(미확인) |
@@ -1316,13 +1318,13 @@ def parser_case_table(path: pathlib.Path | None = None) -> list[dict]:
 | `vllm bench serve --num-prompts` 기본값 | **뺐다.** 항상 명시하게 한다 | `part3.md` 파라미터 절 |
 | Rust 이미지·비디오 입력 | **뺐다** | P1-50(미확인) |
 | 수업 Pod의 frontend, 플래그, 서버 응답 | 모른다고 쓴다 | R-04(미확인), `part6.md` 적용 범위 전제 |
-| packed 배열 안의 요청 순서, 16이 backend별로 바뀌는 경로 | "확인이 필요합니다" | P2-19에 순서 없음, D-13 |
+| packed 배열 안의 요청 순서, 16이 backend별로 바뀌는 경로 | 요청 순서는 02a 셀 40이 `sort_batch_req_ids`로 설명한다(코드 읽기). 16이 바뀌는 경로의 구체 값은 "확인이 필요합니다" | P2-19, D-13 |
 
 ### 대장끼리 어긋나는 곳과 이 문서의 판단
 
 | 어긋나는 곳 | 판단 |
 |---|---|
-| P1-24는 PR #6 본문을 읽었다고 쓰고 `part1.md` 설계 결정 줄은 "제목만 확인"이다 | 제목과 병합일만 인용한다 |
+| P1-24는 PR #6 본문을 읽었다고 쓰고 `part1.md` 설계 결정 줄은 "제목만 확인"이다 | 처음엔 제목과 병합일만 인용하기로 했다. 대장이 `gh pr view`로 본문을 읽은 것으로 정리돼 01 셀 35가 본문(OPT memory analyzer로 KV 크기를 자동 설정)도 인용하고 필요한 이유는 적지 않는다고 쓴다 |
 | P2-28의 salt 길이 1~1024와 P5-10의 검증기 128자 | P5-10을 따른다. 코드의 검증기가 실제로 막는다 |
 | P3-23 "처음부터 되풀이"와 P2-37 "일부 재사용 가능" | P2-37을 함께 가르친다 |
 | D-17은 "Decode를 먼저"를 일치로 판정, P3-22는 부정확하다고 판정 | P3-22를 따른다 |
@@ -1352,3 +1354,12 @@ def parser_case_table(path: pathlib.Path | None = None) -> list[dict]:
 - 1301행: "GLM 층 구성과 숫자를 뺐다"는 범위가 달라졌다. `data/reference_specs.json`(status partial)이 실제 KV 규격 클래스를 CPU에서 호출해 record 크기(main 1024, `fp8_ds_mla` 656, indexer 132, KDA conv 147,456 등)를 준다. block 크기(BF16 TP1 4352, TP4 1152)는 대역 backend로 얻은 값이라 시작 로그가 아니다(`docs/reference/specs.md`). `kv_math`가 숫자를 거부하는 정책을 바꿀지는 이 정정이 정하지 않는다.
 - 578행(요청 목록 밖): `P5-21(미확인)`, `P5-22(미확인)`은 낡았다. 둘은 실측 행으로 바뀌었고 P5-21은 `코드 전용`, P5-22는 `코드 전용`이다. 요약 middleware 조건과 `reasoning` 미전송 설명은 행의 범위로 읽는다.
 - Part 8: `part8.md`의 "설치도 실행도 하지 않았다"는 낡았다. LMCache v0.5.6을 GPU 확장 없이 빌드해 게이팅, SCHEDULER 생성자, 가짜 텐서 저장을 CPU에서 실행했고, 모델별 지원 상태 표에 `실제 클래스 호출` 표지를 더했다. 모델을 LMCache에서 돌린 실행은 없다(`docs/reference/lmcache.md`).
+- 85, 1319행: packed 배열의 요청 순서는 02a 셀 40이 `sort_batch_req_ids`로 설명한다(코드 읽기). 584, 1305행: `clear_thinking`은 05 셀 50이 template 변수로 설명하고 Pod의 template은 R-09(미확인)로 남는다. 1172행: `run_scenario` docstring의 assumption 문구는 `vllm_lab/agent_sim.py:196`의 현재 문구 'toy 렌더링 가정, 실제 template과 tool 위치가 다름(P5-08)'이 정답이다. 1325행: PR #6 본문은 01 셀 35가 인용한다.
+- 3행: "노트북 8개와 모듈 5개"는 설계 당시 값이다. 지금은 노트북 10개이고 `vllm_lab/`의 모듈은 일곱 개(`agent_sim`, `kv_cases`, `kv_math`, `kv_sim`, `sched_sim`, `tier_sim`, `view`)다.
+- 628행의 "케이스 7개"는 기록(`data/reference_parser.json`)의 8개(`no_call_missing_think_end` 포함)와 맞지 않아 숫자를 뺐다. 1272-1280행 `vllm_lab 계약`의 케이스 표는 설계 당시 7행이고 `no_call_missing_think_end`(후보 `[]`)가 없다. 케이스 목록은 기록 파일이 정답이다.
+- 104행: "범위 표기(`#L10-L20`)는 쓰지 않고"는 바뀌었다. 05와 06은 범위 permalink를 쓰고(05 셀 7의 `#L286-L290`), `tests/check_notebook.py`가 이를 받아들인다. 라벨의 줄과 주소의 `#L`이 같아야 한다.
+- 576, 620, 638행은 낡았다. 05는 revision 46a050b의 template을 렌더링해 비교하고(05 셀 15, 17), `part6.md`에는 실행 행이 있으며(`part6.md:3`), 06 셀 50은 `/tokenize`의 위치를 적는다. 그래서 "template을 열지 않았다", "모든 주장은 코드 읽기다", "렌더링 확인 엔드포인트는 존재를 확인하지 않았다"는 더는 맞지 않는다.
+- 551행과 607-618행: 05 절 0의 제목은 `Part 4와 04b에서 넘어온 것`이다. 06의 분은 노트북 시간표가 정답이다(절 1 7, 절 2 7, 절 3 11, 절 4 8, 절 5 6, 절 7 4).
+- 584, 1329행: "R-12(미확인)는 P5-16의 실측으로 대체됐다고 쓴다"는 설계 당시 계획이다. 05는 R-12를 언급하지 않는다. 대체 관계는 `part5.md`의 행이 정답이다.
+- 상태가 바뀐 행: P5-08, P5-13은 `일치`, P5-14, P6-04, P6-21, P6-30은 `코드 전용`, P6-35는 `문서·코드 차이`다. 위 본문의 "(미확인)" 표기는 설계 당시 값이고 현재 값은 `docs/sources/`의 해당 행이 정답이다. 아직 `미확인`인 행 중 위 본문이 이름을 든 행은 P1-50, P2-02, P2-46, P3-17, P4-11, P4-20, P5-07, P5-24와 D-10, D-21, D-26, D-27, D-37, R-04, R-09, R-13이다. Part 7, 8의 행을 포함한 전체 목록은 `docs/sources/`의 각 파일 행이 정답이고, `docs/SOURCES.md`는 파일별 `미확인` 개수만 적는다.
+- 코드 셀 수: "코드 셀(N)" 숫자는 설계 값이다. 완성된 노트북의 코드 셀은 00 5, 01 27, 02a 24, 02b 28, 02c 34, 03 22, 04 17, 04b 25, 05 25, 06 29개다. 셀 번호와 내용은 노트북이 정답이다.

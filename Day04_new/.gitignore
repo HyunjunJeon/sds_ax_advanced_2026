@@ -1,0 +1,6 @@
+.env
+outputs/
+work/
+evidence/
+__pycache__/
+.ipynb_checkpoints/

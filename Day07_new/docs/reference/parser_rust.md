@@ -30,7 +30,7 @@
 
 - 도구 파서에서 갈립니다. 수업 사례는 이름 바로 뒤에 `<arg_key>`가 붙는 형태라 glm45(개행 필수)는 `tool parser parsing failed` 오류를 내고, glm47은 호출을 냅니다(`glm47_moe.rs:9-12` 주석, `mod.rs:39-46`).
 - 추론 파서는 둘 다 `<think>`/`</think>` 분리를 하고, glm45만 시작 앞과 종료 뒤에 `\n`을 한 개 흡수합니다(`reasoning/glm45.rs:25-26`). `reasoning_then_call`에서 glm47의 content는 `\n<tool_call>...`로 개행이 남고, glm45는 개행이 지워집니다. 도구 파서는 두 경우 모두 앞 개행을 처리합니다.
-- 사례가 `no_call`, `no_call_missing_think_end`처럼 도구 호출이 없을 때만 glm45와 glm47 결과가 같습니다.
+- 일반 프롬프트에서는 8개 중 4개(`clean_call`, `reasoning_then_call`, `unknown_tool`, `bad_arg_type`)가 glm45 오류, glm47 호출로 갈렸고, 나머지 4개(호출 없는 2개와 두 이름 모두 오류인 `malformed_markup`, `truncated_call`)는 같았습니다. `<think>`를 연 프롬프트에서는 `reasoning_then_call` 1개만 갈렸습니다(`reference_parser_rust.json`의 `glm45_equals_glm47`).
 
 ## 4. Python 파서와 다른 점
 
@@ -42,6 +42,8 @@
 6. **스트리밍.** Rust는 5글자 단위 스트리밍과 한 번에 주기가 8개 사례에서 같은 결과를 냈습니다. Python 쪽 스트리밍은 `reference_parser.json`에서 실행하지 않았으므로 비교 대상이 없습니다.
 
 ## 5. 01, 06 문장 중 코드 읽기에서 실행 근거로 올릴 수 있는 것
+
+이 실행 당시의 목록입니다. 이후 06에 반영했고 줄 번호는 그때 기준입니다.
 
 `06-Tool-Calling-Errors.ipynb`
 - 2269행 근처, "끝에서 열린 호출이 남으면 `incomplete GLM MoE tool call` 오류" (P6-29): `truncated_call`로 실행 확인. 근거 종류를 "코드 읽기"에서 "Rust 파서 실행(TestTokenizer, 문자열 경로)"로 올릴 수 있습니다.

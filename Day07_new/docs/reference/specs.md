@@ -98,7 +98,7 @@ TP4(TP 그룹만 `world_size=4`로 바꾼 호출)에서는 conv 모양 `[3, 6144
 | 모델 | 조건 | group 수 | 구성 |
 |---|---|---:|---|
 | GLM | BF16, none 또는 align, spec 0 또는 5, TP1 또는 TP4 | 6 | KDA 4개(9, 9, 8, 8), main과 indexer 1개(22), tail 1개(11) |
-| GLM | `fp8`, FlashInfer | 6 | KDA 4개(9, 9, 8, 8), 22, 11 |
+| GLM | `fp8`, FlashInfer (SM90, SM100) | 6 | KDA 4개(9, 9, 8, 8), 22, 11 |
 | GLM | `fp8_ds_mla` (FlashMLA, SM120) | 5 | KDA 3개(12, 11, 11), 22, 11 |
 | GLM | `nvfp4_ds_mla` | 7 | KDA 5개(7, 7, 7, 7, 6), 22, 11 |
 | V4 | 모든 형식 | 5 | SWA 2개(22, 21), main과 indexer 1개(62), 압축 상태 2개(42, 20) |
@@ -145,7 +145,7 @@ CUDA 플랫폼 클래스로 바꾸어 돌리는 길은 import 단계(`_C_stable_
 
 ## kv_cases와 다른 점
 
-record 기준 값은 모두 맞습니다. 다른 것은 page와 stride 기준 값 15행이고 전부 `EXPECTED_DIFFERENCES`에 값과 이유로 있습니다. kv_cases는 padding을 세지 않는다고 적었으므로(`vllm_lab/kv_cases.py:82`, `:93`) 계산 오류가 아니라 범위의 차이입니다. kv_cases는 고치지 않았습니다.
+record 기준 값은 모두 맞습니다. 다른 것은 page와 stride 기준 값 15행이고 전부 `EXPECTED_DIFFERENCES`에 값과 이유로 있습니다. kv_cases는 padding을 세지 않는다고 적었으므로(`vllm_lab/kv_cases.py:82`, `:89`, `:101`) 계산 오류가 아니라 범위의 차이입니다. kv_cases는 고치지 않았습니다.
 
 | 값 | kv_cases | 실제 | 원인 |
 |---|---:|---:|---|
@@ -162,13 +162,13 @@ record 기준 값은 모두 맞습니다. 다른 것은 page와 stride 기준 �
 | GLM KDA 요청당, TP4, 네 rank 합 | 147,619,840 | 160,432,128 | rank당 1,085,440이 1,179,648로. padding 8.7% |
 | GLM KDA 요청당, TP4, align, checkpoint 1 | 442,859,520 | 481,296,384 | 같음 |
 | 교차 문맥, none | 12,696 | 13,027 | 위 두 값의 비 |
-| 교차 문맥, align, checkpoint 1 | 38,089 | 39,080 | 같음. TP4에서는 41,330 |
+| 교차 문맥, align, checkpoint 1 | 38,089 | 39,080 | 같음. TP4는 rank 하나끼리 나눈 9,522(padding 전)와 10,332(padding 후). 10,332는 rank당 고정 state 120,324,096을 rank당 토큰당 stride 11,645.33으로 나눈 값(`real_kda_table`의 `crossover_tokens`) |
 
 `_min_block_size`는 값이 아니라 배수 관계만 맞춥니다. 실제 block은 kv_cases의 최소값(GLM 4, V4 128, V4.1 2)의 배수이지만 크기는 훨씬 큽니다. kv_cases는 이 점을 `_CAPACITY_ASSUMPTIONS`에 적었습니다.
 
 ## 02c, 04b 글과 다른 점
 
-셀 번호는 0부터 셉니다. 노트북은 고치지 않았습니다.
+아래는 이 실행 당시의 차이이고 이후 두 노트북에 반영했습니다. 셀 번호는 그때 기준이고 0부터 셉니다.
 
 | 위치 | 글 또는 코드 | 실제 결과 |
 |---|---|---|
@@ -177,6 +177,6 @@ record 기준 값은 모두 맞습니다. 다른 것은 page와 stride 기준 �
 | 02c 셀 44 | mxfp4를 opt-in으로 설명 | SM10x 조건이 빠져 있음. V4는 SM90에서 거부되는 것을 실행으로 확인(3,514.25의 68B). V4.1은 실행하지 않았지만 같은 함수 `dsa_indexer_uses_fp4`를 지난다(`vllm/v1/attention/backends/mla/indexer.py:59`, `:91`) |
 | 02c 셀 57, 04b 셀 36 | GLM의 실제 block 크기가 자료에 없다고 적음 | 클래스 호출 값이 생김. BF16 TP1 4352, TP4 1152, spec 5 TP1 4480, FP8 8576 또는 8704. 시작 로그 확인은 여전히 아님 |
 | 04b 셀 6, 8, 14 | GLM `BLOCK = 128` (수업이 정한 값) | 이 조건의 실제 block과 다름. 토큰당 계산에는 영향이 없고 block 수만 달라짐 |
-| 04b 셀 11 | 교차 문맥 약 38,089 | padding을 넣으면 39,080, TP4에서 41,330 |
+| 04b 셀 11 | 교차 문맥 약 38,089 | padding을 넣으면 TP1에서 39,080, TP4에서 rank 하나 기준 10,332(04b 셀 10, 11이 보여 주는 값). 41,330은 네 rank 합 481,296,384를 한 rank의 stride 11,645.33으로 나눈 값이라 단위가 섞여 있고 교차점이 아님 |
 
 04b 셀 11의 표(SM10x `fp8` 512, SM90 FlashInfer `fp8` 512, SM120 656, SM90 `fp8_ds_mla` 656), 04b 셀 13의 token당 11,627, 5,995, 7,579, 04b 셀 15의 V4.1 528과 584, 02c 셀 15의 record 표, 02c 셀 54의 V4.1과 GLM 꼬리 값은 record 기준으로 일치합니다.

@@ -70,7 +70,7 @@ uv run --no-sync python -m pytest Day07_new/tests/test_reference_parser_stream.p
 1. **잘린 호출의 인자.** 비스트리밍은 닫힌 쌍만 남겨 올바른 JSON을 낸다. 스트리밍은 값을 먼저 내보내므로 닫히지 않은 JSON으로 끝난다. 최종 변환 결과가 이미 보낸 것보다 짧아 더 보낼 것이 없기 때문이다(`vllm/parser/engine/parser_engine.py:1076` 부근).
 2. **`</tool_call>` 없이 다음 `<tool_call>`이 온 경우.** 비스트리밍은 뒤 호출(부산)이 남고 스트리밍은 앞 호출(서울)이 닫히지 않은 채 남는다. 남는 값이 반대다. 최종 변환 결과가 이미 보낸 접두사로 시작하지 않으면 나머지를 보내지 않는다(`parser_engine.py:1077`). 그리고 이때 `finish_reason`은 `tool_calls`다. **`tool_calls`로 정상 종료한 스트림의 인자도 JSON이 아닐 수 있다.**
 3. **`finish_reason`.** 엔진 `length`에서 호출이 있으면 두 경로가 다르다(`serving.py:771-780`, `serving.py:1099-1103`).
-4. **reasoning token 수.** 스트리밍의 `count_reasoning_tokens`는 `</think>` 앞 token 수보다 적다. 12개 중 11개, 15개 중 13개를 셌고, 모자란 수는 text가 빈 조각(한글 한 글자가 token 둘로 갈려 앞 token의 `delta_text`가 빈 경우)의 수와 같다. 비스트리밍은 12, 15로 맞다. 원인은 `vllm/parser/engine/streaming_parser_engine.py:252-256`에서 빈 조각의 token 수가 사라지는 것으로 읽힌다(코드 읽기, 실행으로 분리하지는 않음). 06과 대장에는 이 수치를 말하는 문장이 없다.
+4. **reasoning token 수.** 스트리밍의 `count_reasoning_tokens`는 `</think>` 앞 token 수보다 적다. 12개 중 11개, 15개 중 13개를 셌고, 모자란 수는 text가 빈 조각(한글 한 글자가 token 둘로 갈려 앞 token의 `delta_text`가 빈 경우)의 수와 같다. 비스트리밍은 12, 15로 맞다. 원인은 `vllm/parser/engine/streaming_parser_engine.py:252-256`에서 빈 조각의 token 수가 사라지는 것으로 읽힌다(코드 읽기, 실행으로 분리하지는 않음).
 
 ## token ID 판정
 
@@ -86,7 +86,7 @@ uv run --no-sync python -m pytest Day07_new/tests/test_reference_parser_stream.p
 | 빈 목록 | 거짓 |
 
 - 생각 구간을 끝내는 token은 둘이다. `reasoning_end_token_ids`가 `</think>`(154842)와 `<tool_call>`(154843)이다. `find_reasoning_end`로 보면 앞의 것은 content가 아니고 뒤의 것은 content에 든다.
-- `<think>`(154841)부터 `</arg_value>`(154850)까지 마크업은 한 token씩이고 `all_special_tokens`에 **들지 않는다.** 18개 특수 token은 `<|user|>`, `<|observation|>` 같은 것들이다. `skip_special_tokens=True`로 decode해도 마크업이 남고, `<|observation|>`만 사라진다. 대장 P6-36이 "확인하지 못했다"고 적은 값이다.
+- `<think>`(154841)부터 `</arg_value>`(154850)까지 마크업은 한 token씩이고 `all_special_tokens`에 **들지 않는다.** 18개 특수 token은 `<|user|>`, `<|observation|>` 같은 것들이다. `skip_special_tokens=True`로 decode해도 마크업이 남고, `<|observation|>`만 사라진다. 근거 표 P6-36이 같은 결과를 싣는다.
 - `adjust_request`는 `skip_special_tokens`를 참에서 거짓으로 바꿨다(P6-36의 코드 읽기와 같음).
 
 ## 항상 생각 판정
@@ -112,7 +112,9 @@ uv run --no-sync python -m pytest Day07_new/tests/test_reference_parser_stream.p
 - `tools: []` 요청은 `ChatCompletionRequest`가 `VLLMValidationError`로 거절한다(`vllm/entrypoints/openai/chat_completion/protocol.py:946`). 파서까지 가지 않는다. `tools`를 아예 빼면 스트리밍, 비스트리밍 모두 호출도 content도 나오지 않는다(`omitted_tools_call`). 파서 클래스에 `tools=[]`를 직접 주면 이름 검사 없이 `get_humidity` 호출이 나온다.
 - `--reasoning-parser` 없이 `--tool-call-parser glm47`만 쓰면 생각 글이 `</think>` 문자열까지 포함해 content에 그대로 들어간다(`tool_parser_without_reasoning_parser`). 호출 앞 공백 처리는 다르다. `reasoning_then_call`의 content 끝이 스트리밍은 `</think>\n`, 비스트리밍은 `</think>`다.
 
-## 06에서 바꿀 곳 (노트북은 이 작업에서 고치지 않았다)
+## 이 실행 당시 06에서 바꿀 곳 (이후 06과 근거 표에 반영함)
+
+이 절의 셀 번호와 `지금` 칸은 이 실행 당시 기준이다. 이후 06의 셀 번호가 바뀌었다.
 
 06의 스트리밍 주장 중 **행과 어긋나는 것은 없다.** 표지가 약하거나 빠진 것이 있고, 틀린 행 하나는 스트리밍이 아니라 요청 검증 쪽이다.
 
@@ -135,7 +137,7 @@ uv run --no-sync python -m pytest Day07_new/tests/test_reference_parser_stream.p
 
 새로 가르칠 만한 사실은 하나다. **`finish_reason`이 `tool_calls`여도 스트리밍 인자가 JSON이 아닐 수 있다(`malformed_markup`).** 코드 읽기 단계의 06은 `length`로 잘린 경우만 닫히지 않은 JSON을 말했다. 다만 이 입력은 기본 태그의 문법이 거절하는 입력이므로 태그가 없는 서버의 이야기다.
 
-대장에서 영향을 받는 행은 P6-17(빈 `tools`), P6-19, P6-20, P6-21, P6-22, P6-36, C2, C3, C4, C6, C7이다. 이 작업에서 고치지 않았다. `REFERENCE_RUN.md`의 "tokenizer 다운로드 없음"(14행)과 "tokenizer 대체물과 한계"(66-71행)도 이 기록과 함께 읽어야 한다.
+근거 표에서 영향을 받는 행은 P6-17(빈 `tools`), P6-19, P6-20, P6-21, P6-22, P6-36, C2, C3, C4, C6, C7이다. 이 실행 당시에는 고치지 않았고 이후 반영했다. `REFERENCE_RUN.md`의 "tokenizer 다운로드 없음"(14행)과 "tokenizer 대체물과 한계"(66-71행)도 이 기록과 함께 읽어야 한다.
 
 ## 증명한 것과 증명하지 않은 것
 

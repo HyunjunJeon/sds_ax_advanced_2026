@@ -59,13 +59,13 @@ LangGraph 루프를 손으로 짜지 않고 곧바로 `create_deep_agent`로 간
 
 | 파일 | 상태 | 내용 |
 |---|---|---|
-| `00-Setup.ipynb` | 제공 | 10분 사전 점검. 키 상태(Anthropic + Decision API), 판정 API 한 번(`make_decider`), 모델 호출, Deep Agents 한 턴 |
-| `01-Agentic-AI-Basics.ipynb` | 제공 | Agent가 일반 LLM 호출과 다른 점, 도구 호출 왕복 |
-| `02-Function-Calling-and-Tools.ipynb` | 제공 | 도구 설명·스키마, 오류, 예산, 허용 목록 |
-| `03-Agent-Skills.ipynb` | 제공 | `SKILL.md` 구조, 트리거 측정, 설명 수정 전후 |
-| `04-Retrieval-Design.ipynb` | 제공 | 청킹, BM25·dense·RRF, recall·MRR 측정, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해와 출처 보강), AutoRAG와 다른 점, PDF 쪽 판독 |
-| `05-Production-Agentic-RAG.ipynb` | 제공 | 설계 결정 아홉 가지(근거 검증, 지지 검토, 실행 기록)와 선택 결정(빠른 답변과 Jev 게이트 세 개의 비용 측정, 게이트 실패 [깨뜨리기]) |
-| `06-Lab-DeepAgents-RAG.ipynb` | 제공 | 융합 검색+재순위 도구로 조립, 6단계 `ask_two_phase`(Jev 게이트, 분해 기본 켬), 한 설정을 측정하고 한 가지만 바꿔 전후 비교 |
+| `00-Setup.ipynb` | 제공 | 10분 사전 점검. 키 상태(Anthropic + Decision API), 판정 API 한 번(`make_decider`), 모델 호출, Deep Agents 한 턴. `announce` 합 3회(Claude 2회, Decision API 1회). 2026-11-02 실제 호출은 같은 3회(Claude 2, Decision API 1), 16.1초 |
+| `01-Agentic-AI-Basics.ipynb` | 제공 | Agent가 일반 LLM 호출과 다른 점(단일 호출, 고정 workflow, Agent), 같은 질문 세 번(도구 없이, 도구 하나, 직접 실행), 메시지가 곧 상태라는 점, 존재하지 않는 도구와 반복 한도. 2절 제목 셀이 따로 있다. `기본 경로의 announce` 합은 약 30회(추정). 2026-11-02 실제 호출은 Claude 29회, 51.9초 |
+| `02-Function-Calling-and-Tools.ipynb` | 제공 | 도구 왕복 4단계, 도구 설명·스키마, `Pydantic` 입력 범위, 도구 선택·병렬 호출, 도구 실패 세 유형, 오류 정보를 돌려주는 도구 vs 예외를 던지는 도구(8절), `tool_choice`·`strict`. 예산과 허용 목록은 여기서 가르치지 않고 05(결정 2)에서 다룬다. `announce` 합은 약 25회(추정). 2026-11-02 실제 호출은 Claude 23회, 42.2초 |
+| `03-Agent-Skills.ipynb` | 제공 | `SKILL.md` 구조, 트리거 측정, 설명 수정 전후. **Skill 트리거 테스트(양성과 near-miss)는 6절-7절**이다. `RUN_OPTIONAL = False` 기본 경로의 `announce` 합은 약 132회, 선택 측정 두 셀은 약 100회(모두 추정). 2026-11-02 실제 호출은 기본 경로 Claude 87회(126.3초), `RUN_OPTIONAL = True` 복사본은 184회(422.0초) |
+| `04-Retrieval-Design.ipynb` | 제공 | 청킹, BM25·dense·RRF, recall·MRR 측정, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해와 출처 보강), AutoRAG와 다른 점, PDF 쪽 판독. 1절에 `[깨뜨리기]` 셀 세 개(전체 문서를 한 프롬프트에 넣었을 때의 크기, 같은 이름의 여러 버전, 기준일을 넣은 전체 문서 질문)가 있다. 기본 경로의 Claude 호출은 최대 4회, Decision API는 5회(추정). 2026-11-02 실제 호출은 Claude 3회, Decision API 5회, 112.0초 |
+| `05-Production-Agentic-RAG.ipynb` | 제공 | 설계 결정 아홉 가지(근거 검증, 지지 검토, 실행 기록)와 선택 결정(빠른 답변과 Jev 게이트 세 개의 비용 측정, 게이트 실패 [깨뜨리기]). 예산은 3절(`MAX_SEARCHES`의 `[바꿔보기]` 셀), 허용 목록은 결정 2(적용 전 `[따라하기]`, `MENU_ALLOWED`의 `[바꿔보기]`, `ALLOWED_TOOLS`의 `[깨뜨리기]`)에서 가르친다. 근거 상태별 행동 표(충분·일부·모호·부재·충돌·timeout)가 있다. `announce` 합은 Claude 약 58회(`[내 것 만들기]` 11회 제외 약 47회, 추정). 2026-11-02 실제 호출은 Claude 42회와 Decision API 4회, 132.1초 |
+| `06-Lab-DeepAgents-RAG.ipynb` | 제공 | 융합 검색+재순위 도구로 조립, 6단계 `ask_two_phase`(Jev 게이트, 분해 기본 켬), 한 설정을 측정하고 한 가지만 바꿔 전후 비교. 1~3단계가 Tool + Skill + RAG 기본 통합(최소 Agentic RAG 루프, 검색 도구와 Skill 연결, 도구 호출과 `loaded_skills` 관찰)이고 4~6단계는 확장이다. Skill 트리거 테스트 자체는 03의 6절-7절에 있다. `announce` 합은 약 77회(추정). 2026-11-02 실제 호출은 Claude 54회와 Decision API 54회, 259.8초(`MAX_CASES = 3`) |
 | `rag_lab/` | 제공 | 노트북이 import하는 지원 모듈 (4장 참고) |
 | `docs/gold_review_sheet.md` | 제공 | `data/gold_hard*.jsonl`과 `gold.jsonl:3`(`versioned-deadline-june`) 검수 시트. AI 교차 확인 초안이고 모든 판정이 `미검수`다. 사람 검수 전에는 gold를 확정이라 말하지 않는다 |
 | `docs/rehearsal_sheet.md` | 제공 | 60분 리허설 시트. `실제 분`이 비어 있고 리허설은 아직 하지 않았다 |
@@ -147,7 +147,7 @@ uv run jupyter lab          # 실행은 이 폴더에서 (00-Setup.ipynb 안내�
 | PDF 쪽 판독(글자층 없는 쪽을 골라 모델이 글자로 옮김) | `rag_lab/pages.py` | `needs_reading`(`:38`), `read_page`(`:44`), 임계값 `IMAGE_AREA_THRESHOLD`, `MIN_TEXT_CHARS` |
 | 검색 recall·MRR 측정, 유형별 집계 | `rag_lab/evaluation.py` | `load_gold`, `evaluate_retrieval`, `recall_by_type`, `mrr` |
 
-노트북별로는 대략 02가 `agent.py`·`evidence.py`(예산·허용 목록), 03이 `agent.py`·`answer.py`(Skill),
+노트북별로는 대략 02는 `rag_lab`보다 노트북 안에서 정의한 도구를 중심으로 하고, 05가 `agent.py`·`evidence.py`(예산·허용 목록)를, 03이 `agent.py`·`answer.py`(Skill),
 04가 `corpus.py`·`retrieval.py`·`evaluation.py`·`pipeline.py`·`rerank.py`·`pages.py`에 더해 `decisions.py`·`gates.py`(Jev 관문 셀), 00은 `decisions.py`(판정 API 한 번), 05가 `phases.py`·`gates.py`·`decisions.py`도 쓰고 `answer.py`·`agent.py`, 06이 전체를 쓴다.
 이 대응은 노트북이 바뀌면 달라질 수 있으니 확인이 필요하면 `grep`으로 import를 본다.
 
@@ -166,7 +166,7 @@ uv run jupyter lab          # 실행은 이 폴더에서 (00-Setup.ipynb 안내�
    결과에서 빼거나 잘 나온 반복만 골라 남기지 않는다. 05의 실행 기록이 실패를 남기는 것이 의도다.
 3. **예산을 올려 실패를 감추지 않는다.** `Budget`의 `max_tool_calls`, `max_model_calls`, `max_searches`,
    `max_reads`, `max_context_bytes`, `max_seconds`, `max_decision_calls`(`rag_lab/evidence.py:23`, 판단 호출 한도는 `:30`)와 `_RECURSION_LIMIT`
-   (`rag_lab/agent.py:28`)을 실패를 없애려고 올리지 않는다. 02의 `직접 해보기`처럼 **예산 동작을 보려고
+   (`rag_lab/agent.py:28`)을 실패를 없애려고 올리지 않는다. 05 3절의 `# [바꿔보기]` 셀(`MAX_SEARCHES = 1`을 2로 바꿔 몇 번째 검색에서 멈추는지 보는 셀)처럼 **예산 동작을 보려고
    낮추는 것**은 허용이다. 올릴 때는 "왜 이 숫자가 필요한가"를 수강생이 먼저 말하게 한다.
 4. **가짜 모델을 실행 경로에 들이지 않는다.** 가짜 모델·임베딩은 `tests/fakes.py`에만 두고 단위 시험
    전용으로 쓴다. `rag_lab`과 노트북이 import하지 않으며, 그 출력으로 정확도나 recall을 말하지 않는다.
@@ -189,27 +189,29 @@ uv run jupyter lab          # 실행은 이 폴더에서 (00-Setup.ipynb 안내�
 실행하면 노트북별 모델 호출, 초, 토큰, 비용이 나온다. 아래는 한 번 실행·한 대의 컴퓨터 값이며, 모델이
 바뀌면 위 명령으로 다시 계산한다 (03은 `RUN_OPTIONAL = False`, 06은 `MAX_CASES = 3`).
 
+**2026-11-02 주의:** 아래 표의 모든 행은 2026-11-02에 개정한 노트북 00~06(코드 셀을 같은 호출을 유지한 채 자세히 풀어 쓴 판)을 실제로 다시 돌린 기록이다. 이전 기록은 `outputs/live/history/`에 보관했다. `announce` 합은 셀이 실행 직전에 알리는 `model_calls`를 더한 **추정치**이고, 아래 표가 측정값이다. 계획(추정) 대 측정은 다음과 같다: 00 약 3회 대 3회(Claude 2, Decision API 1), 01 약 30회 대 29회, 02 약 25회 대 23회, 03 약 132회 대 87회, 04 Claude 최대 4회와 Decision API 5회 대 3회와 5회, 05 Claude 약 58회(`[내 것 만들기]` 제외 약 47회)와 Decision API 약 4~7회 대 42회와 4회, 06 약 77회 대 Claude 54회와 Decision API 54회, 선택 측정 복사본 약 232회 대 184회. 대부분 추정보다 적게 나왔다. 추정은 상한에 가까운 값이고 모델이 도구를 덜 부르면 호출이 줄기 때문이다. 코드 셀은 한 줄씩 읽도록 풀어 썼으니 수강생에게도 줄 단위로 읽게 안내한다.
+
 | 노트북 | 모델 | 모델 호출 | 초 | 입력 토큰 | 출력 토큰 | 비용(USD) |
 |---|---|---:|---:|---:|---:|---:|
-| 00-Setup | claude-sonnet-5-5 | 2 | 16.7 | 3898 | 157 | 0.0113 |
-| 00-Setup | jev-1.14.0 | 1 |  | 340 | 22 | 0.0000 |
-| 01-Agentic-AI-Basics | claude-sonnet-5-5 | 24 | 45.1 | 74274 | 2536 | 0.0822 |
-| 02-Function-Calling-and-Tools | claude-sonnet-5-5 | 18 | 33.6 | 23265 | 1252 | 0.0487 |
-| 03-Agent-Skills | claude-sonnet-5-5 | 82 | 102.2 | 423623 | 16163 | 0.3306 |
-| 03-optional-copy | claude-sonnet-5-5 | 181 | 393.9 | 954513 | 45356 | 0.7864 |
-| 04-Retrieval-Design | claude-sonnet-5-5 | 2 | 103.8 | 2609 | 486 | 0.0101 |
+| 00-Setup | claude-sonnet-5-5 | 2 | 16.1 | 3898 | 133 | 0.0024 |
+| 00-Setup | jev-1.14.0 | 1 |  | 348 | 22 | 0.0000 |
+| 01-Agentic-AI-Basics | claude-sonnet-5-5 | 29 | 51.9 | 87454 | 2685 | 0.0970 |
+| 02-Function-Calling-and-Tools | claude-sonnet-5-5 | 23 | 42.2 | 36678 | 1857 | 0.0691 |
+| 03-Agent-Skills | claude-sonnet-5-5 | 87 | 126.3 | 459078 | 17272 | 0.3553 |
+| 03-optional-copy | claude-sonnet-5-5 | 184 | 422.0 | 959902 | 48400 | 0.7235 |
+| 04-Retrieval-Design | claude-sonnet-5-5 | 3 | 112.0 | 5535 | 932 | 0.0204 |
 | 04-Retrieval-Design | jev-1.14.0 | 5 |  | 1861 | 110 | 0.0001 |
-| 05-Production-Agentic-RAG | claude-sonnet-5-5 | 31 | 89.1 | 220418 | 7743 | 0.1963 |
-| 05-Production-Agentic-RAG | jev-1.14.0 | 3 |  | 2340 | 119 | 0.0001 |
-| 06-Lab-DeepAgents-RAG | claude-sonnet-5-5 | 48 | 275.0 | 551786 | 18307 | 0.7206 |
-| 06-Lab-DeepAgents-RAG | jev-1.14.0 | 49 |  | 36338 | 1767 | 0.0015 |
-| **합계** | | 265 | 665.5 | 1340752 | 48662 | **1.4015** |
-| **선택 측정** (수업 합계에서 제외) | | 181 | 393.9 | 954513 | 45356 | **0.7864** |
+| 05-Production-Agentic-RAG | claude-sonnet-5-5 | 42 | 132.1 | 252098 | 11058 | 0.3142 |
+| 05-Production-Agentic-RAG | jev-1.14.0 | 4 |  | 3237 | 159 | 0.0001 |
+| 06-Lab-DeepAgents-RAG | claude-sonnet-5-5 | 54 | 259.8 | 616554 | 20679 | 0.7703 |
+| 06-Lab-DeepAgents-RAG | jev-1.14.0 | 54 |  | 40126 | 1985 | 0.0017 |
+| **합계** | | 304 | 740.4 | 1506867 | 56892 | **1.6307** |
+| **선택 측정** (수업 합계에서 제외) | | 184 | 422.0 | 959902 | 48400 | **0.7235** |
 
-(한 번 실행·한 대의 컴퓨터 값이다. **01, 02, 05, 06은 이번 라운드의 재실행, 00과 04는 그 앞 실행(Decision API 게이트를 붙인 뒤), 03은 그보다 앞선 최종 실행 값이다.** `03-optional-copy`는 03을 `RUN_OPTIONAL = True`로 돌린 복사본의 **선택 측정**이라 합계에서 제외하고 마지막 줄에 따로 적었다. 03과 이 복사본은 이번 라운드에 다시 돌리지 않았고, 복사본은 검색 코드 변경(`multi_query` 삭제 등) 이전 값이라 지금 검색 코드와 맞지 않는다. 같은 표에 실행 시점이 섞여 있다. **같은 노트북도 실행마다 값이 다르다. 05는 30회, 31회, 32회, 34회가 모두 관찰되었다.** `합계` 265회에는 Decision API 58회(`jev-1.14.0` 행)가 들어 있고 Claude는 207회다. **Decision API(`jev-*`)는 입력 10억 토큰당 $42(https://typesafe.ai/, 2026-11-01)로 계산했다. 공식 페이지에 출력 단가가 없고 2차 출처(https://www.eesel.ai/blog/typesafe-jev-pricing)가 출력 무료라고 해서 출력은 0으로 둔 가정이다.** 출력 단가가 붙으면 Decision API 비용은 더 크다. 이 단가를 다른 공급자(OpenRouter, OpenAI, Azure)에 쓰지 않고, 그 공급자의 비용은 수강생의 청구서를 보게 하며 추정치를 지어내지 않는다. 단가표에 없는 모델은 계속 `단가 미확인`이다. 입력 토큰에는 캐시 읽기와 캐시 쓰기가 들어 있고, 비용은 각각 캐시 단가로 계산한다. 캐시 쓰기는 이번 기록에서 관찰되었다(전체 283,191 토큰, 1시간 TTL 0). 캐시 쓰기 필드가 없는 옛 기록 58줄은 0으로 계산되어 실제보다 적을 수 있다(여기에는 캐시 필드가 원래 없는 Decision API 줄도 들어 있다).)
+(한 번 실행·한 대의 컴퓨터 값이다. 모든 행이 2026-11-02 실행이다. `03-optional-copy`는 03을 `RUN_OPTIONAL = True`로 돌린 복사본의 **선택 측정**이라 합계에서 제외하고 마지막 줄에 따로 적었다. **같은 노트북도 실행마다 값이 다르다.** 호출 수가 모델의 도구 선택에 따라 달라지므로 이 표를 정답 호출 수로 외우게 하지 않는다. `합계` 304회에는 Decision API 64회(`jev-1.14.0` 행)가 들어 있고 Claude는 240회다. **Decision API(`jev-*`)는 입력 10억 토큰당 $42(https://typesafe.ai/, 2026-11-01)로 계산했다. 공식 페이지에 출력 단가가 없고 2차 출처(https://www.eesel.ai/blog/typesafe-jev-pricing)가 출력 무료라고 해서 출력은 0으로 둔 가정이다.** 출력 단가가 붙으면 Decision API 비용은 더 크다. 이 단가를 다른 공급자(OpenRouter, OpenAI, Azure)에 쓰지 않고, 그 공급자의 비용은 수강생의 청구서를 보게 하며 추정치를 지어내지 않는다. 단가표에 없는 모델은 계속 `단가 미확인`이다. 입력 토큰에는 캐시 읽기와 캐시 쓰기가 들어 있고, 비용은 각각 캐시 단가로 계산한다. 캐시 쓰기는 이번 기록에서 관찰되었다(전체 271,563 토큰, 1시간 TTL 0). 캐시 쓰기 필드가 없는 옛 기록 64줄은 0으로 계산되어 실제보다 적을 수 있다(여기에는 캐시 필드가 원래 없는 Decision API 줄도 들어 있다).)
 
 "초"는 기계 시간일 뿐이고 60분 수업 시간은 리허설하지 않았다. 04의 임베딩과 재순위는 로컬 모델이라 API
-비용이 없고, 04의 비용은 Claude 호출 2회(0.0101달러)가 전부이며(어느 셀의 호출인지는 `outputs/live/04-Retrieval-Design.usage.jsonl`에서 확인한다) Jev 관문 5회는 입력 단가만 적용한 0.0001달러다. 03의 `RUN_OPTIONAL`을 `True`로 하거나 06의 `MAX_CASES`를 올리면 이 값을 넘는다. 그런 셀은
+비용이 없고, 04의 비용은 Claude 호출 3회(0.0204달러)가 전부이며(어느 셀의 호출인지는 `outputs/live/04-Retrieval-Design.usage.jsonl`에서 확인한다) Jev 관문 5회는 입력 단가만 적용한 0.0001달러다. 03의 `RUN_OPTIONAL`을 `True`로 하면 선택 측정 두 셀(예상 호출 약 100회)이 더해지고, 06의 `MAX_CASES`(와 `REPEATS`, 질문 수)를 올리면 대표 사례 셀(4 x `MAX_CASES`), 내 질문 셀, 전후 비교 셀(4 x 질문 수 x `REPEATS` x 2)이 비례해 늘어 이 값을 넘는다. 그런 셀은
 실행 전에 한 번 더 고지한다. 정확한 호출 수는 `Budget.counts`와 실행 기록(`outputs/runs/`)에서 확인한다.
 
 ---
@@ -220,7 +222,7 @@ uv run jupyter lab          # 실행은 이 폴더에서 (00-Setup.ipynb 안내�
 - **dense·hybrid가 오류를 낸다**: `Retriever`는 임베딩 없이 두 방식을 만들면 `ValueError`를 낸다
   (`rag_lab/retrieval.py:134`). 조용히 대체하지 않는 것이 설계다. `make_embeddings()`로 만든 임베딩을 넘기거나 `mode="bm25"`로 간다.
 - **도구를 추가했는데 Agent가 못 쓴다**: `allowlist_middleware`가 허용 목록 밖의 도구를 숨기고 거부한다
-  (`rag_lab/agent.py:54`). 02처럼 허용 집합에 추가한다. 우회하려고 미들웨어를 빼지 않게 이유부터 묻는다.
+  (`rag_lab/agent.py:54`). 05 결정 2의 `[바꿔보기]` 셀(`MENU_ALLOWED`)처럼 허용 집합에 추가한다. 우회하려고 미들웨어를 빼지 않게 이유부터 묻는다.
 - **`BudgetExceeded`**: 예산 한도에 걸린 정상 동작이다. 3번 규칙대로 숫자를 올리기 전에 어떤 호출이 한도를
   소진했는지 `Budget.events`를 보게 한다.
 - **Skill이 안 읽힌다**: `SKILL.md`의 `description`이 트리거를 결정한다. `check_skill_folder`

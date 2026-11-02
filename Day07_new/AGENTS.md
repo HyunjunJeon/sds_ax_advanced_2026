@@ -3,7 +3,7 @@
 루트 [../AGENTS.md](../AGENTS.md)의 공통 규칙을 먼저 따르고, 여기에 Day07_new 고유 규칙을 더한다.
 
 **이 폴더에서 배우는 것:** vLLM v0.32.0(커밋 `5df63a7`, `vllm_lab/__init__.py:6-7`)의 서빙 기초, KV Cache, 서빙 파라미터와 측정,
-Quantization, Agent 연결, Tool Calling 오류(Part 1~6)에 최근 모델의 KV 통제(02c)와 KV 운영·LMCache(04b)를 더했다. 노트북 10개(00, 01, 02a, 02b, 02c, 03, 04, 04b, 05, 06)이고 앞 330분(01~04b)이 이론이다.
+Quantization, Agent 연결, Tool Calling 오류(Part 1부터 6까지)에 최근 모델의 KV 통제(02c)와 KV 운영·LMCache(04b)를 더했다. 노트북 10개(00, 01, 02a, 02b, 02c, 03, 04, 04b, 05, 06)이고 앞 330분(01부터 04b까지)이 이론이다.
 GPU, API 키, RunPod 없이 끝까지 실행된다. 설계 근거는 [docs/DESIGN.md](docs/DESIGN.md)에 있지만 수강생용이 아니다.
 
 > `Day07/`은 이 폴더와 별개다. `Day07/`의 `runpod_model_call.py`, `runpod_openai_reasoning.py`, `task.md`, `dcode_task.md`는 그대로 실습 자료이고
@@ -29,7 +29,7 @@ GPU, API 키, RunPod 없이 끝까지 실행된다. 설계 근거는 [docs/DESIG
 수강생 실습에는 실행 스크립트도 `argparse`도 없다. 조건은 노트북 안의 변수와 셀이다(`RUN_POD` 등). 조건을 바꾸려면 셀을 편집해 다시 실행한다.
 `--flag`나 환경변수 분기를 지어내 안내하지 않는다. 예외는 저자용 도구뿐이며 수강생 실습에 필요하지 않다.
 
-- `tests/check_notebook.py <노트북> --minutes N --source <v0.32.0 소스 트리> --ledger <대장 폴더>` — 구조 검사 (`tests/check_notebook.py:188-192`). 노트북을 실행하지 않는다
+- `tests/check_notebook.py <노트북> --minutes N --source <v0.32.0 소스 트리> --ledger <대장 폴더>` — 구조 검사 (`tests/check_notebook.py:234-237`). 노트북을 실행하지 않는다. 마크다운 셀은 홑 `~` 둘이 한 줄에 있으면(`LONE_TILDE`, 취소선으로 렌더링됨), 출처 링크 뒤에 조사가 바로 붙으면(`LINK_SUBJECT`, `symbol`(링크)로 쓴다), 링크 라벨의 줄이 주소 `#L`과 다르면(`LABEL_LINE`), `레시피 <숫자>` 형태의 줄 번호 참조가 있으면(`RECIPE_LINE`) 실패한다 (`tests/check_notebook.py:41-45`). 문서 `.md`의 홑 `~`는 `tests/test_docs_markup.py`가 같은 `LONE_TILDE`로 검사한다
 - `tests/check_sources.py --blog <블로그 본문 txt> <파일...>` — 대장·노트북이 블로그 문장을 옮겼는지 검사 (`tests/check_sources.py:165-167`)
 
 ## 2. 파일 상태표
@@ -86,7 +86,7 @@ uv run jupyter lab
 - 사실은 대장(`docs/sources/part1~8.md`, `pdf-diff.md`)에 있는 것만 쓴다. ID는 `P1-01`, `D-01`, `R-01` 형식이다.
 - **`미확인`은 `미확인`으로 둔다.** 추측으로 채우거나 "아마 ~일 것"을 사실처럼 말하지 않는다. 어디를 봐야 하는지(대장 항목, 소스 줄)만 알려 준다.
 - 대장의 "~한다"는 "코드에 이렇게 적혀 있다"이지 서버를 돌려 본 결과가 아니다.
-- 근거 링크는 `https://github.com/vllm-project/vllm/blob/<커밋>/<경로>#L<줄>` 형식의 permalink다 (`vllm_lab/view.py:57`).
+- 근거 링크는 `https://github.com/vllm-project/vllm/blob/<커밋>/<경로>#L<줄>` 형식의 permalink다 (`vllm_lab/view.py:59-65`).
 
 ## 6. 시뮬레이터는 교육용 모델이다
 
@@ -98,7 +98,8 @@ uv run jupyter lab
 
 ### 지원 상태 표는 근거보다 세게 말하지 않는다
 
-04b와 `part8.md`의 지원 상태 표 칸은 `문서 검증`(문서가 검증했다고 적음), `코드 읽기`(코드 경로만 확인, 동작한다는 뜻이 아님), `코드가 막음`, `미확인` 네 가지다.
+04b와 `part8.md`의 지원 상태 표 칸은 `문서 검증`(문서가 검증했다고 적음), `코드 읽기`(코드 경로만 확인, 동작한다는 뜻이 아님), `코드가 막음`(코드가 거부하는 줄이 있어 켜지지 않음), `실제 클래스 호출`, `미확인` 다섯 가지고 한 칸에 둘이 붙기도 한다.
+`실제 클래스 호출`은 CPU에서 그 칸의 관문이나 생성자를 실제 vLLM·LMCache 클래스로 불렀다는 표지다. SCHEDULER 역할 객체를 만들었을 뿐 worker 경로, 실제 가중치, 서버, GPU는 쓰지 않았고 byte 치수는 config와 코드를 읽어 맞춘 값이다. 칸의 조합이 모델에서 돌아간다는 뜻이 아니다.
 `코드 읽기`를 "지원한다/동작한다"로, `문서 검증`을 "저자가 확인했다"로 바꿔 말하지 않는다. 칸의 상태보다 강한 단정이 필요하면 `미확인`이라고 답하고 대장 행을 알려 준다.
 LMCache(v0.5.6)는 CPU에서 일부만 실행했다(설치, 연결 gating, connector 생성, 가짜 텐서 저장 — `docs/reference/lmcache.md`, `data/reference_lmcache.json`). 어떤 모델도 LMCache에서 돌리지 않았고 GPU 값은 없다. `자기 보고` 행은 제작사 수치이고 제3자 재현이 없다.
 

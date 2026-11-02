@@ -1,4 +1,4 @@
-# 2026-2, 삼성SDS - AX Advanced 과정 
+# 2026, 삼성SDS - AX Advanced 과정 
 
 ## 설치
 

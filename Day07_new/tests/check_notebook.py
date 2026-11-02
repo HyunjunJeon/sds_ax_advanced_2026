@@ -37,6 +37,12 @@ GUARD = re.compile(r"^if\s+RUN_POD\s*:", re.MULTILINE)
 PLACEHOLDER = re.compile(r"\{[A-Za-z_][A-Za-z0-9_]*\}")  # 채워지지 않은 {이름} 자리표시자
 FENCED_CODE = re.compile(r"^(`{3,}|~{3,}).*?^\1[ \t]*$", re.MULTILINE | re.DOTALL)
 INLINE_CODE = re.compile(r"(`+).+?\1", re.DOTALL)
+# marked는 한 줄에 홑 ~ 둘이 있으면 사이를 취소선으로 그린다(del 규칙: 여는 ~ 뒤와 닫는 ~ 앞이 공백이 아님).
+LONE_TILDE = re.compile(r"(?<![~\\])~(?=[^\s~])[^~\n]*?[^\s~]~(?!~)")
+SOURCE_URL = r"https://github\.com/(?:vllm-project/vllm|LMCache/LMCache)/blob/[^)\s]+"
+LINK_SUBJECT = re.compile(rf"\]\({SOURCE_URL}\)[은는이가을를과와](?![가-힣])")  # 이름 없이 path:line 링크가 주어나 목적어
+LABEL_LINE = re.compile(r"\[`?[^\[\]]*?:(\d+)(?:-(\d+))?`?\]\([^)\s]*#L(\d+)(?:-L(\d+))?\)")
+RECIPE_LINE = re.compile(r"레시피\s*\d+")
 
 
 def floors(minutes: int) -> dict[str, float]:
@@ -158,6 +164,29 @@ def placeholder_problems(nb: nbformat.NotebookNode) -> list[str]:
     return problems
 
 
+def markup_problems(nb: nbformat.NotebookNode) -> list[str]:
+    """markdown 렌더링과 인용 표기 결함. 메시지 앞머리가 규칙 이름이다."""
+    problems = []
+    for index, cell in enumerate(nb.cells):
+        if cell.cell_type != "markdown":
+            continue
+        linked = FENCED_CODE.sub("", cell.source)  # 링크 라벨은 backtick을 품으므로 코드 span을 남긴다
+        prose = INLINE_CODE.sub("", linked)
+        problems += [f"LONE_TILDE: 셀 {index}에 홑 ~ 둘이 한 줄에 있어 취소선으로 그려집니다: {found.group(0)[:30]!r}"
+                     for found in LONE_TILDE.finditer(prose)]
+        problems += [f"LINK_SUBJECT: 셀 {index}에서 path:line 링크 뒤에 조사가 바로 붙었습니다. symbol(링크)로 쓰세요: {found.group(0)[-12:]!r}"
+                     for found in LINK_SUBJECT.finditer(linked)]
+        for found in LABEL_LINE.finditer(linked):
+            label_first, label_last, anchor_first, anchor_last = found.groups()
+            if (label_first, label_last or label_first) != (anchor_first, anchor_last or anchor_first):
+                problems.append(f"LABEL_LINE: 셀 {index}의 링크 라벨 줄 {label_first}"
+                                f"{'-' + label_last if label_last else ''}이 주소 #L{anchor_first}"
+                                f"{'-L' + anchor_last if anchor_last else ''}와 다릅니다.")
+        problems += [f"RECIPE_LINE: 셀 {index}에 레시피 줄 번호 참조 {found.group(0)!r}가 있습니다."
+                     for found in RECIPE_LINE.finditer(prose)]
+    return problems
+
+
 def static_problems(nb: nbformat.NotebookNode, minutes: int, source: Path, ledger: Path) -> list[str]:
     markdown = [cell.source for cell in nb.cells if cell.cell_type == "markdown"]
     code = [(i, cell.source) for i, cell in enumerate(nb.cells) if cell.cell_type == "code"]
@@ -178,6 +207,7 @@ def static_problems(nb: nbformat.NotebookNode, minutes: int, source: Path, ledge
     problems += ledger_problems(nb, load_ledger(ledger))
     problems += run_pod_problems(code)
     problems += placeholder_problems(nb)
+    problems += markup_problems(nb)
     for index, cell in enumerate(nb.cells):
         for pattern, what in ((SECRETS, "키 형식 문자열"), (POD_HOST, "Pod 호스트"), (POD_CONSOLE, "Pod ID")):
             if pattern.search(cell.source):

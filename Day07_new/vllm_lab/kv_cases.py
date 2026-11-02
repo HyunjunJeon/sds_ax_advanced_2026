@@ -104,7 +104,7 @@ REAL_CLASS_ASSUMPTIONS: tuple[str, ...] = (
     "CPU에서 실제 층 클래스와 get_kv_cache_groups, get_kv_cache_configs를 부른 값이다. 서버를 띄우지 않았고 메모리를 재지 않았다.",
     "SM 값, backend, weight 커널, FlashInfer 유무를 패치했다. 어느 GPU에서 어느 backend가 잡히는지는 이 값으로 말할 수 없다.",
     "TP4는 TP 그룹만 값으로 바꾼 호출이다. 실제 4-GPU 실행이 아니다.",
-    "모델 클래스 전체는 만들지 못해 층만 만들었다. spec 5의 group 수에 MTP drafter 층은 들어 있지 않다.",
+    "모델 클래스 전체는 만들지 못해 층만 만들었다. spec 5(MTP draft token 5개, 02b 5절)의 group 수에 MTP drafter 층은 들어 있지 않다.",
 )
 _TAIL_ASSUMPTIONS: tuple[str, ...] = (
     "행 수와 행 크기는 실제 spec의 sliding_window, state_content_bytes, page 크기에서 읽었고 곱은 이 자료가 계산했다. 요청당 하한이다.",
@@ -360,7 +360,7 @@ class _Snapshot:
 @cache
 def _snapshot(model: str) -> _Snapshot:
     if model not in MODELS:
-        raise ValueError(f"model={model!r}은 스냅샷에 없습니다. 가능한 값 {len(MODELS)}개: {MODELS}")
+        raise ValueError(f"스냅샷에 없는 model={model!r}입니다. 가능한 값 {len(MODELS)}개: {MODELS}")
     entry = json.loads((DATA_DIR / "model_configs.json").read_text(encoding="utf-8"))["models"][model]
     return _Snapshot(entry["source_url"], entry["fetch_date"], entry["fields"])
 
@@ -579,7 +579,7 @@ def _resident_states(num_spec: int, mamba_cache_mode: MambaCacheMode, prefill_ch
         return 2 + num_spec + prefill_checkpoint_blocks
     if mamba_cache_mode == "none":
         return 1 + num_spec
-    raise ValueError(f"mamba_cache_mode={mamba_cache_mode!r}은 모르는 값입니다. 가능한 값: ('none', 'align')")
+    raise ValueError(f"모르는 mamba_cache_mode={mamba_cache_mode!r}입니다. 가능한 값: ('none', 'align')")
 
 
 def glm_kda_fixed_state(
@@ -698,7 +698,7 @@ def capacity_estimate(
     size = real_block_size(model) if block_size is None else block_size
     smallest = _min_block_size(layer_table(model)["rows"])
     if size < 1 or size % smallest:
-        raise ValueError(f"block_size={size}: {model}은 {smallest}의 배수여야 record가 나누어떨어집니다")
+        raise ValueError(f"block_size={size}: model={model}, record가 나누어떨어지려면 {smallest}의 배수여야 합니다")
     reserved = kda_requests * (kda_state or glm_kda_fixed_state())["fixed_bytes_per_request"] if kda_requests else 0
     block_bytes = int(per_token * size)
     estimate = capacity_from_budget(
@@ -732,7 +732,7 @@ def _saved_specs() -> _SavedSpecs:
 
 def _require_known_model(model: str) -> None:
     if model not in MODELS:
-        raise ValueError(f"model={model!r}은 실제 클래스 실행에 없습니다. 가능한 값 {len(MODELS)}개: {MODELS}")
+        raise ValueError(f"실제 클래스 실행에 없는 model={model!r}입니다. 가능한 값 {len(MODELS)}개: {MODELS}")
 
 
 def _stride_row(model: str) -> _SpecRow:

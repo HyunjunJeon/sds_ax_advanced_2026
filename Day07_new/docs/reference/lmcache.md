@@ -160,4 +160,4 @@ N 값: 실제 `Platform._align_hybrid_block_size`를 GLM-5.3-Flash config로 불
 | P8-04 | `use_native` 참이면 동봉 구현 | LMCache v0.5.6과 함께면 `ImportError`로 멈춥니다. 그 버전은 `DeviceIPCWrapper`만 있습니다 |
 | P8-19 | 셋째 조건은 문서상 요구 | 일치합니다. 생성자는 검사하지 않습니다. 필요 없다는 뜻은 아닙니다 |
 
-`AGENTS.md`의 "LMCache(v0.5.6)는 설치도 실행도 하지 않았다"와 `part8.md` 머리말의 같은 취지 문장도 함께 고쳐야 합니다. 설치와 가짜 텐서 저장, 관문, 스케줄러 쪽 생성자는 돌렸고, 모델 경로는 여전히 돌리지 않았습니다. 이 문서는 그 파일들을 고치지 않았습니다.
+`AGENTS.md`와 `part8.md` 머리말의 같은 취지 문장은 이 실행 뒤에 고쳤습니다.

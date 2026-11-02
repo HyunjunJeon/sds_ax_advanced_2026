@@ -20,17 +20,17 @@ Day07_new 노트북(Part 1~8)이 인용할 사실은 이 문서가 색인하는 
 | 파일 | 범위 | 행 수 | 일치 | 문서·코드 차이 | 블로그·코드 차이 | 코드 전용 | 미확인 | 자기 보고 | 문서 전용 |
 |---|---|---|---|---|---|---|---|---:|---:|
 | `part1.md` | Part 1 vLLM 서빙 기초: step, 컴포넌트, 서버 초기화 순서, request 경로, 상태, V0 제거, MRV2·async scheduling 기본값, Rust frontend | 51 | 39 | 4 | 4 | 3 | 1 | 0 | 0 |
-| `part2.md` | Part 2 KV Cache: block, block table, slot, prefix cache hash, 할당·해제·preemption, speculative decoding, hybrid KV cache group, GLM-5.3-Flash KV | 73 | 52 | 2 | 7 | 10 | 2 | 0 | 0 |
+| `part2.md` | Part 2 KV Cache: block, block table, slot, prefix cache hash, 할당·해제·preemption, speculative decoding, hybrid KV cache group, GLM-5.3-Flash KV | 74 | 52 | 2 | 7 | 11 | 2 | 0 | 0 |
 | `part3.md` | Part 3 서빙 파라미터와 측정: scheduler 순서, 기본값 표, `vllm bench serve`, TTFT·ITL·TPOT 정의, `/metrics` 이름 | 41 | 25 | 6 | 1 | 8 | 1 | 0 | 0 |
 | `part4.md` | Part 4 Quantization: 가중치 양자화와 KV dtype 구분, `--kv-cache-dtype`, H200에서 GLM-5.3-Flash KV dtype | 20 | 13 | 3 | 0 | 2 | 2 | 0 | 0 |
 | `part5.md` | Part 5 Local Model과 Agent: 멀티턴 prefix caching, `cache_salt`, `cached_tokens`, `reasoning` 필드, langchain-openai·deepagents 동작 | 25 | 12 | 1 | 1 | 9 | 2 | 0 | 0 |
 | `part6.md` | Part 6 Tool Calling 오류: glm47 파서, finish_reason, 잘림, 알 수 없는 도구, strict 수준, Rust 파서 차이, 실패 사례 후보 12개 | 36 | 11 | 5 | 1 | 19 | 0 | 0 | 0 |
 | `part7.md` | Part 7 최근 모델의 KV 통제: 세 곱셈 차원, MLA, DSA·IndexShare, CSA·HCA, KDA, 비용 비교 (논문 원문·config·v0.32.0 코드) | 63 | 54 | 0 | 2 | 5 | 2 | 0 | 0 |
 | `part8.md` | Part 8 LMCache를 포함한 KV cache 운영: 켜는 법, hybrid 게이트, 지원 상태, 실패 정책, 지표, 오프로딩, PD, 격리 (`## 모델별 지원 상태` 포함) | 56 | 20 | 8 | 0 | 17 | 4 | 6 | 1 |
-| `pdf-diff.md` | 강의 PDF(D-01~D-38)와 `Day07/` README·AGENTS·스크립트(R-01~R-14)를 v0.32.0·레시피와 대조. 판정 어휘가 달라 열이 맞지 않는다 | 52 | 28 | - | - | - | 8 | - | - |
+| `pdf-diff.md` | 강의 PDF(D-01부터 D-38까지)와 `Day07/` README·AGENTS·스크립트(R-01부터 R-14까지)를 v0.32.0·레시피와 대조. 판정 어휘가 달라 열이 맞지 않는다 | 52 | 27 | - | - | - | 9 | - | - |
 
 - `part7.md`의 `블로그·코드 차이` 열 2는 이 대장의 상태어 `논문·코드 차이`(P7-51, P7-63)이며 블로그와 무관하다.
-- Part 1~8 합계는 365행이다(Part 1~6 246행, `part7.md` 63행, `part8.md` 56행). `part8.md`의 `자기 보고` 6행과 `문서 전용` 1행은 자기 보고·문서 전용 열에 센다. `pdf-diff.md`는 52행(D 38, R 14)이고 판정 어휘가 달라 위 표의 열에 그대로 맞지 않는다. 일치 28은 D 23 + R 5, 미확인 8은 D 5 + R 3이고, 나머지 16행은 표현 주의 13과 버전 차이 3이다.
+- Part 1부터 Part 8까지 합계는 366행이다(Part 1부터 Part 6까지 247행, `part7.md` 63행, `part8.md` 56행). `part8.md`의 `자기 보고` 6행과 `문서 전용` 1행은 자기 보고·문서 전용 열에 센다. `pdf-diff.md`는 52행(D 38, R 14)이고 판정 어휘가 달라 위 표의 열에 그대로 맞지 않는다. 일치 27은 D 23 + R 4, 미확인 9는 D 5 + R 4이고, 나머지 16행은 표현 주의 13과 버전 차이 3이다.
 - 상태는 한 행에 하나만 붙는다. 차이가 있어도 세부는 주장 칸에 있다.
 - 각 파일 끝의 `수업에 쓰지 말 것` 절은 노트북이 피해야 할 문장 목록이다. 노트북을 쓰기 전에 해당 Part 것을 먼저 읽는다.
 
@@ -85,7 +85,8 @@ Day07_new 노트북(Part 1~8)이 인용할 사실은 이 문서가 색인하는 
 - R-01 (`pdf-diff.md`): README는 이미지를 "v0.28.1rc1 dev 빌드"로 적고, 레시피는 0.29.0+와 GLM5Next 포함 이미지를 요구한다. 소스(v0.32.0)와 수업 서버 버전을 구분해 써야 한다.
 - R-11 (`pdf-diff.md`): README는 응답 필드를 `reasoning` 또는 `reasoning_content`로 적는다. v0.32.0은 `reasoning` 하나다. 수업 서버가 어느 쪽인지는 실제 응답으로 확인한다.
 - R-14 (`pdf-diff.md`): README는 `--tokenizer-mode`, Rust frontend, autotune 플래그를 적지 않는다. 레시피의 이 세 가지는 v0.32.0에서 그대로 쓸 수 없다(`glm5_next`와 `--disable-flashinfer-autotune` 플래그 모두 없음).
-- 참고로 표현 주의 13개는 D-01, D-02, D-06, D-08, D-11, D-13, D-15, D-22, D-24, D-29, R-02, R-03, R-07이다. R-09는 P5-14가 템플릿 변수로 의미를 정해 미확인에서 일치로 올렸다. 각 행의 "저자에게 제안" 칸이 고칠 문구를 준다.
+- 참고로 표현 주의 13개는 D-01, D-02, D-06, D-08, D-11, D-13, D-15, D-22, D-24, D-29, R-02, R-03, R-07이다.
+- R-09는 뜻은 P5-14가 템플릿에서 정했지만 Pod의 template을 확인하지 못해 미확인으로 둔다. 각 행의 "저자에게 제안" 칸이 고칠 문구를 준다.
 
 ## 블로그 인용 규칙
 

@@ -103,7 +103,7 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 - `self_preempt_tail`: step 2의 running이 `[a, b]`이고 `a`가 block을 받은 뒤 `b`가 받지 못합니다. `running[-1]`이 `b` 자신이라 자기를 내보내고 순회를 멈춥니다(`vllm/v1/core/sched/scheduler.py:802`, `:842`). 네 변형 모두 같습니다.
 - `self_preempt_after_other`: step 2의 `preempted`가 `[c, b]`입니다. `a`가 `c`를 내보내 block을 받고, `b`가 자기를 내보냅니다.
 - `self_preempt_alone_decode`: 혼자 있는 요청이 block 경계를 넘다 자기를 내보내고 그대로 멈춥니다. 실제 쪽은 예외 없이 빈 `schedule()`을 반복합니다. 이 pool은 기동 검사로 도달할 수 없는 상태입니다.
-- `waiting_skipped_then_head_blocks`: step 2에 `B`가 자기를 내보내고 `C`는 자리가 있어도 들어가지 못합니다(`vllm/v1/core/sched/scheduler.py:900`). step 3, 4에는 맨 앞 `B`가 block이 모자라 `C`도 막힙니다. `prefix=off` 두 변형이 `sched_sim`과 같습니다.
+- `waiting_skipped_then_head_blocks`: step 2에 `B`가 자기를 내보내고 `C`는 들어가지 못합니다. preempt가 난 step은 waiting 단계를 건너뛰는 코드(`vllm/v1/core/sched/scheduler.py:900`)입니다. 다만 행만으로는 이 규칙의 증거가 못 됩니다. step 2에 free block이 2개 남지만(`blocks_after` 3, pool 5) 방금 내보낸 `B`가 waiting 맨 앞에서 33 token, 곧 block 3개를 요구해 이 규칙이 없어도 `C`를 막기 때문입니다. step 3, 4의 `waiting_before` `[B, C]`와 step 5의 `B` 33, `C` 16이 그 점을 보여 줍니다. 규칙 자체는 코드 읽기입니다. step 3, 4에는 맨 앞 `B`가 block이 모자라 `C`도 막힙니다. `prefix=off` 두 변형이 `sched_sim`과 같습니다.
 
 ### (e) threshold와 max_num_seqs
 
@@ -122,15 +122,15 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 
 ## 3. 차이와 그 뜻
 
-차이 있는 변형은 20개이고 `EXPECTED_DIFFERENCES`에 변형 이름과 원인으로 적었습니다. 원인은 다섯입니다.
+차이 있는 변형은 20개입니다. 12개는 `EXPECTED_DIFFERENCES`, `reserve_full_isl` 8개는 `FULL_INPUT_DIFFERENCES`에 변형 이름과 원인으로 적었습니다. 원인은 다섯입니다.
 
 ### `reserve_full_isl`
 
-대상: `preempt_blocks_5`, `preempt_blocks_6`, `preempt_blocks_8`의 `isl=on` 변형. 새 요청의 전체 입력이 들어갈 free block이 없으면 waiting에서 꺼내지 않습니다(`vllm/config/scheduler.py:190`, `vllm/v1/core/sched/scheduler.py:1270`, `vllm/v1/core/kv_cache_manager.py:522-539`). `sched_sim`은 기본값(`SchedConfig.reserve_full_isl=False`)이면 첫 chunk만 보므로 다르고, `SchedConfig(reserve_full_isl=True)`로 돌리면 같아집니다. `NOT_MODELED`에도 기본값을 따르지 않는다고 적혀 있습니다.
+대상: `preempt_blocks_5`, `preempt_blocks_6`, `preempt_blocks_8`, `prompt_larger_than_pool`의 `isl=on` 변형. 새 요청의 전체 입력이 들어갈 free block이 없으면 waiting에서 꺼내지 않습니다(`vllm/config/scheduler.py:190`, `vllm/v1/core/sched/scheduler.py:1270`, `vllm/v1/core/kv_cache_manager.py:522-539`). `sched_sim`은 기본값(`SchedConfig.reserve_full_isl=False`)이면 첫 chunk만 보므로 다르고, `SchedConfig(reserve_full_isl=True)`로 돌리면 같아집니다. `NOT_MODELED`에도 기본값을 따르지 않는다고 적혀 있습니다.
 
 이 검사는 입장 때만 작동합니다. running 요청이 생성으로 block 경계를 넘을 때의 preempt는 막지 못합니다. `self_preempt_tail`의 `isl=on`에도 preempt가 있습니다. "기본 설정이면 preempt가 없다"가 아니라 "이 워크로드의 이 pool에서는 없다"로 읽어야 합니다.
 
-`reserve_full_isl=True`를 켠 `sched_sim`은 `isl=on|prefix=off` 변형 38개 중 설정 오류로 끝나는 1개를 뺀 37개의 `core_sha256`을 재현합니다(`probes.isl_prototype`). 이 절의 8개 변형은 기본값(False)으로 돌린 `sched_sim`과의 차이이고, 검사 `FULL_INPUT_DIFFERENCES`는 True로 다시 돌린 행이 실제와 같은지도 확인합니다.
+`reserve_full_isl=True`를 켠 `sched_sim`은 `isl=on|prefix=off` 변형 38개 중 설정 오류로 끝나는 1개를 뺀 37개의 `core_sha256`을 재현합니다(`probes.isl_prototype`의 `replayed` 37, `tests/test_reference_sched.py:333-339`). 이 절의 8개 변형은 기본값(False)으로 돌린 `sched_sim`과의 차이이고, 검사 `FULL_INPUT_DIFFERENCES`는 True로 다시 돌린 행이 실제와 같은지도 확인합니다.
 
 ### `prefix_comeback`
 
@@ -142,20 +142,20 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 
 대상: `preempt_blocks_8|isl=off|prefix=on`. `sched_sim`의 step 5는 `chat:30`인데 실제에는 `chat`이 없습니다. 적중한 block이 ref_cnt 0으로 free queue에 있으면 free 칸을 쓰는 수로 세기 때문입니다(`vllm/v1/core/single_type_kv_cache_manager.py:255-260`, `:265`). 적중 16 token이면 남은 18 token까지 한 번에 잡아 block 3개(적중 1, 새것 2)가 필요한데 free는 2개입니다. step 5 직전에 실제 `allocate_slots`를 불러 `None`을 확인했습니다(`probes.evictable_admission`).
 
-그래서 prefix cache를 켜면 복귀 입장이 **늦어질** 수 있고, 이 입력에서는 그 덕분에 preempt가 3번에서 1번으로 줄었습니다. `NOT_MODELED`에 없는 효과입니다.
+그래서 prefix cache를 켜면 복귀 입장이 **늦어질** 수 있고, 이 입력에서는 그 덕분에 preempt가 3번에서 1번으로 줄었습니다. 이 효과는 지금 `NOT_MODELED`에 적혀 있습니다.
 
 ### `block_sharing`
 
-대상: `sample_shared_prefix`. 다른 요청이 쥔 block에 적중하면 ref_cnt만 늘어납니다(`vllm/v1/core/single_type_kv_cache_manager.py:245-248`, `:267-278`). `sched_sim`은 `cached_tokens` 몫도 요청별 block으로 셉니다. token 칸은 같고 `blocks_in_use`, `blocks_after`만 다릅니다. `NOT_MODELED`의 "block 안의 부분 공유"와는 다른 내용이라 이 계산 방식은 아직 적혀 있지 않습니다.
+대상: `sample_shared_prefix`. 다른 요청이 쥔 block에 적중하면 ref_cnt만 늘어납니다(`vllm/v1/core/single_type_kv_cache_manager.py:245-248`, `:267-278`). `sched_sim`은 `cached_tokens` 몫도 요청별 block으로 셉니다. token 칸은 같고 `blocks_in_use`, `blocks_after`만 다릅니다. `NOT_MODELED`의 "block 안의 부분 공유"와는 다른 내용이고, 이 계산 방식도 지금 `NOT_MODELED`에 적혀 있습니다.
 
 `kv_cache_usage_perc`는 이 값에서 나오므로 step 3~8의 값이 부풀려집니다. 03 셀 52가 출력하는 step 2 표본(4/64)과 셀 54의 마지막 값(0)은 실제와 같아 지금 보이는 숫자는 바뀌지 않습니다.
 
 ### `pool_smaller_than_input`
 
-대상: `prompt_larger_than_pool`의 `isl=off|prefix=on`, `isl=on` 2개. 64 token 입력에 block 2개 pool입니다.
+대상: `prompt_larger_than_pool|isl=off|prefix=on` 1개. 64 token 입력에 block 2개 pool입니다.
 
 - `isl=off|prefix=off`, `sched_sim`: 32 token을 넣고 밀어내기를 끝없이 반복합니다(둘 다 `step_cap`).
-- `isl=on`: 0 token으로 처음부터 멈춥니다.
+- `isl=on`: 0 token으로 처음부터 멈춥니다. 원인은 위 `reserve_full_isl`이고, `SchedConfig(reserve_full_isl=True)`인 `sched_sim`도 같습니다.
 - `isl=off|prefix=on`: 한 번 밀려난 뒤 적중 block까지 세면 자리가 없어 멈춥니다.
 
 실제 서버에서는 도달하지 못하는 상태입니다. KV가 `max_model_len` 한 건을 담지 못하면 기동 때 `ValueError`이기 때문입니다(`vllm/v1/core/kv_cache_utils.py:1104-1132`, 코드 읽기). `create_scheduler`가 이 검사를 지나가지 않아서 보인 상태이고, 스케줄러 동작의 교육 사례로 쓰면 안 됩니다.
@@ -166,7 +166,7 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 
 ## 4. 노트북과 강사 문서에 미치는 영향
 
-노트북과 문서는 이 작업에서 고치지 않았습니다. 셀 번호는 저장된 노트북의 0부터 세는 위치입니다.
+아래는 이 실행 당시의 영향 목록이고 이후 노트북과 강사 문서에 반영했습니다. 셀과 줄 번호는 그때 기준입니다.
 
 ### 01
 
@@ -176,7 +176,7 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 
 ### 02b
 
-- 셀 35: 표의 "자기 자신이면", "그 step의 waiting", "복귀" 세 행이 실제 `Scheduler`로 확인됐습니다. 코드 읽기에서 실행 확인으로 올릴 수 있습니다.
+- 셀 35: 표의 "자기 자신이면", "복귀" 두 행과 FCFS 희생자 행이 실제 `Scheduler`로 확인됐습니다. "그 step의 waiting" 행은 위 `waiting_skipped_then_head_blocks`의 설명대로 행만으로 구별되지 않아 코드 읽기로 남습니다.
 - 셀 40: "이 표는 시뮬레이터 결과이며 실제 scheduler를 돌린 것이 아닙니다"는 그 표에 대해서는 여전히 맞습니다. 같은 현상을 `schedule()`에서 본 `comeback_faq`를 함께 가리킬 수 있지만 입력이 달라 표의 값 자체를 확인한 것은 아닙니다.
 - 셀 32: `reference_kv.json`에 대한 문장이라 그대로 맞습니다.
 
@@ -199,20 +199,20 @@ block 8개에서 `chat`은 네 변형이 이렇게 갈립니다.
 
 ### 이 작업 범위 밖의 문서
 
-`AGENTS.md:93`("`sched_sim`의 `schedule()`은 그 범위 밖이다"), `docs/REFERENCE_RUN.md:82`, `docs/REFERENCE_RUN.md:108`이 같은 이유로 바뀌어야 합니다.
+`AGENTS.md:93`에는 그 문장이 더는 없고, `docs/REFERENCE_RUN.md:82`와 `:108`은 이미 이 파일의 결과(`data/reference_sched.json`)를 가리키도록 고쳐 놓았습니다.
 
 ## 5. `sched_sim`에 필요한 수정
 
 `SchedConfig.reserve_full_isl`(기본 False)이 생겨 전체 입력 검사를 켤 수 있습니다. 규칙 옮김 자체의 결함은 찾지 못했습니다. `isl=off|prefix=off` 38개가 모두 일치합니다.
 
-1. `NOT_MODELED`에 없는 것을 더합니다. `cached_tokens` 몫을 요청별 block으로 세어 `blocks_in_use`와 `kv_cache_usage_perc`가 커진다는 점(`block_sharing`), 적중 block이 free 칸을 쓰는 입장 규칙(`evictable_admission`), prefix cache를 끄는 칸이 없어 조회 수를 항상 센다는 점입니다.
+1. (완료: 세 가지 모두 지금 `NOT_MODELED`에 있습니다.) `cached_tokens` 몫을 요청별 block으로 세어 `blocks_in_use`와 `kv_cache_usage_perc`가 커진다는 점(`block_sharing`), 적중 block이 free 칸을 쓰는 입장 규칙(`evictable_admission`), prefix cache를 끄는 칸이 없어 조회 수를 항상 센다는 점입니다.
 2. `SimStuck` 메시지가 running, waiting과 도착 전 요청을 "남은 요청" 하나로 묶습니다. 나누어 적거나 03 셀 29의 질문을 고쳐야 합니다.
-3. 전체 입력 검사 칸은 이미 `SchedConfig.reserve_full_isl`로 있습니다. 기본을 끔으로 둔 것은 기존 노트북 표를 바꾸지 않으려는 선택이고, 기본값 쪽 표를 노트북에서 보이려면 True로 돌리면 됩니다.
+3. 전체 입력 검사 칸은 이미 `SchedConfig.reserve_full_isl`로 있습니다. 기본을 끔으로 둔 것은 기존 노트북 표를 바꾸지 않으려는 선택이고, 03 셀 35~37이 `reserve_full_isl`의 False와 True 두 설정을 이미 나란히 보여 줍니다.
 
 `tests/test_sched_sim.py`에서 함께 볼 것이 둘 있습니다.
 
 - `test_stuck_when_request_can_never_fit`은 `max_steps` 10000에 닿아 통과합니다. 멈춤이 아니라 반복이고 메시지의 `big`만 맞춰 봅니다.
-- `test_waiting_is_skipped_on_a_step_with_preemption_and_head_blocks_later_requests`의 `C`는 step 1에 끝나서(`{'A': 1, 'B': 1, 'C': 3}`) 두 assert가 그 규칙을 시험하지 못합니다. 이 파일의 `waiting_skipped_then_head_blocks`가 `C`를 step 2에 도착시킨 구성입니다.
+- `test_waiting_is_skipped_on_a_step_with_preemption`(`tests/test_sched_sim.py:127`)은 `B`만 두고 free block 1개와 예산 16이 남아도 preempt가 난 step에 waiting을 보지 않는 것을 시험합니다. 앞의 `C`가 step 1에 끝나 규칙을 시험하지 못한다는 지적은 이전 이름의 테스트에 대한 것이었고, 지금 테스트에는 해당하지 않습니다.
 
 ## 6. 증명하지 않은 것
 

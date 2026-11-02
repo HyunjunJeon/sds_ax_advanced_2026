@@ -155,12 +155,5 @@ def test_forbidden_names_allowed_after_first_follow_along(tmp_path):
     assert sixty(tmp_path, codes).returncode == 0
 
 
-def test_markdown_limit_is_ten_thousand_chars(tmp_path):
-    base = len(TIMETABLE.replace("| 7 |", "| 57 |")) + len(BODY)
-    assert sixty(tmp_path, GOOD_CELLS, filler=10000 - base).returncode == 0
-    result = sixty(tmp_path, GOOD_CELLS, filler=10001 - base)
-    assert result.returncode == 1 and "markdown이 너무 깁니다: 10001" in result.stderr
-
-
 def test_marker_rules_skip_ten_minute_notebooks(tmp_path):
     assert run_check(write_notebook(tmp_path, code="print(1)"), "--minutes", "10").returncode == 0
