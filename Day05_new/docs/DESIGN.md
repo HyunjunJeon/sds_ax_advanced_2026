@@ -213,7 +213,7 @@
 
 ### 11.3 보상 해킹 반례 (06.5)
 
-개선기가 평가기를 건드릴 수 있게 하면 무엇이 일어나는지를 **scripted 개선기**로 보여 준다(모델 호출 없음). 예: 문턱값을 낮추는 후보, 위반 사건을 재생 풀에서 지우는 후보. 해석기와 게이트가 이 후보를 형식 단계에서 거부하는지 확인한다. 함께 보여 줄 실패 모양이 하나 더 있다. 지나치게 엄격한 정책(예: `refund_payment` 전에 같은 Episode 안의 `begin_cancellation` 성공을 요구)은 이미 `cancelling`인 주문을 이어서 처리하는 올바른 경로(`fx-resume-pending`)를 막는다. 재생 풀에 그 계열이 없으면 V는 이것을 못 보고, holdout의 P5 2단계가 잡는다. 루트 `AGENTS.md` 5장의 금지 목록과 같은 것을 코드로 막는다는 점을 연결한다.
+개선기가 평가기를 건드릴 수 있게 하면 무엇이 일어나는지를 **scripted 개선기**로 보여 준다(모델 호출 없음). 예: 문턱값을 낮추는 후보, 위반 사건을 재생 풀에서 지우는 후보. 해석기와 게이트가 이 후보를 형식 단계에서 거부하는지 확인한다. 함께 보여 줄 실패 모양이 하나 더 있다. 평가기가 모르는 위험은 그 위험을 담은 사례가 풀에 없으면 아무 단계에서도 보이지 않는다. 해로운 경우는 `cancelling` 주문의 환불이 아직 끝나지 않은 사례다. 재생 풀에는 그런 계열이 없어 V가 이 위험을 볼 수 없고, 승인된 holdout에도 그런 카드가 없어 P5도 볼 수 없다. holdout은 자기가 담은 경로만 지킨다. (`fx-resume-pending`의 `order-a`는 `cancelling`이지만 결제가 `captured` 12500 = `refunded` 12500이고 시나리오 `resume-pending`은 환불 시도 0회를 기대하므로, `refund_payment` 전에 같은 Episode 안의 `begin_cancellation` 성공을 요구하는 정책이 막을 것이 없다.) 루트 `AGENTS.md` 5장의 금지 목록과 같은 것을 코드로 막는다는 점을 연결한다.
 
 <!-- PREREG:BEGIN -->
 ## 사전 등록 (이 블록은 확정 후 수정하지 않는다)
@@ -348,17 +348,21 @@ PREREG 블록은 그대로 두고, 구현 중 설계가 말하지 않은 곳을 
 - **게이트가 막은 호출은 서비스 사건이 아니다.** 막힌 호출은 `GateEvent`로 `Artifact.gate_events`에 남고(`eval_lab/contracts.py:116`, `:154`) 궤적 규칙은 위반으로 세지 않으며 `blocked_attempts`로 개수만 센다(`eval_lab/trajectory_rules.py:10`, `:86`).
 - **holdout 초안은 새 family_id를 쓴다.** `incident-hv-*`를 쓴다(`Day05_new/data/scenarios.json:383`). `load_dataset`이 한 family가 dev와 holdout에 걸치면 거부하기 때문이다(`eval_lab/dataset.py:41`).
 - **PROVISIONAL은 끝나지 않은 Episode만이다.** 끝난 Episode가 후속 질문으로 끝나도 판정한다(7절, `eval_lab/trajectory_rules.py:486`). `awaiting_user`는 요약에 키로 실리며, 이 키가 없는 옛 요약은 `False`로 읽는다(`eval_lab/episodes.py:237`). 요약 스키마 이름은 v1 그대로다(기본값 있는 키 추가는 변경이 아니다, `eval_lab/episodes.py:34`).
-- **P5 완료율은 계획한 격자 기준이다.** 받은 행 수가 아니라 `len(expected_cases) x reps`로 나누고(`eval_lab/rsi.py:933`), 빠진 Episode는 이름으로 이유 목록에 남긴다(`eval_lab/rsi.py:923`). `holdout_check`는 항상 계획한 사례 ID를 넘기고 `payload["missing"]`에 누락을 기록한다(`eval_lab/rsi.py:1216`).
-- **치명 Episode는 상태와 상관없다.** 치명 위반 hit가 있는 행은 모두 치명 Episode다(`eval_lab/rsi.py:859`). 재생 풀의 라벨과 같은 정의다(`eval_lab/replay.py:130`).
+- **P5 완료율은 계획한 격자 기준이다.** 받은 행 수가 아니라 `len(expected_cases) x reps`로 나누고(`eval_lab/rsi.py:949`), 빠진 Episode는 이름으로 이유 목록에 남긴다(`eval_lab/rsi.py:939`). `holdout_check`는 항상 계획한 사례 ID를 넘기고 `payload["missing"]`에 누락을 기록한다(`eval_lab/rsi.py:1232`).
+- **치명 Episode는 상태와 상관없다.** 치명 위반 hit가 있는 행은 모두 치명 Episode다(`eval_lab/rsi.py:875`). 재생 풀의 라벨과 같은 정의다(`eval_lab/replay.py:130`).
 - **claim-without-record의 위치는 `len(events)`다.** 응답 주장은 모든 호출 뒤에 있으므로(`eval_lab/replay.py:96`), 그보다 앞선 어떤 block도 재생에서는 이 위반을 잡은 것으로 센다.
 - **재생은 ask를 block처럼 다룬다.** 첫 non-allow 결정을 같은 위치로 기록한다(`eval_lab/replay.py:53`). 그러나 실제 실행의 ask는 `NEEDS_CONFIRMATION`을 돌려주고(`eval_lab/agent.py:51`), 모델은 대개 고객에게 확인 질문을 하며 끝낸다. 그래서 재생 점수와 holdout 결과가 다를 수 있다.
 - **복구하지 못한 VERSION_CONFLICT는 치명이다.** `stale-version`(7절)이 맡고 정책 근거는 `Day05_new/data/order_policy.md:18`이다. 서비스 쪽 충돌은 하네스 정책이 막을 수 없으므로(충돌은 호출 뒤에야 알려진다), 이 위반 유형은 어떤 후보에게도 재현율 상한을 똑같이 건다.
-- **`max_attempts`와 `block_after`는 주문별로 센다.** 같은 주문의 사건만 본다(`eval_lab/policy.py:207`, `:198`).
-- **`require_check_after_timeout`은 자기 도구에 매인다.** 그 규칙의 `tool`이 낸 마지막 TIMEOUT만 기준으로 삼고, 그 뒤에 확인 도구 호출이 있는지 본다(`eval_lab/policy.py:218`).
+- **`max_attempts`와 `block_after`는 주문별로 센다.** 같은 주문의 사건만 본다(`eval_lab/policy.py:205`, `:197`).
+- **`require_check_after_timeout`은 자기 도구에 매인다.** 그 규칙의 `tool`이 낸 마지막 TIMEOUT만 기준으로 삼고, 그 뒤에 확인 도구 호출이 있는지 본다(`eval_lab/policy.py:216`, `:219`).
 - **`jev_only`의 중간대 답은 미결(None)이다.** Judge를 부르지 않으므로 `t_lo`~`t_hi` 사이와 거절은 `passed=None`이고 통과로 세지 않는다(`eval_lab/judges.py:249`).
-- **성공 건당 비용은 trajectory PASS 건수로 나눈다.** 비용을 모르는 기록이 있거나 PASS가 0이면 None이다(`eval_lab/monitoring.py:162`). 같은 정의를 `eval_lab/rsi.py:983`에서 쓴다.
+- **성공 건당 비용은 trajectory PASS 건수로 나눈다.** 비용을 모르는 기록이 있거나 PASS가 0이면 None이다(`eval_lab/monitoring.py:162`). 같은 정의를 `eval_lab/rsi.py:999`에서 쓴다.
 - **서버 쪽 Rule은 비활성으로 만든다.** `create_root_rule`의 기본값이 `enabled=False`다(`eval_lab/online.py:495`). 서버 Judge는 수강생 키를 LLM Connection에 저장하므로 비용을 이해한 뒤 켠다.
 - **Langfuse version 라벨.** `execute_episode`와 `run_traffic`이 `version`을 받아 Langfuse에 넘기고 없으면 release를 쓴다(`eval_lab/episodes.py:84`). 정책이 바뀌는 라운드를 trace에서 가를 수 있다.
 - **holdout 불러오기는 두 길이다.** 수업은 `load_dataset(split="holdout", approved_only=True)`로 승인된 카드만 읽고(`eval_lab/dataset.py:45`), 저자 측정(P3)은 엄격한 기본값을 쓴다. 검수 전 카드가 하나라도 있으면 측정 스크립트가 멈춘다(`tests/run_measurement.py` 사전 점검).
 - **DeepEval 텔레메트리를 끈다.** 14절 목록에 없는 전송이라서 `eval_lab/__init__.py:7`이 막는다.
 - **측정 스크립트의 선택.** release는 `baseline`(`tests/run_measurement.py:112`), 라운드 버전 라벨은 r0·r1(`:115`)이다. 실수 확률과 seed는 03a·04의 운전자 값을 그대로 쓴다(`:121`, `:128`, 11.2a). `outcome_passed`는 `check_outcome(artifact, expected).passed`이고 expected는 라운드에서는 `family_id`가 같은 dev 카드, holdout에서는 holdout 카드다. 의미 판정(cascade)은 holdout 36 Episode에만 붙인다(`:431`).
+- **11.3의 실패 모양을 바로잡았다 (2026-11-03 추가, 측정 전).** 앞 판에는 지나치게 엄격한 정책이 올바른 경로 `fx-resume-pending`을 막고 holdout의 P5 2단계가 이를 잡는다고 적혀 있었다. 이 자료에서는 거짓이다. `Day05_new/data/fixtures.json:412`의 `order-a`는 `cancelling`이지만 결제가 `captured` 12500 = `refunded` 12500이고, `Day05_new/data/scenarios.json`의 `resume-pending`은 환불 시도 0회를 기대하므로 그 정책이 막을 호출이 없다. 06의 5절은 P5가 그런 정책을 채택하는 모습을 보여 준다. 참인 교훈은 11.3에 적은 대로다: 해로운 경우는 환불이 남은 `cancelling` 주문이고, 재생 풀과 승인된 holdout 모두에 그 계열이 없어 V도 P5도 볼 수 없다.
+- **열린 저자 결정: 이어서 처리하는 경로와 `step-out-of-order` (2026-11-03 추가, 측정 전).** `check_step_out_of_order`(`eval_lab/trajectory_rules.py:180`)는 같은 Episode에 `begin_cancellation`이 없는 `refund_payment`를 치명으로 본다. 그런데 `Day05_new/data/order_policy.md:16`의 P2는 `cancelling` 주문을 부분 완료 상태를 조회한 뒤 이어서 처리한다고 한다. 두 문장이 환불이 남은 `cancelling` 주문에서 부딪힐 수 있다. `Day05_new/data/fixtures.json`에서 `"status": "cancelling"`은 412줄 하나뿐이고 그 결제는 환불이 끝나 있으므로, 환불이 남은 `cancelling` 카드는 dev에도 holdout에도 없다. 그래서 P3 측정은 영향받지 않는다. 저자가 정할 때까지 평가기는 바꾸지 않는다.
+- **P5 holdout 행은 치명이 아니거나 모르는 규칙 ID를 거부한다 (2026-11-03 추가, 측정 전).** 치명 등급 ID는 규칙 표에서 읽고(`eval_lab/rsi.py:764`), `holdout_row`(`eval_lab/rsi.py:788`)와 `holdout_decision`이 받는 원시 행(`eval_lab/rsi.py:843`)이 경고 ID나 모르는 ID를 `ValueError`로 거부한다. 손으로 만든 행이 치명이 아닌 ID로 치명 Episode 수를 부풀리는 길을 막는다.
+- **06은 승인된 holdout 카드를 끝에서 한 번만 연다 (2026-11-03 추가, 측정 전).** 보여 주는 것은 `scenario_id`, `family_id`, 최대 턴, 검수자뿐이다. 사전 등록 P3가 holdout을 끝에서 한 번만 연다고 정했고, 요청 문장과 기대 상태는 보이지 않는다.

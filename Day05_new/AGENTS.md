@@ -106,9 +106,9 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 - 02는 두 스위치가 유료 호출을 만들지 않아 같은 값이다. 05의 `RUN_EXERCISE`도 무료다.
 - 06의 holdout은 사례 3개 상한(72회)으로 고지한다. 현재 승인된 holdout 카드가 2개라 실제 상한은 이보다 24회 적다. 06은 의미 판정(Jev·Judge)을 부르지 않는다.
-- 노트북이 `DESIGN.md` 13절의 계획 표와 다른 곳이 있다(예: 03a Judge ≤60, 03b Judge 36, 06 Jev·Judge 0). 노트북의 `announce`가 정답이다. 숫자를 말하기 전에 해당 셀의 `announce` 줄을 다시 본다.
+- `DESIGN.md` 13절의 계획 표는 노트북의 `announce` 인자를 옮겨 적은 것이다. 노트북이 바뀌면 그 셀의 `announce` 줄이 정답이다. 숫자를 말하기 전에 해당 셀의 `announce` 줄을 다시 본다.
 - Decision API(Jev)는 질문과 state(요청·사건 요약·최종 상태·응답)를 공급자에게 보내고, Langfuse는 프롬프트·도구 입출력·점수를 받는다 (`docs/DESIGN.md` 14절). 서버 쪽 Judge를 켜면 수강생 키가 Langfuse LLM Connection에 저장된다. 켜기 전에 알린다.
-- **DeepEval 텔레메트리는 꺼 둔다.** `eval_lab/__init__.py:7`이 `DEEPEVAL_TELEMETRY_OPT_OUT=1`을 `setdefault`로 설정한다(이미 정한 값은 그대로 둔다). 시험은 `tests/test_hygiene.py:28`이다. `eval_lab`을 import하기 전에 deepeval을 먼저 import하는 코드를 만들지 않는다.
+- **DeepEval 텔레메트리는 꺼 둔다.** `eval_lab/__init__.py:7`이 `DEEPEVAL_TELEMETRY_OPT_OUT=1`을 `setdefault`로 설정한다(이미 정한 값은 그대로 둔다). 시험은 `tests/test_hygiene.py:28`이다. `eval_lab`을 import하기 전에 deepeval을 먼저 import하는 코드를 만들지 않는다. 노트북은 `tests/check_notebook.py`가 이 순서를 검사한다.
 
 ---
 
@@ -129,7 +129,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 - `load_dataset(split="holdout")` 기본값은 **엄격**하다. 분할 안에 검수 전 카드가 하나라도 있으면 `ValueError("검수가 끝나지 않은 시나리오: ...")`를 던진다 (`eval_lab/dataset.py:22`, `eval_lab/dataset.py:54`). 저자 P3 측정이 이 기본값을 쓴다.
 - `load_dataset(split="holdout", approved_only=True)`는 수업 시연용이다. 검수 전 카드를 건너뛰고 approved 카드만 돌려준다. 돌려주는 카드는 reviewer·source·review_reason·정책 버전 검사를 그대로 통과한다 (`eval_lab/dataset.py:29`, `eval_lab/dataset.py:45`). 06이 이 경로를 쓴다.
 - `pending_ids(path, split=...)`는 초안 ID 목록을 준다 (`eval_lab/dataset.py:60`).
-- 승인을 AI가 대신 하지 않는다. `review_status`나 `reviewer`를 고쳐 엄격 로드를 통과시키지 않는다. holdout 사례 내용을 수강생에게 보여 주거나 요약하지 않고, 실행 경로 밖에서 에이전트가 읽게 하지 않는다 (사전 등록 P7).
+- 승인을 AI가 대신 하지 않는다. `review_status`나 `reviewer`를 고쳐 엄격 로드를 통과시키지 않는다. 사전 등록 P3은 holdout을 라운드 중 재생 풀·개선기 입력·임계값 선택에 쓰지 않고 마지막에 한 번만 연다고 정하고, P7은 holdout 사례를 개선기 입력에 넣지 않게 한다. 조교는 holdout 사례 내용을 수강생에게 보여 주거나 요약하지 않고, 실행 경로 밖에서 에이전트가 읽게 하지 않는다. 06은 승인된 카드를 마지막에 한 번, ID 수준(scenario_id, family_id, 최대 턴, 검수자)으로만 연다. 06.5는 P5 결과를 설명하려고 이어서 처리 카드 fixture의 상태(이미 취소 중이고 환불이 끝남)를 한 번 말한다. 카드의 요청 문장과 기대 상태는 보여 주지 않는다.
 
 ---
 
@@ -139,7 +139,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 - `check_prereg.py` — `docs/DESIGN.md`의 PREREG 블록이 `docs/prereg.sha256`과 같은지 본다. 종료 코드 0 일치, 1 불일치, 2 확인 불가 (`tests/check_prereg.py:1`). 호출 없음. 해시만 고쳐 통과시키지 않는다. 블록 밖(노트북 지도, 호출 규모 등)은 고쳐도 된다.
 - `run_fake.py <노트북>... | --all` — 노트북을 가짜 모델·가짜 Langfuse·Langfuse 없음, 스위치 끔·켬 조합으로 끝까지 실행한다(노트북당 3회). 키와 네트워크 불필요. 마지막 줄 `run_fake: <ok>/<total> OK`.
-- `check_notebook.py --all` 또는 `<노트북> --minutes N` — 구조 검사(시간표 합계, 표지, 유료 셀의 announce, 스위치 규칙, 키 패턴, 저장된 출력). 호출 없음.
+- `check_notebook.py --all` 또는 `<노트북> --minutes N` — 구조 검사(시간표 합계, 표지, 유료 셀의 announce, 스위치 규칙, 키 패턴, deepeval보다 eval_lab을 먼저 import하는 순서, 저장된 출력). 호출 없음.
 - `check_secrets.py` — `.env` 값이 `Day05_new` 안 파일에 새어 들어갔는지 본다. 값은 출력하지 않고 `LEAK <파일> <변수 이름>`만 낸다. 유출이 없으면 종료 코드 0.
 - `pytest` — `uv run --no-sync pytest Day05_new/tests`. 키 불필요.
 - `run_measurement.py` — **P3 저자 측정(유료)**. 인자 없이 실행하면 계획과 `announce` 줄, 검수 전 holdout 초안 목록만 출력하고 종료한다. 모델·키를 쓰지 않는다. `--live`는 실제 측정, `--offline`은 같은 코드를 `tests/fakes.py`의 가짜로 돌린다. `--no-langfuse`, `--scenarios`, `--out` 옵션이 있다 (`tests/run_measurement.py:564`).
@@ -154,7 +154,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 수강생이 요청해도 하지 않는다. 이유를 한 문장으로 말하고 **실패를 정확히 드러내는 방법**을 제안한다.
 
-1. **holdout을 보고 개선하지 않는다.** holdout 사례 내용을 수업에서 읽거나 요약하지 않는다. 오염 검사(`ContaminationError`, `eval_lab/rsi.py`)를 끄지 않는다.
+1. **holdout을 보고 개선하지 않는다.** holdout 사례 내용을 수업에서 읽거나 요약하지 않는다(06이 마지막에 한 번 ID 수준으로 여는 것은 6장대로다). 오염 검사(`ContaminationError`, `eval_lab/rsi.py`)를 끄지 않는다.
 2. **사전 등록(PREREG) 블록을 고치지 않는다.** 바꿔야 하면 문서화된 개정으로만 한다. 측정 결과는 블록 뒤에 별도 절로 덧붙인다 (`docs/DESIGN.md` 상단).
 3. **판정 규칙·임계값·예산·반복을 결과를 보고 올리지 않는다.** `t_lo = 0.2`, `t_hi = 0.8`은 라벨로 재지 않은 자리값이며 "미조정"이라고 부른다. 예산 동작을 **보려고 낮추는 것**은 허용이다.
 4. **실패한 행을 지우지 않는다.** 오류·평가 불능 행은 그대로 둔다. 잘 나온 반복만 골라 남기지 않는다. `None`(확인 불가)은 통과도 실패도 아니다.
@@ -173,7 +173,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 - **Langfuse가 401이다.** 00의 인증 확인 셀이 먼저 보여 준다. 키가 틀렸거나 `LANGFUSE_HOST`가 안 맞는 경우다. 모델 호출 전에 보이는 실패라 비용이 나가지 않는다. 키를 대신 고치지 않는다. 00은 Langfuse SDK가 4.7.0 미만이면 `RuntimeError`로 멈춘다.
 - **키 미설정 `RuntimeError`.** 메시지가 키 이름만 대고 `.env.example`을 가리킨다 (`eval_lab/settings.py:104`). Decision API 키가 하나도 없으면 Jev 셀에서 멈춘다. Claude로 대신하지 않는다.
 - **holdout 로드 오류.** `검수가 끝나지 않은 시나리오: hv-...`는 엄격 로드가 검수 전 카드를 만난 것이다 (`eval_lab/dataset.py:54`). 버그가 아니다. 수업 경로는 `approved_only=True`, 승인은 저자 몫이다 (6장).
-- **판정이 `NOT_DETERMINABLE`이다.** "개선이 없다"가 아니라 **재지 못했다**는 뜻이다. 두 정책 중 하나라도 평가 완료율(PASS+FAIL / 전체)이 90% 미만이거나, π0의 치명 위반 Episode가 0이라 개선 여지를 잴 수 없을 때 나온다 (`eval_lab/rsi.py:888`). 보류(HOLD)·채택(ADOPT)과 구분해서 읽게 하고, 이유 목록을 먼저 본다. 낮은 점수와 평가 불능은 다르다 (01).
+- **판정이 `NOT_DETERMINABLE`이다.** "개선이 없다"가 아니라 **재지 못했다**는 뜻이다. 두 정책 중 하나라도 평가 완료율(PASS+FAIL / 전체)이 90% 미만이거나, π0의 치명 위반 Episode가 0이라 개선 여지를 잴 수 없을 때 나온다 (`eval_lab/rsi.py:904`). 보류(HOLD)·채택(ADOPT)과 구분해서 읽게 하고, 이유 목록을 먼저 본다. 낮은 점수와 평가 불능은 다르다 (01).
 - **같은 사례인데 결과가 달라진다.** 모델 결과는 실행마다 다르다. 1회 관찰이라고 부르고 반복으로 본다.
 - **`ToolStrategy` 구조화 응답 오류나 Judge 응답 잘림.** 5장의 미확인 항목이다. 00에서 이름과 `stop_reason`을 읽게 하고 `max_tokens`를 올려 감추지 않는다(8장 3번).
 - **같은 라벨로 작업 폴더를 두 번 만들면 겹친다.** 오류 메시지의 폴더 이름을 읽게 하고 기록을 지워서 통과시키지 않는다 (`new_run_dir`, `eval_lab/notebook.py:55`).
