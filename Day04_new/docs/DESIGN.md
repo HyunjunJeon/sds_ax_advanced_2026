@@ -54,10 +54,10 @@
 - `langchain.mcp.MCPAdapter`와 fastmcp `PythonStdioTransport`로 `Day04/build_mcp/reference/server.py`의 도구 7개가 field enum을 보존한 채 로드되고, `create_deep_agent`가 그것을 받는다.
 - deepagents 기본 도구: ls, read_file, write_file, edit_file, delete, glob, grep, task. write_todos는 선택(opt-in).
 - 도구 매개변수를 `Annotated[Model, Resolve(ask)]`로 선언하고 `ask`가 `Elicit(...)`을 돌려주면(`mcp/server/mcpserver/resolve.py`) 모델에 보이는 인자에 나타나지 않는다(탐침 결과 `['goal']`만 보임). 호출은 `{type: mcp_elicitation, ...}` interrupt를 올리고 `Command(resume={"responses": {key: {"action": "accept", "content": {...}}}})`로 재개된다. `create_agent`와 `create_deep_agent` 양쪽에서 확인.
-- deepagents `SkillToolResolver`는 `.venv/lib/python3.13/site-packages/deepagents/middleware/skills.py:176`, description 길이 한도 1024는 `skills.py:173`.
-- `FilesystemPermission`의 deny는 `deepagents/middleware/filesystem.py:382`.
-- ToolAnnotations 필드는 `mcp_types/_v2026_07_28/__init__.py:1091-1118`.
-- traceparent 도우미는 `mcp/shared/_otel.py:39`, `fastmcp/telemetry.py:152`.
+- deepagents `SkillToolResolver`는 `.venv/lib/python3.13/site-packages/deepagents/middleware/skills.py:176`, description 길이 한도 1024는 `.venv/lib/python3.13/site-packages/deepagents/middleware/skills.py:173`.
+- `FilesystemPermission`의 deny는 `.venv/lib/python3.13/site-packages/deepagents/middleware/filesystem.py:382`.
+- ToolAnnotations 필드는 `.venv/lib/python3.13/site-packages/mcp_types/_v2026_07_28/__init__.py:1091-1118`.
+- traceparent 도우미는 `.venv/lib/python3.13/site-packages/mcp/shared/_otel.py:39`, `.venv/lib/python3.13/site-packages/fastmcp/telemetry.py:152`.
 - MCP 2026-07-28 변경: stateless(initialize 제거, 요청마다 `_meta`에 프로토콜 버전과 capabilities, SEP-2575), server/discover, Mcp-Session-Id 제거와 도구 인자로 쓰는 서버 발급 핸들(SEP-2567), MRTR `InputRequiredResult`가 서버 주도 elicitation/sampling/roots를 대체(SEP-2322), tasks는 확장으로 이동(SEP-2663), subscriptions/listen, ttlMs/cacheScope(SEP-2549), tools/list 순서 결정적, 스키마는 JSON Schema 2020-12(SEP-2106), Roots/Sampling/Logging 폐기 예정(SEP-2577), DCR은 Client ID Metadata Documents로 대체 예정.
 - 실행 스모크(env-smoke, `Day04_new/.env`): Claude ok, Jev ok(`POST https://api.typesafe.ai/v1/systemone`, `noul` 질문, 확률은 `answers.judgeable.noul`). traceparent는 MCP 요청 `_meta`로 도착하고 Langfuse trace id와 일치한다(`traceparent_received` true, `traceparent_matches_langfuse` true). Langfuse 인증은 복사한 키로 실패했다(`langfuse_auth: fail: UnauthorizedError`, 401). `mcp_protocol_version`은 `unknown`으로 남았다.
 - 기존 Day04 실행 기록으로는 병목을 찾을 수 없다. 검증 보고서가 4건뿐이고 2026-10-31 보고서는 1.91초 만에 ExceptionGroup(인프라)으로 실패했다. 병목은 새로 측정해야 한다.
@@ -191,7 +191,7 @@ H2 (S2): 에이전트 미들웨어 GoalGuard가 Jev Noul 질문으로 `start_int
 
 바뀌지 않는 것: P5 판정 규칙, 임계값, 예산, 사례, 분할, 반복 횟수. 07 수강생 노트북은 그대로 Langfuse에 기록하며 인증이 실패하면 멈춘다(`run_experiment`의 기본 `record`는 `"langfuse"`).
 
-실행기 지원: `run_experiment(..., record="local")`(`Day04_new/cap_lab/experiment.py:474`, 인자 `record` `:485`, 로컬 분기 `_run_local` `:563`)와 저자 스크립트 `Day04_new/tests/run_measurement.py`. 로컬 실행은 `outputs/runs/<실행 이름>.jsonl`과 `<실행 이름>.meta.json`(시작과 끝에 기록, 끝나지 않으면 `finished_at`이 null)을 남긴다.
+실행기 지원: `run_experiment(..., record="local")`(`Day04_new/cap_lab/experiment.py:476`, 인자 `record` `:487`, 로컬 분기 `_run_local` `:584`)와 저자 스크립트 `Day04_new/tests/run_measurement.py`. 로컬 실행은 `outputs/runs/<실행 이름>.jsonl`과 `<실행 이름>.meta.json`(시작과 끝에 기록, 끝나지 않으면 `finished_at`이 null)을 남긴다.
 
 키 교체 뒤 로컬 사본을 Langfuse에 올릴 수 있다. 그래도 판정은 계속 로컬 사본으로 한다.
 
@@ -199,7 +199,7 @@ H2 (S2): 에이전트 미들웨어 GoalGuard가 Jev Noul 질문으로 `start_int
 
 ## 결과 1: dev 기준선 (A, A2), 2026-11-02
 
-PREREG 블록과 개정 2 뒤에 덧붙인 결과다. 블록은 수정하지 않았다. 이 절은 dev 10사례의 기준선이며 B(게이트 켬)와 holdout은 아직 실행하지 않았다. 따라서 B에 대한 판정은 이 절에 없다. 수치는 `Day04_new/outputs/runs/dev-baseline-summary.json`과 `dev-*.meta.json`에서 가져왔고, 실행 줄 수·호출 수·토큰은 `dev-*-r*.jsonl`에서 다시 합산해 일치를 확인했다.
+PREREG 블록과 개정 2 뒤에 덧붙인 결과다. 블록은 수정하지 않았다. 이 절은 dev 10사례의 기준선이며 B(게이트 켬)와 holdout은 이 절을 쓸 때 실행하지 않았다. 따라서 B에 대한 판정은 이 절에 없다(결과 2, 결과 3에 있다). 수치는 `Day04_new/outputs/runs/dev-baseline-summary.json`과 `dev-*.meta.json`에서 가져왔고, 실행 줄 수·호출 수·토큰은 `dev-*-r*.jsonl`에서 다시 합산해 일치를 확인했다.
 
 ### 설정과 실행 규모
 
@@ -245,19 +245,146 @@ H1은 S3 `vague_not_frozen`, H2는 S2 `goal_preserved`로 읽었다(위 P2).
 ### P3 읽기
 
 - 첫 실패 몫이 가장 큰 단계는 S3(11/20 = 55%)다. H1(S3)의 병목 전제와 맞는다. H1 목표 지표는 0.45(구간 0.26~0.66)라 올라갈 여지가 있다. 다만 그 실패는 사실상 dev-06 하나(10회 모두 실패)이고, dev-05는 10회 중 1회만 S3에서 실패한다(나머지 dev-05의 첫 실패는 S5).
-- H2(S2)의 첫 실패는 0회이고 목표 지표 `goal_preserved`는 20/20 = 100%다. 기준선에 개선 여지가 없고 가장 큰 몫도 S2가 아니다. 이것은 P3이 말하는 "기준선이 H1 또는 H2와 모순"에 해당할 수 있다: 저자 확인 필요. P3은 이 경우 게이트 위치를 바꾸기 전에 저자에게 묻고, 효과가 없어 보인다는 이유로 게이트를 제거하지 않는다고 정한다. 이 문서는 어느 쪽도 결정하지 않았다.
-- S5 첫 실패가 9회(45%)로 S3에 근접하다(11 대 9). S5는 H1·H2 어느 쪽의 목표도 아니다: 저자 확인 필요(결정하지 않음).
+- H2(S2)의 첫 실패는 0회이고 목표 지표 `goal_preserved`는 20/20 = 100%다. 기준선에 개선 여지가 없고 가장 큰 몫도 S2가 아니다. 이것은 P3이 말하는 "기준선이 H1 또는 H2와 모순"에 해당할 수 있다: 저자 확인 필요. P3은 이 경우 게이트 위치를 바꾸기 전에 저자에게 묻고, 효과가 없어 보인다는 이유로 게이트를 제거하지 않는다고 정한다. 이 문서는 어느 쪽도 결정하지 않았다. 저자 결정(2026-11-03): H2를 사전 등록대로 유지한다(P3: 게이트를 옮기거나 제거하지 않는다).
+- S5 첫 실패 9회(45%)는 H1의 게이트가 꺼진 쪽이다. 아래 분석은 조정자가 2026-11-03에 dev-A*·dev-A2* jsonl을 `jq`로 직접 확인했다. S5 첫 실패 9회는 모두 dev-05다(`Day04_new/data/cases.jsonl:5`: kind `vague_criteria`, 기대 `frozen` true, 스크립트된 elicitation `acceptance_criteria`가 있다). 그 실행들에서 에이전트는 `freeze_seed`를 부르지 않았고 마지막 글에서 사용자에게 테스트할 수 있는 완료 기준을 달라고 물었다. 기준선 100회 모두 `interrupts`가 비어 있다. 스크립트된 답은 H1 게이트의 Elicit을 거쳐서만 에이전트에 닿는다(`Day04_new/cap_lab/server/server.py:242-246`, `:259-290`; 실행기가 답하는 곳은 `Day04_new/cap_lab/experiment.py`의 `_elicitation_response`, `:305`). 그리고 A와 A2는 게이트가 꺼져 있다. 따라서 게이트가 꺼진 dev-05는 S3(모호한 문장을 그대로 확정)에서 실패하거나 S5(`frozen_ok`, `Day04_new/cap_lab/scorers.py:209-216`)에서 실패할 수밖에 없다. `frozen_ok`를 통과한 A2의 한 실행이 바로 S3에서 실패한 실행이다. 그러므로 S5 몫은 별도의 병목이 아니라 H1 사례의 게이트 꺼진 쪽이다. 기준선 실패 20회가 모두 H1의 목표 사례 둘(dev-05, dev-06)에 있고, 가드인 `frozen_ok` 실패도 전부 이 두 사례에 있다. 이전에 적었던 S5에 대한 `저자 확인 필요`는 이 분석으로 해소되었다.
 - 이 값은 dev 10사례(목표 사례는 H1 2개, H2 2개)이고 사례당 5회 반복이라 표본이 매우 작다. 위 신뢰구간이 넓다.
-- 측정되지 않은 것: B(게이트 켬)와 holdout은 실행하지 않았다. 게이트의 효과에 대해서는 아무 것도 말할 수 없다.
+- 측정되지 않은 것: 기준선 시점에는 B(게이트 켬)와 holdout을 실행하지 않았다. 게이트의 효과는 이 절만으로 말할 수 없다(B와 holdout은 결과 2, 결과 3).
 
-### 기준선 전에 찾은 코드 결함 두 가지
+### 측정 전에 찾아 고친 코드 결함 세 가지
 
-첫 번째 실제 실행(`Day04_new/outputs/live-pass1`, 노트북 00~07)이 측정 전에 코드 결함 두 가지를 드러냈다. Claude 호출 39회 중 29회가 실패했다.
+첫 번째 실제 실행(`Day04_new/outputs/live-pass1`, 노트북 00~07)이 측정 전에 코드 결함 두 가지(A, B)를 드러냈다. Claude 호출 39회 중 29회가 실패했다. 세 번째(C)는 2차 실행의 stderr 소음이며 3c 단계(2026-11-03)에서 (B)와 함께 고쳤다.
 
 - (A) 모든 skill 공개 방식의 Claude 호출이 HTTP 400(`Tool 'save_evidence' cannot have both defer_loading=true and cache_control set.`)으로 실패했다. 기본 프롬프트 캐싱이 마지막 도구에 `cache_control`을 붙였는데 그 도구가 `defer_loading`이었다. 수정(cache-fix): `Day04_new/cap_lab/middleware.py:126`의 `DeferralSafePromptCaching`(`name` `:138`, `_apply_caching` `:141`)이 기본 미들웨어를 이름으로 대체하고 태그를 deferred가 아닌 마지막 도구(`grep`)로 옮긴다. 등록은 `Day04_new/cap_lab/agent.py:133`, 테스트는 `Day04_new/tests/test_agent.py:295`, `:301`. upfront 요청은 그대로이고 deferral도 끄지 않았다.
-- (B) 한 프로세스에서 두 번째 이후의 `run_small_compare`가 `Connection error.`로 실패했다(원인은 추정이 아니라 수정 노드가 offline 테스트로 재현했다: 실행마다 새 이벤트 루프를 쓰는 `_run_blocking`과 `lru_cache`로 공유되는 비동기 클라이언트). 수정(loop-fix): `Day04_new/cap_lab/notebook.py:20`(import)와 `:124`(`cache_clear()`)로 실행마다 캐시를 비운다. 테스트는 `Day04_new/tests/test_notebook_helpers.py:261`, `:269`. 이 한 줄 수정에 `experiment.py`는 포함하지 않았다(`langfuse` 기록에서 repeats 2 이상이면 `experiment.py:542` 부근이 같은 위험에 노출될 가능성이 있다: 추정, 확인 필요).
+- (B) 한 프로세스에서 두 번째 이후의 `run_small_compare`가 `Connection error.`로 실패했다(원인은 추정이 아니라 수정 노드가 offline 테스트로 재현했다: 실행마다 새 이벤트 루프를 쓰는 `_run_blocking`과 `lru_cache`로 공유되는 비동기 클라이언트). 1차 수정은 `_run_blocking`에서 실행마다 캐시를 비웠다. 3c에서 이것을 `with_own_anthropic_client`(`Day04_new/cap_lab/experiment.py:560`)로 바꿨다. 이 도우미는 이번 이벤트 루프 안에서 Anthropic 비동기 클라이언트를 새로 만들어 쓰고 루프가 끝나기 전에 같은 루프에서 닫는다. `_run_blocking`(`Day04_new/cap_lab/notebook.py:116`)이 `:122`에서 부르고, 가져오기는 `:24`다. 같은 위험이 있던 Langfuse 경로(`record="langfuse"`, 반복 2 이상)는 `run_experiment`의 task가 `run_case`를 이 도우미로 감싸게 고쳤다(`Day04_new/cap_lab/experiment.py:535`; 스레드에서 Langfuse를 부르는 `asyncio.to_thread`는 `:544`). 이 task에서 `run_case`의 결과를 받던 지역 변수 `record`가 `run_experiment`의 인자 `record`(`:487`)를 가렸으므로 `run_record`로 이름을 바꿨다(`:535`, `:539`). 테스트: `Day04_new/tests/test_notebook_helpers.py:283`(`test_three_runs_in_a_notebook_cell_leave_no_unretrieved_task_exception`), `:301`(`test_run_experiment_langfuse_repeats_each_reach_the_api_from_their_own_event_loop`). Langfuse 반복 실패는 오프라인 가짜 API로 재현했다(수정 전 `[None, 'AnthropicConnectionError: Connection error.']`, 수정 뒤 `[None, None]`). 실제 Langfuse 기록으로는 확인하지 못했다(키가 무효). 이 줄의 이전 문구 "추정, 확인 필요"는 이 재현으로 해소되었다.
+- (C) 02 셀 32와 05 셀 27의 stderr에 `Task exception was never retrieved ... RuntimeError('Event loop is closed')`가 나왔다(2차 실행, 11개씩, 결과에는 영향 없음). 원인은 `langchain_anthropic`의 `_AsyncHttpxClientWrapper.__del__`이 실행 중인 루프에 `aclose()`를 예약하는데 그 루프가 이미 닫혔기 때문이다. 이 가설을 오프라인 테스트가 재현했고(수정 전 `Task exception was never retrieved ... AsyncClient.aclose() ... RuntimeError('Event loop is closed')`가 한 건 이상 잡힘) (B)와 같은 도우미가 고친다. 테스트는 `Day04_new/tests/test_notebook_helpers.py:283`이다. 실제 확인: 한 `asyncio.run` 안에서 `run_small_compare`를 두 번(dev-01, dev-02, 반복 1) 불러 행 4개가 모두 `error` None이었고 stderr에 `Task exception was never retrieved`와 `Event loop is closed`가 0건이었다(stderr 2줄은 `LangChainBetaWarning`뿐). 이 실제 확인은 Claude 8호출이다(8장).
 
-기준선(dev-A, dev-A2)은 두 수정 뒤에 실행했다. 2차 노트북 실행에서 오류 0이었다(8장).
+측정되는 경로는 바뀌지 않았다. 실행 전에 `check_measured`가 "measured path unchanged (38 objects)"를 확인했고 `SHA256SUMS`가 모두 일치했다(dev B, holdout 전).
+
+기준선(dev-A, dev-A2)은 (A), (B)의 1차 수정 뒤에 실행했고, dev-B와 holdout은 (C)까지 고친 뒤에 실행했다. 2차 노트북 실행에서 오류 0이었다(8장).
+
+## 결과 2: dev B 판정 (H1·H2), 2026-11-03
+
+PREREG 블록은 수정하지 않았다. 수치는 `Day04_new/outputs/decisions/dev-decision.json`(`cap_lab`의 `compare()`와 `decide()` 반환값)과 `Day04_new/outputs/runs/dev-B-r*.meta.json`에서 가져왔다. 판정 낱말과 이유는 JSON 원문 그대로다. 잡음 폭은 dev A 대 A2다.
+
+### 설정과 규모
+
+- 설정(`dev-B-r1.meta.json`, 5개 meta가 같은 설정): 모델 `claude-sonnet-5-5`, effort `medium`, interface `rich`, tool_disclosure `skill`, 게이트 H1·H2 `on`, 임계값 0.5와 0.5, `jev_model` `typesafe:jev-latest`, record `local`.
+- 임계값 0.5는 미조정이다. 저자 결정(2026-11-03)으로 라벨을 검토하지 않은 채 0.5를 유지했고 `Day04_new/data/gate_labels_draft.jsonl`은 읽지 않았다. 판정 JSON의 `thresholds.tuned`는 false다.
+- 서버 sha256 `82a13e69cde8197e39e820d5f6b487252d7b9a1f6bed4580970dc245dd39c79b`와 SKILL.md sha256 `7c8e469a95b6c67af0387c810dca20f47bda59237ceba4fc350f34b12e79593b`는 dev A와 같다.
+- 실행: 5개 반복 x 10사례 = 50줄. 오류 줄 0, `decision_unavailable` 줄 0, 모든 meta의 `finished_at`이 채워짐. 2026-11-02 16:11:01Z에서 16:24:53Z까지 13분 52초.
+- 규모: Claude 호출 226회(`model_calls` 합), 입력 토큰 1,586,157, 출력 토큰 68,939. Jev는 `gate_decisions` 기록으로 센 하한 60회(h1 20, h2 40).
+
+### 목표별 판정 (A 대 B)
+
+| 목표 | 차이 [lo, hi] | n_cases | 잡음 폭 | 판정 | 이유(원문) |
+|---|---|---|---|---|---|
+| H1 vague_not_frozen | 0.5 [0.0, 1.0] | 2 | 0.2 | 개선 확인 불가 | 목표 지표 구간 하한 0.000이 0 이하라 개선을 확인할 수 없습니다. |
+| H2 goal_preserved | 0.0 [0.0, 0.0] | 2 | 0.0 | 개선 확인 불가 | 목표 지표 구간 하한 0.000이 0 이하라 개선을 확인할 수 없습니다. |
+
+두 목표 모두 가드 데이터가 빠진 것이 없다(`guards_without_data` 빈 목록).
+
+### 움직인 가드 (A 대 B 차이 [lo, hi], 잡음 폭)
+
+- `frozen_ok`: +0.25 [0.00, 0.75], n_cases 4, 잡음 0.15.
+- `model_calls`: -0.48 [-1.10, -0.06], 잡음 0.22. `tool_calls`: -0.40 [-1.06, 0.06], 잡음 0.20. `latency_s`: -1.38 [-3.06, -0.11], 잡음 1.38. 세 수치는 낮을수록 좋은 방향이다.
+- 나머지 가드(`trigger_ok`, `tool_selection_ok`, `args_valid`, `evidence_linked`, `no_blind_retry`, `retry_bounded`, `side_effect_stable`, `contamination_free`)의 차이는 모두 0이다. 판정이 교환·회귀로 가지 않았다.
+
+### 사례별 통과/반복 (목표 사례)
+
+| 사례 | A | A2 | B |
+|---|---|---|---|
+| dev-05 (H1) | 5/5 | 4/5 | 5/5 |
+| dev-06 (H1) | 0/5 | 0/5 | 5/5 |
+| dev-03 (H2) | 5/5 | 5/5 | 5/5 |
+| dev-04 (H2) | 5/5 | 5/5 | 5/5 |
+
+H1의 점추정 +0.5는 dev-06 한 사례에서 나온다. 목표 사례가 2개뿐이라 사례 단위 쌍체 부트스트랩의 하한이 0이 된다(`decide()`가 규칙대로 "개선 확인 불가"를 냈다). H2는 A에서 이미 20/20이라 올라갈 여지가 없었다.
+
+### P3 병목 귀속 (첫 실패 단계, 50회 중)
+
+| 변형 | S1 | S2 | S3 | S5 | S6 | unchecked | no_failure |
+|---|---|---|---|---|---|---|---|
+| A | 0 | 0 | 5 | 5 | 0 | 0 | 40 |
+| A2 | 0 | 0 | 6 | 4 | 0 | 0 | 40 |
+| B | 0 | 0 | 0 | 5 | 0 | 0 | 45 |
+
+B에서 S3 첫 실패가 사라졌고 S5는 5회다. B의 S5 5회가 어느 사례인지는 이 문서에서 확인하지 않았다: 저자 확인 필요.
+
+### 게이트 기록 (B, 줄 수는 줄 안의 낱말 포함 수)
+
+- `gate_decisions`: h2 40, h1 20. `decision_unavailable` 0줄, `criteria_not_testable` 5줄, `goal_changed` 45줄.
+- `goal_changed` 45는 그 낱말이 들어 있는 줄 수다. 게이트가 꺼진 holdout A와 A2에도 같은 낱말이 35줄 있어(결과 3) 게이트가 막은 횟수가 아니다. 이 줄 수를 게이트 발동 횟수로 읽지 않는다.
+
+### P2 주의
+
+B는 H1과 H2 게이트를 함께 켠다. 한 목표 지표의 변화를 한 게이트의 효과로 나눌 수 없고 두 게이트의 효과가 서로 섞였을 수 있다(P4의 한계). 이 절은 게이트별 효과를 말하지 않는다.
+
+### 저자 확인 필요
+
+1. 목표 사례가 2개뿐이라 하한이 0이 되는 구조다. 점추정 +0.5를 어떻게 말할지는 저자가 정한다. 이 문서는 규칙의 판정 낱말만 적었다.
+2. 임계값 0.5는 라벨 미검토 상태다.
+
+## 결과 3: holdout 최종 판정, 2026-11-03
+
+PREREG 블록은 수정하지 않았다. holdout은 P4대로 한 번만 열었다(A, A2, B 각각 한 번, 8사례 x 5반복 = 40줄씩, 종료 코드 0). 수치는 `Day04_new/outputs/decisions/holdout-decision.json`과 `Day04_new/outputs/runs/holdout-*-r*.meta.json`이다. 사례는 id와 개수만 적는다. 설정은 dev와 같고(임계값 0.5, 미조정, `tuned` false) 15개 meta가 dev A와 같은 서버·SKILL.md sha256을 가진다. 오류 줄 0, 모든 meta의 `finished_at`이 채워짐.
+
+### 목표별 최종 판정 (A 대 B, 잡음 폭은 A 대 A2)
+
+| 목표 | 차이 [lo, hi] | n_cases | 잡음 폭 | 판정 | 이유(원문) |
+|---|---|---|---|---|---|
+| H1 vague_not_frozen | 0.5 [0.0, 1.0] | 2 | 0.0 | 개선 확인 불가 | 목표 지표 구간 하한 0.000이 0 이하라 개선을 확인할 수 없습니다. |
+| H2 goal_preserved | 0.2 [0.2, 0.2] | 1 | 0.2 | 개선 | 목표 지표 구간 하한 0.200이 0보다 크고 가드 지표는 잡음 폭 안입니다. |
+
+`guards_without_data`는 두 목표 모두 빈 목록이다(ho-07, ho-08이 `no_blind_retry`, `retry_bounded` 값을 주었다, 각 n_cases 1).
+
+### 목표 사례별 통과/반복
+
+| 사례 | A | A2 | B |
+|---|---|---|---|
+| ho-03 (H1) | 5/5 | 5/5 | 5/5 |
+| ho-04 (H1) | 0/5 | 0/5 | 5/5 |
+| ho-02 (H2) | 4/5 | 5/5 | 5/5 |
+
+### 움직인 가드 (A 대 B)
+
+- `frozen_ok`: +0.2 [0.0, 0.6], n_cases 5, 잡음 0.0.
+- `model_calls`와 `tool_calls`: 각각 -0.45 [-0.975, -0.10], 잡음 0.25. `latency_s`: -0.89 [-2.46, 0.29], 잡음 1.09.
+- H1 판정표의 가드로서 `goal_preserved`는 +0.2, n_cases 1, 잡음 0.2였다. 나머지 가드의 차이는 0이다.
+
+### P3 병목 귀속 (40회 중)
+
+| 변형 | S1 | S2 | S3 | S5 | S6 | unchecked | no_failure |
+|---|---|---|---|---|---|---|---|
+| A | 0 | 1 | 5 | 5 | 0 | 0 | 29 |
+| A2 | 0 | 0 | 5 | 5 | 0 | 0 | 30 |
+| B | 0 | 0 | 0 | 5 | 0 | 0 | 35 |
+
+dev와 같은 모양이다. B에서 S3가 사라지고 S5는 5회로 그대로다.
+
+### 게이트 기록과 규모 (줄 수는 줄 안의 낱말 포함 수)
+
+| 변형 | gate_decisions | goal_changed | criteria_not_testable | decision_unavailable | Claude 호출 | 입력 / 출력 토큰 | 벽시계(UTC 2026-11-02) |
+|---|---|---|---|---|---|---|---|
+| A | 없음 | 35 | 0 | 0 | 205 | 1,432,215 / 50,735 | 16:25:30-16:35:19 (9분 49초) |
+| A2 | 없음 | 35 | 0 | 0 | 202 | 1,402,644 / 49,608 | 16:35:20-16:44:46 (9분 26초) |
+| B | h1 25, h2 40 | 35 | 5 | 0 | 187 | 1,266,960 / 46,718 | 16:44:47-16:53:59 (9분 12초) |
+
+합계: Claude 호출 594회, 입력 4,101,819 / 출력 147,061 토큰, 벽시계 28분 29초, Jev 하한 65회(h1 25, h2 40). `goal_changed`는 게이트가 꺼진 A, A2에도 35줄이라 게이트가 막은 횟수가 아니다.
+
+### 최종 주장 (P4)
+
+holdout 판정이 최종 주장이다. H1은 `개선 확인 불가`다. H2는 `개선`이다. 두 판정 모두 B가 H1·H2 게이트를 함께 켠 것이라 한 게이트의 효과로 나눌 수 없다(P2 주의). 임계값은 미조정이다.
+
+### dev와 holdout 비교
+
+H1은 두 분할에서 같은 판정(`개선 확인 불가`)이고 차이도 0.5 [0.0, 1.0]로 같다. 점추정은 각 분할에서 한 사례(dev-06, ho-04)가 0/5에서 5/5로 바뀐 데서 나오며, 목표 사례가 2개뿐이라 하한이 0이다. H2는 판정이 다르다. dev는 `개선 확인 불가`(차이 0.0, A에서 이미 100%)이고 holdout은 `개선`(차이 0.2 [0.2, 0.2])이다. P4에 따라 holdout이 최종 주장이지만 이 두 분할의 불일치를 함께 적는다.
+
+### 저자 확인 필요
+
+1. H2 `개선`은 사례 1개(ho-02)와 차이 0.2에 기대고 있다. 이 차이는 A 대 A2의 잡음 폭 0.2(A 4/5, A2 5/5)와 같다. `decide()` 규칙은 하한 0.2가 0보다 크고 가드가 잡음 폭 안이라 `개선`을 냈다. n_cases 1이라 구간이 한 점이다. 이것을 주장으로 쓸지는 저자가 정한다.
+2. H1은 ho-04의 0/5에서 5/5 변화가 있어도 목표 사례가 2개라 판정이 `개선 확인 불가`다. 문구는 저자가 정한다.
+3. 임계값 0.5는 라벨 미검토 상태다(미조정).
+
 
 ## 8. 비용
 
@@ -280,8 +407,13 @@ Jev는 게이트당 실행마다 1~3회 호출한다.
 | 노트북 2차(수정 후) | Claude 123호출, 오류 0, 입력 811,755(캐시 읽기 722,137) / 출력 33,703 토큰. 커널 Jev 4회 + 서버 측 계량 1회(미계량 약 2회). 합산 벽시계 468.6초 | 00~07 실행. 07은 Langfuse 확인에서 설계대로 멈춤(Langfuse 기록 0). 예고는 Claude 약 290회였고 실제가 낮다 |
 | 노트북 1차(수정 전) | Claude 39호출 중 실패 29, 성공 10. 토큰 입력 52,570 / 출력 2,245. 벽시계 150.4초 | 결함 (A), (B)로 낭비. 실패 호출이 과금되었는지는 확인하지 못했다(추정 불가) |
 | 수정 노드의 실제 확인 | cache-fix: dev-01 skill 공개 3호출(16,962 / 956 토큰). loop-fix: dev-01 3호출(17,000 / 817), dev-02 1호출(3,495 / 1,204) | 호출 합 7, 토큰 입력 37,457 / 출력 2,977 |
+| 루프 정리 실제 확인(2026-11-03) | 한 `asyncio.run` 안에서 `run_small_compare` 2번(dev-01, dev-02, 반복 1, 행 4개). 오류 0. Claude 8호출, 입력 40,944 / 출력 3,629 토큰, Jev 0 | 행 지연 시간 합 35.9초(벽시계가 아니라 `latency_s` 합). stderr 소음 0건 |
+| dev B (게이트 켬) | 50회, 오류 0. Claude 226호출, 입력 1,586,157 / 출력 68,939 토큰. Jev 하한 60(h1 20 + h2 40, `gate_decisions` 기록). 벽시계 13분 52초 | 계획(사례 10 x 5 x 변형 1)의 한 변형분. 사례당 약 4.52호출 |
+| holdout A, A2, B | 120회(40 x 3), 오류 0. Claude 594호출(205 + 202 + 187), 입력 4,101,819 / 출력 147,061 토큰. Jev 하한 65(h1 25 + h2 40). 벽시계 9분 49초 + 9분 26초 + 9분 12초 = 28분 27초 | 변형별 기록은 결과 3. 세 변형의 시작과 끝 시각 차이는 28분 29초이고 합 28분 27초와 2초 다른 것은 변형 사이 대기다 |
 
 기준선까지 합한 Claude 호출 계측 합계: 497 + 123 + 39 + 7 = 666(`outputs/live*`의 계측은 호출 시작 수이며 1차의 실패 29 포함). 예고한 범위(Claude 약 790~1,190)보다 낮다. 캐시 쓰기 토큰은 계측하지 않았고, 서버 측 Jev 약 2회는 계량하지 못했다.
+
+3c까지 합한 계측 합계(2026-11-03): Claude 666 + 8(루프 정리) + 226(dev B) + 594(holdout) = 1,494호출. 3c에서 예고한 범위(Claude 약 860~1,550, Jev 약 180~540) 안이다. Jev는 3c의 게이트 기록으로 센 하한이 60 + 65 = 125회이고 이 하한은 예고 범위의 아래에 있다. 게이트 한 번의 Jev 호출 수(1~3회)가 기록에 없어 실제 Jev 호출은 이보다 많을 수 있다: 저자 확인 필요. 07 노트북의 수업 측정(예고 Claude 324회, Jev 72회)은 측정하지 않았다.
 
 ## 9. 외부 전송
 
@@ -292,7 +424,7 @@ Langfuse는 프롬프트와 도구 입출력을 받는다. Decision API는 답�
 1. run 1 기반: 환경, 이 문서, `cap_lab`, 오프라인 테스트.
 2. run 2 노트북과 문서.
 3. 저자 라벨 검토 관문. 저자 측정은 Langfuse 없이 로컬로 돌리므로 키 교체는 run 3의 선행 조건이 아니다(개정 2). 키 교체는 07의 Langfuse 기록에만 필요하다.
-4. run 3 유료 측정. 결과 절은 PREREG 블록 뒤에 덧붙이고 블록 자체는 수정하지 않는다.
+4. run 3 유료 측정. 결과 절은 PREREG 블록 뒤에 덧붙이고 블록 자체는 수정하지 않는다. 완료(2026-11-03): dev 기준선과 dev B(결과 1, 결과 2), holdout A, A2, B(결과 3). 07 노트북의 수업 측정(Langfuse 기록, Claude 324회, Jev 72회 예고)은 아직 측정하지 않았다.
 
 ## 11. 출처
 

@@ -3,7 +3,9 @@
 실제 server.py는 stdio 자식 프로세스로 띄우고 모델은 가짜를 쓴다. 키·네트워크·유료 호출은 없다.
 """
 import asyncio
+import gc
 import json
+import logging
 import socket
 import threading
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
@@ -12,13 +14,15 @@ from pathlib import Path
 import langfuse
 import pytest
 from langchain_core.messages import AIMessage
+from langchain_anthropic._client_utils import _get_default_async_httpx_client
 from mcp_types import ElicitResult
 
 from cap_lab import notebook
-from cap_lab.experiment import Variant
+from cap_lab.experiment import Variant, run_experiment
 from cap_lab.scorers import MCP_TOOLS
 from cap_lab.settings import ROOT, Settings
 from fakes import FakeChatModel
+from test_experiment import FakeLangfuse, case_of
 
 _REAL_CONNECT = socket.socket.connect  # conftest의 네트워크 차단이 걸리기 전의 connect다.
 DUMMY_ANTHROPIC = "dummy-anthropic-value-1234"
@@ -274,3 +278,31 @@ def test_two_run_small_compare_calls_in_one_kernel_both_reach_the_api(output_roo
 
     rows = asyncio.run(notebook_cell())
     assert [row["error"] for row in rows] == [None, None]
+
+
+def test_three_runs_in_a_notebook_cell_leave_no_unretrieved_task_exception(output_root, local_messages_api, caplog):
+    async def notebook_cell():
+        rows = []
+        for case_id in ("dev-01", "dev-02", "dev-03"):
+            rows += notebook.run_small_compare([Variant("A")], [case_id], 1, label=f"소음-{case_id}")
+            gc.collect()
+        return rows
+
+    # 앞선 시험이 남긴 클라이언트가 이 시험 중에 수거되어 경고를 내지 않도록, 실행 중인 루프가 없을 때 미리 치운다.
+    _get_default_async_httpx_client.cache_clear()
+    gc.collect()
+    with caplog.at_level(logging.ERROR, logger="asyncio"):
+        rows = asyncio.run(notebook_cell())
+        gc.collect()
+    assert [row["error"] for row in rows] == [None, None, None]
+    assert [r.getMessage() for r in caplog.records if "Task exception was never retrieved" in r.getMessage()] == []
+
+
+def test_run_experiment_langfuse_repeats_each_reach_the_api_from_their_own_event_loop(tmp_path, local_messages_api):
+    # Langfuse의 run_experiment는 호출마다 asyncio.run을 새로 돈다. FakeLangfuse가 그것을 흉내 낸다.
+    settings = Settings(anthropic_api_key=DUMMY_ANTHROPIC)
+    run_names = asyncio.run(run_experiment(Variant("L"), [case_of("dev-01")], 2, settings=settings,
+                                           mirror_dir=tmp_path / "runs", client=FakeLangfuse()))
+    errors = [json.loads(line)["error"] for name in run_names
+              for line in (tmp_path / "runs" / f"{name}.jsonl").read_text(encoding="utf-8").splitlines()]
+    assert errors == [None, None]

@@ -43,6 +43,7 @@ from eval_lab.replay import (
 from eval_lab.reporting import quantile
 from eval_lab.trajectory_rules import (
     RESPONSE_EVENT,
+    RULES,
     VERDICT_STATUSES,
     TrajectoryVerdict,
 )
@@ -759,6 +760,18 @@ def dream(pool: Sequence[PoolEpisode], candidates: Sequence[PolicySpec],
 
 # ---------------------------------------------------------------- holdout 행
 
+# holdout 행의 fatal_rule_ids에 쓸 수 있는 ID. 규칙 표(trajectory_rules.RULES)에서 치명 등급만 읽는다.
+_FATAL_RULE_IDS = frozenset(rule_id for rule_id, grade, _ in RULES if grade == "fatal")
+_WARN_RULE_IDS = frozenset(rule_id for rule_id, grade, _ in RULES if grade == "warn")
+
+
+def _refuse_non_fatal_ids(rule_ids: Iterable[str], where: str) -> None:
+    """치명 규칙이 아닌 ID가 있으면 ValueError로 멈춘다. where는 어느 행인지 알리는 말이다."""
+    for rule_id in sorted(set(rule_ids) - _FATAL_RULE_IDS):
+        kind = "경고 규칙" if rule_id in _WARN_RULE_IDS else "알 수 없는 규칙"
+        raise ValueError(f"{where}의 fatal_rule_ids에 치명 규칙이 아닌 ID가 있습니다: {rule_id!r}({kind})")
+
+
 def holdout_row(scenario_id: str, trial: int, trajectory_status: str, fatal_rule_ids: Iterable[str],
                 outcome_passed: bool | None, *, latency_ms: float | None = None, cost_usd: float | None = None,
                 judge_questions: int | None = None, judge_escalated: int | None = None) -> HoldoutRow:
@@ -771,6 +784,8 @@ def holdout_row(scenario_id: str, trial: int, trajectory_status: str, fatal_rule
     """
     if trajectory_status not in VERDICT_STATUSES:
         raise ValueError(f"알 수 없는 궤적 판정 상태입니다: {trajectory_status!r}")
+    fatal_rule_ids = list(fatal_rule_ids)
+    _refuse_non_fatal_ids(fatal_rule_ids, f"{scenario_id} #{trial} 행")
     return {
         "scenario_id": scenario_id,
         "trial": trial,
@@ -825,6 +840,7 @@ def _checked_rows(rows: Sequence[HoldoutRow], label: str, reps: int) -> list[Hol
         status = row["trajectory_status"]
         if status not in VERDICT_STATUSES:
             raise ValueError(f"{label} 행의 궤적 판정 상태를 알 수 없습니다: {status!r}")
+        _refuse_non_fatal_ids(row["fatal_rule_ids"], f"{label} 행 {row['scenario_id']} #{row['trial']}")
         if status == "PASS" and row["fatal_rule_ids"]:
             raise ValueError(f"{label} 행이 PASS인데 치명 규칙이 있습니다: {row['scenario_id']} #{row['trial']}")
         if status == "FAIL" and not row["fatal_rule_ids"]:
