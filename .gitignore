@@ -23,3 +23,10 @@ wheels/
 
 # Lecture Note
 Lecture_Note/
+
+# used_jev_deepagents: 키와 의존성은 올리지 않는다
+used_jev_deepagents/.env
+used_jev_deepagents/.venv/
+used_jev_deepagents/.ui/
+used_jev_deepagents/frontend/node_modules/
+used_jev_deepagents/frontend/.next/
