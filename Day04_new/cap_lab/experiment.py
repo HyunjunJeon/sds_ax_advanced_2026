@@ -9,15 +9,17 @@
 from __future__ import annotations
 
 import asyncio
+import gc
 import hashlib
 import json
 import time
 from collections import Counter, defaultdict
-from collections.abc import Iterable, Sequence
+from collections.abc import Coroutine, Iterable, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
+from langchain_anthropic._client_utils import _AsyncHttpxClientWrapper, _get_default_async_httpx_client
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
@@ -530,11 +532,11 @@ async def run_experiment(
         async def task(*, item: DatasetItem, **_: object) -> dict:
             # 이 함수는 아래 run_experiment 호출이 끝나기 전에만 불리므로 repeat·run_name은 이번 반복의 값이다.
             callbacks = [CallbackHandler(public_key=settings.langfuse_public_key)] if trace_langchain else None
-            record = await run_case(
+            run_record = await with_own_anthropic_client(run_case(
                 by_id[item.input["id"]], variant=variant, settings=settings, workdir=workdir, repeat=repeat,
                 callbacks=callbacks, model=model, decider=decider, server_env=server_env,
-            )
-            line = _mirror_line(record, _score(record), run_name=run_name, variant=variant, repeat=repeat)
+            ))
+            line = _mirror_line(run_record, _score(run_record), run_name=run_name, variant=variant, repeat=repeat)
             _append_line(mirror_dir / f"{run_name}.jsonl", line)
             return {key: line[key] for key in ("final_text", "scores", "first_failure", "error")}
 
@@ -553,6 +555,25 @@ async def run_experiment(
             metadata={**metadata, "repeat": str(repeat)},
         )
     return run_names
+
+
+async def with_own_anthropic_client[T](coroutine: Coroutine[None, None, T]) -> T:
+    """이 이벤트 루프가 Anthropic 비동기 HTTP 클라이언트를 새로 만들어 쓰고, 루프가 끝나기 전에 같은 루프에서 닫는다.
+
+    langchain_anthropic은 클라이언트 하나를 lru_cache로 공유한다. 닫힌 루프에 묶인 클라이언트를 다음 루프가 받으면
+    "Connection error."가 나고, 버려진 클라이언트의 __del__은 그때 도는 루프에 aclose()를 예약해
+    "Event loop is closed" 경고를 낸다. 실행 전에 캐시를 비우고, 실행 중 새로 생긴 클라이언트만 실행 뒤에 닫는다.
+    다른 곳에서 열어 둔 클라이언트는 건드리지 않는다.
+    """
+    _get_default_async_httpx_client.cache_clear()
+    before = {id(obj) for obj in gc.get_objects() if isinstance(obj, _AsyncHttpxClientWrapper)}
+    try:
+        return await coroutine
+    finally:
+        for obj in gc.get_objects():
+            if isinstance(obj, _AsyncHttpxClientWrapper) and id(obj) not in before and not obj.is_closed:
+                await obj.aclose()
+        _get_default_async_httpx_client.cache_clear()
 
 
 # local 기록의 중단 장치. 한 실행 이름의 처음 이만큼의 항목이 모두 오류로 끝나면 멈춘다. 키·한도·설정 문제로

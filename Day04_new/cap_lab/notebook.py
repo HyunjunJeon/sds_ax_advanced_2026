@@ -17,12 +17,11 @@ from pathlib import Path
 
 import pandas as pd
 from IPython.display import display
-from langchain_anthropic._client_utils import _get_default_async_httpx_client
 from mcp import Client
 from mcp.client.stdio import StdioServerParameters
 
 from cap_lab.agent import SERVER_SCRIPT, server_argv
-from cap_lab.experiment import Variant, load_cases, run_case
+from cap_lab.experiment import Variant, load_cases, run_case, with_own_anthropic_client
 from cap_lab.scorers import RunRecord, first_failure, score_run
 from cap_lab.server.server import FaultPlan
 from cap_lab.settings import ROOT, Settings, key_status, load_settings
@@ -117,17 +116,16 @@ def show_events(evidence_dir: Path | str) -> None:
 def _run_blocking(coroutine: Coroutine[None, None, RunRecord]) -> RunRecord:
     """노트북 셀은 이미 이벤트 루프 안이라 asyncio.run을 바로 못 쓴다. 그때는 별도 스레드에서 돌린다.
 
-    실행마다 새 이벤트 루프를 쓰는데 langchain_anthropic은 비동기 HTTP 클라이언트 하나를 lru_cache로 공유한다.
-    닫힌 첫 루프에 묶인 클라이언트를 다음 실행이 받으면 "Connection error."가 나므로, 실행 전에 비워서
-    이 루프가 자기 클라이언트를 새로 만들게 한다.
+    실행마다 새 이벤트 루프를 쓰므로 with_own_anthropic_client가 그 루프 안에서 Anthropic 클라이언트를 새로 만들어
+    쓰고 루프가 끝나기 전에 닫는다. 닫힌 루프에 묶인 공유 클라이언트가 다음 실행에 넘어가지 않게 하기 위해서다.
     """
-    _get_default_async_httpx_client.cache_clear()
+    runner = with_own_anthropic_client(coroutine)
     try:
         asyncio.get_running_loop()
     except RuntimeError:
-        return asyncio.run(coroutine)
+        return asyncio.run(runner)
     with ThreadPoolExecutor(max_workers=1) as pool:
-        return pool.submit(asyncio.run, coroutine).result()
+        return pool.submit(asyncio.run, runner).result()
 
 
 def _dev_cases(case_ids: list[str]) -> list[dict]:
