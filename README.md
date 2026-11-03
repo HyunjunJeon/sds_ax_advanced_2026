@@ -24,6 +24,22 @@ npx skills add langchain-ai/langchain-skills --skill '*' --yes
 
 ## Day02_new
 
+
+
+## Don't touch
+[claude 계정]
+http://bit.ly/sds-ax-ad-claude
+
+[수업자료]
+1일차
+https://bit.ly/SDS-AI-2026
+
+2~10일차
+http://bit.ly/sds-ax-ad-class
+
+google-driver
+http://bit.ly/sds-ax-ad-drive
+
 `Day02_new/`는 `Day02/`와 나란히 놓인 새 버전으로, Day01처럼 노트북(`00-Setup`부터 `06-Lab-DeepAgents-RAG`까지)을 위에서 아래로 실행하며 배웁니다. `Day02/`를 대체하지 않습니다. 루트 환경을 쓰고 `pyproject.toml`은 없으며, 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`가 필요합니다. 자세한 내용은 [Day02_new/README.md](Day02_new/README.md)를 봅니다.
 
 ## Day03_new
