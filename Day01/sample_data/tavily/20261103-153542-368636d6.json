@@ -1,0 +1,24 @@
+{
+  "query": "LangChain latest version release",
+  "saved_at": "2026-11-03T15:35:42.195025",
+  "results": [
+    {
+      "url": "https://releasebot.io/updates/langchain-ai",
+      "title": "LangChain Release Notes - October 2026 Latest Updates - Releasebot",
+      "content": "Oct 21, 2026\n  + First seen by Releasebot:\n\n    Oct 22, 2026\n\n  LangChain logo\n\n  LangChain\n\n  LangChain releases core 1.6.13, adding support for stream consumers to read tool-call deltas.\n\n  ### Changes since langchain-core==1.6.12 [...] Oct 27, 2026\n  + First seen by Releasebot:\n\n    Oct 28, 2026\n\n  LangChain logo\n\n  LangChain\n\n  ## langchain-anthropic==1.7.7\n\n  LangChain releases Anthropic integration 1.7.7, fixing reasoning-effort tracing and improving dependency compatibility.\n\n  ### Changes since langchain-anthropic==1.7.6 [...] Oct 22, 2026\n  + First seen by Releasebot:\n\n    Oct 23, 2026\n\n  LangChain logo\n\n  LangChain\n\n  ## langchain-core==1.7.0\n\n  LangChain releases core 1.7, streaming tool-call arguments as incremental deltas while keeping `.tool\\_calls.get()` and `.output` unchanged.\n\n  ### Changes since langchain-core==1.6.13\n\n  release(core): 1.7.0 (#41418)\n\n  feat(core): emit tool-call-delta for streamed tool-call args (#41257)\n\n  ### Notes",
+      "score": 0.8965509
+    },
+    {
+      "url": "https://en.wikipedia.org/wiki/LangChain",
+      "title": "LangChain - Wikipedia",
+      "content": "| LangChain |\n\n| Developer | Harrison Chase |\n| Release | October 2022 |\n| Stable release | 0.1.16 / 11 April 2024; 2 years ago (11 April 2024) |\n|  |\n| Written in | Python \"Python (programming language)\") and JavaScript |\n| Type | Software framework for large language model application development |\n| License | MIT License |\n| Website | LangChain.com |\n\n \n\n Free and open-source software portal [...] 1. ↑ \"Release 0.1.16\". 11 April 2024. Retrieved 23 April 2024.\n2. ↑ Buniatyan, Davit (2023). \"Code Understanding Using LangChain\". Activeloop.\n3. ↑ Palazzolo, Stephanie (2023-04-13). \"AI startup LangChain taps Sequoia to lead funding round at a valuation of at least $200 million\". Business Insider. Archived from the original on 2023-04-18. Retrieved 2023-04-18.",
+      "score": 0.8941352
+    },
+    {
+      "url": "https://docs.langchain.com/oss/python/versioning",
+      "title": "Versioning - Docs by LangChain",
+      "content": "Latest major version: Full support with active development (ACTIVE status)\n Previous major version: Security updates and critical bug fixes for 12 months after the next major release (MAINTENANCE status)\n Older versions: Community support only\n\n### ​ Long-term support (LTS) releases\n\nBoth LangChain and LangGraph 1.0 are designated as LTS releases: [...] Version 1.0 will remain in ACTIVE status until version 2.0 is released\n After version 2.0 is released, version 1.0 will enter MAINTENANCE move for at least 1 year\n LTS releases follow semantic versioning (semver), allowing safe upgrades between minor versions\n Legacy versions (LangChain 0.3 and LangGraph 0.4) are in MAINTENANCE mode until December 2026\n\n### ​ Pre-1.0 packages [...] ## ​ Upgrade\n\n```\n# Upgrade to the latest version # Upgrade to the latest versionpip install -U langchain-core langchain pip  install -U langchain-core  langchain # Upgrade to a specific version # Upgrade to a specific versionpip install langchain-core==1.0.0 pip  install langchain-core==1.0.0\n```",
+      "score": 0.7876867
+    }
+  ]
+}
