@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-labelledby="05a-3-skill-subagent-title 05a-3-skill-subagent-desc">
+<title id="05a-3-skill-subagent-title">Skill, SubAgent, 코드의 판단 기준</title>
+<desc id="05a-3-skill-subagent-desc">절차 재사용, Context 분리, 도구·권한 분리, 병렬 필요라는 네 기준에서 Skill, SubAgent, 코드가 각각 어떻게 다른지 비교한 판단표.</desc>
+<defs><marker id="05a-3-skill-subagent-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05a-3-skill-subagent-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05a-3-skill-subagent-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="340" fill="#f5f5f5"/>
+
+<text x="340.0" y="44" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#4f5d75">Skill</text>
+<text x="572.0" y="44" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#4f5d75">SubAgent</text>
+<text x="804.0" y="44" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#4f5d75">코드</text>
+<text x="40" y="93.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">절차 재사용</text>
+<rect x="228" y="64" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="340.0" y="93.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">적합</text>
+<rect x="460" y="64" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="572.0" y="93.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">가능하지만 과함</text>
+<rect x="692" y="64" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="804.0" y="93.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">판단 없는 절차는 코드</text>
+<text x="40" y="149.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">Context 분리</text>
+<rect x="228" y="120" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="340.0" y="149.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">없음</text>
+<rect x="460" y="120" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="572.0" y="149.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">있음</text>
+<rect x="692" y="120" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="804.0" y="149.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">해당 없음</text>
+<text x="40" y="205.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">도구·권한 분리</text>
+<rect x="228" y="176" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="340.0" y="205.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">없음</text>
+<rect x="460" y="176" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="572.0" y="205.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">Worker마다 허용 목록</text>
+<rect x="692" y="176" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="804.0" y="205.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">게이트처럼 강제</text>
+<text x="40" y="261.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">병렬 필요</text>
+<rect x="228" y="232" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="340.0" y="261.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">없음</text>
+<rect x="460" y="232" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="572.0" y="261.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">task 여러 개로 가능</text>
+<rect x="692" y="232" width="224" height="48" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="804.0" y="261.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#2d3142">Send로 코드가 정함</text>
+<text x="40" y="324" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">기준을 정리한 표입니다. 위 실행 표의 수치가 어느 칸을 뒷받침하는지는 직접 대조하세요.</text>
+</svg>

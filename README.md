@@ -28,4 +28,4 @@ npx skills add langchain-ai/langchain-skills --skill '*' --yes
 
 ## Day03_new
 
-`Day03_new/`는 `Day03/`와 나란히 놓인 새 버전으로, Day01처럼 노트북(`00-Setup`부터 `06-Lab-Research-Agents`까지)을 위에서 아래로 실행하며 Workflow와 Agent의 경계부터 Multi-Agent 선택 기준까지 배웁니다. `Day03/`를 대체하지 않습니다. 루트 환경을 쓰고 `pyproject.toml`은 없으며, 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`와 `EXA_API_KEY`가 필요합니다. 00의 키 확인 셀이 두 키를 모두 확인하고 EXA는 06의 필수 실습에서 씁니다. 자세한 내용은 [Day03_new/README.md](Day03_new/README.md)를 봅니다.
+`Day03_new/`는 `Day03/`와 나란히 놓인 새 버전으로, Day01처럼 노트북(`00-Setup`부터 `06-Lab-Research-Agents`까지, 03·04·05는 a/b로 나뉨)을 위에서 아래로 실행하며 Workflow와 Agent의 경계부터 Multi-Agent 선택 기준까지 배웁니다. `Day03/`를 대체하지 않습니다. 루트 환경을 쓰고 `pyproject.toml`은 없으며, 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`와 `EXA_API_KEY`가 필요합니다. 00의 키 확인 셀이 두 키를 모두 확인하고 EXA는 06의 필수 실습에서 씁니다. 자세한 내용은 [Day03_new/README.md](Day03_new/README.md)를 봅니다.

@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-labelledby="04b-2-join-visibility-title 04b-2-join-visibility-desc">
+<title id="04b-2-join-visibility-title">조용한 합류와 드러내는 합류</title>
+<desc id="04b-2-join-visibility-desc">위쪽 silent_join은 complete인 결과만 작성 노드에 넘겨 실패가 사라진다. 아래쪽 join_results는 작업별 상태를 드러내고 failed인 작업만 새 키로 다시 Send한다.</desc>
+<defs><marker id="04b-2-join-visibility-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="04b-2-join-visibility-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="04b-2-join-visibility-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="340" fill="#f5f5f5"/>
+<path d="M240,96 L300,96" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04b-2-join-visibility-arr)"/>
+<path d="M500,96 L560,96" fill="none" stroke="#bf4520" stroke-width="1.5" marker-end="url(#04b-2-join-visibility-arr-a)"/>
+<path d="M240,240 L300,240" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04b-2-join-visibility-arr)"/>
+<path d="M500,240 L560,240" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04b-2-join-visibility-arr)"/>
+<path d="M660,272 L660,292 Q660,300 652,300 L148,300 Q140,300 140,292 L140,272" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04b-2-join-visibility-arr)"/>
+<text x="40" y="50" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#bf4520">조용한 합류</text>
+<rect x="40" y="64" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="64" width="200" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="140.0" y="94.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">worker 셋</text>
+<text x="140.0" y="112.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">outage 하나가 failed</text>
+<rect x="300" y="64" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="300" y="64" width="200" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="400.0" y="94.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">silent_join</text>
+<text x="400.0" y="112.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">complete만 모읍니다</text>
+<rect x="560" y="64" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="560" y="64" width="200" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="660.0" y="94.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">작성 노드의 입력</text>
+<text x="660.0" y="112.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">outage가 없습니다</text>
+<text x="40" y="194" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">드러내는 합류</text>
+<rect x="40" y="208" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="208" width="200" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="140.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">worker 셋</text>
+<text x="140.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">outage 하나가 failed</text>
+<rect x="300" y="208" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="300" y="208" width="200" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="400.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">join_results</text>
+<text x="400.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">작업별 상태 표</text>
+<rect x="560" y="208" width="200" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="560" y="208" width="200" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="660.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">after_visible_join</text>
+<text x="660.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">failed만 새 키로 Send</text>
+<text x="380.0" y="320" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">outage#2만 다시 실행하고 billing, policy 결과는 그대로 둡니다</text>
+<text x="776" y="100" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">실패의 흔적 없음</text>
+</svg>

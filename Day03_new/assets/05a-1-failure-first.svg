@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 396" width="960" height="396" role="img" aria-labelledby="05a-1-failure-first-title 05a-1-failure-first-desc">
+<title id="05a-1-failure-first-title">나누기 전에 Single의 실패를 분류하는 순서</title>
+<desc id="05a-1-failure-first-desc">Single 실행의 자동 검사와 신호표를 읽어 실패를 네 칸(정보 부족, 도구 선택, Context 크기, 단계 의존성)과 자동 검사 문제, 실패 아님으로 분류하고, 먼저 점검할 것을 고친 뒤에도 남는 실패와 비용만 분리의 근거로 삼는다.</desc>
+<defs><marker id="05a-1-failure-first-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05a-1-failure-first-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05a-1-failure-first-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="396" fill="#f5f5f5"/>
+<path d="M200,184 L280,184" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<path d="M440,166 L472,166 Q480,166 480,158 L480,72 Q480,64 488,64 L520,64" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<path d="M440,178 L472,178 Q480,178 480,170 L480,136 Q480,128 488,128 L520,128" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<path d="M440,190 L478,190 Q480,190 480,192 L480,190 Q480,192 482,192 L520,192" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<path d="M440,202 L472,202 Q480,202 480,210 L480,248 Q480,256 488,256 L520,256" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<path d="M360,220 L360,308 Q360,316 368,316 L520,316" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-1-failure-first-arr)"/>
+<rect x="40" y="148" width="160" height="72" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="148" width="160" height="72" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="120.0" y="182.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Single 실행</text>
+<text x="120.0" y="200.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">네 사례, 각 1회</text>
+<rect x="280" y="148" width="160" height="72" rx="6" fill="#f5f5f5"/>
+<rect x="280" y="148" width="160" height="72" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="360.0" y="182.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">표 두 개 읽기</text>
+<text x="360.0" y="200.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">자동 검사 · 신호표</text>
+<text x="520" y="28" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#4f5d75">점검할 칸 → 먼저 점검할 것</text>
+<rect x="520" y="40" width="200" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="40" width="200" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="620.0" y="69.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">정보가 부족함</text>
+<text x="736" y="68" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">검색어, 코퍼스, not_found 처리</text>
+<rect x="520" y="104" width="200" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="104" width="200" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="620.0" y="133.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">도구를 잘못 고름</text>
+<text x="736" y="132" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">도구 설명, 프롬프트 지침</text>
+<rect x="520" y="168" width="200" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="168" width="200" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="620.0" y="197.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Context가 너무 큼</text>
+<text x="736" y="196" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">도구 결과 크기, 필요한 원문만 읽기</text>
+<rect x="520" y="232" width="200" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="232" width="200" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="620.0" y="261.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">단계 의존성이 강함</text>
+<text x="736" y="260" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">코드로 순서 고정(03의 순차)</text>
+<rect x="520" y="292" width="200" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="292" width="200" height="48" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="620.0" y="321.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">자동 검사 문제 · 실패 아님</text>
+<text x="736" y="320" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">이 두 칸은 분리의 근거가 아닙니다</text>
+<text x="40" y="380" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">먼저 점검할 것을 고친 뒤에도 남는 실패나 비용이 분리를 검토할 근거입니다. 단계 의존성은 대개 근거가 못 됩니다.</text>
+</svg>

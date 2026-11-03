@@ -1,0 +1,58 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 452" width="960" height="452" role="img" aria-labelledby="03a-4-longest-path-title 03a-4-longest-path-desc">
+<title id="03a-4-longest-path-title">병렬의 시간은 합계가 아니라 최장 경로</title>
+<desc id="03a-4-longest-path-desc">작업 시간이 0.2, 0.2, 1.0초일 때 차례로 돌리면 1.4초이고 동시에 돌리면 가장 긴 1.0초이며, credit이 셋을 기다리면 1.1초다.</desc>
+<defs><marker id="03a-4-longest-path-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="03a-4-longest-path-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="03a-4-longest-path-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="452" fill="#f5f5f5"/>
+<line x1="216" y1="72" x2="216" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="312" y1="72" x2="312" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="408" y1="72" x2="408" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="504" y1="72" x2="504" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="600" y1="72" x2="600" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="696" y1="72" x2="696" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="792" y1="72" x2="792" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<line x1="888" y1="72" x2="888" y2="432" stroke="rgba(45,49,66,0.12)" stroke-width="1"/>
+<text x="40" y="60" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">시간(초)</text>
+<text x="216" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">0.0</text>
+<text x="312" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">0.2</text>
+<text x="408" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">0.4</text>
+<text x="504" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">0.6</text>
+<text x="600" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">0.8</text>
+<text x="696" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">1.0</text>
+<text x="792" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">1.2</text>
+<text x="888" y="60" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">1.4</text>
+<text x="40" y="100" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">차례로 돌리면 (max_concurrency=1)</text>
+<text x="888" y="100" text-anchor="end" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">합계 1.4초 = 0.2 + 0.2 + 1.0</text>
+<rect x="216" y="110" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="264.0" y="125" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">billing 0.2</text>
+<rect x="312" y="110" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="360.0" y="125" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">policy 0.2</text>
+<rect x="408" y="110" width="480" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="648.0" y="125" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">outage 1.0</text>
+<text x="40" y="176" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">동시에 돌리면</text>
+<text x="888" y="176" text-anchor="end" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">최장 경로 1.0초 = max(0.2, 0.2, 1.0)</text>
+<text x="204" y="201" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">billing</text>
+<rect x="216" y="186" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="264.0" y="201" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">0.2</text>
+<text x="204" y="229" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">policy</text>
+<rect x="216" y="214" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="264.0" y="229" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">0.2</text>
+<text x="204" y="257" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">outage</text>
+<rect x="216" y="242" width="480" height="22" rx="4" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="456.0" y="257" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">1.0</text>
+<rect x="696" y="242" width="192" height="22" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25" stroke-dasharray="5,4"/>
+<text x="792.0" y="257" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">0.4초 짧아짐</text>
+<text x="40" y="308" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">credit이 셋을 모두 기다리면</text>
+<text x="888" y="308" text-anchor="end" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">최장 경로 1.1초 = 1.0 + 0.1</text>
+<text x="204" y="333" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">billing</text>
+<rect x="216" y="318" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="264.0" y="333" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">0.2</text>
+<text x="204" y="361" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">policy</text>
+<rect x="216" y="346" width="96" height="22" rx="4" fill="#f5f5f5" stroke="#4f5d75" stroke-width="1.25"/>
+<text x="264.0" y="361" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">0.2</text>
+<text x="204" y="389" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">outage</text>
+<rect x="216" y="374" width="480" height="22" rx="4" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="456.0" y="389" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">1.0</text>
+<text x="204" y="417" text-anchor="end" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">credit</text>
+<rect x="696" y="402" width="48" height="22" rx="4" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="720.0" y="417" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">0.1</text>
+</svg>

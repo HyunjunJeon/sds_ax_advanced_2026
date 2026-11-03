@@ -93,3 +93,36 @@ def test_timetable_sum_fails():
     nb = make_notebook(*good_cells())
     nb.cells[0].source = nb.cells[0].source.replace("| 1 | 60 |", "| 1 | 50 |")
     assert any("분 합계" in p for p in static_problems(nb, 60, FLOORS[60]))
+
+
+def make_half_notebook(*cells, minutes=30):
+    """30분 노트북(분할한 03a, 03b 같은 것)의 뼈대. 시간표 합계만 minutes로 바꾼다."""
+    nb = make_notebook(*cells)
+    nb.cells[0].source = nb.cells[0].source.replace("| 1 | 60 |", f"| 1 | {minutes} |")
+    return nb
+
+
+def good_half_cells():
+    code = [nbformat.v4.new_code_cell("# 실패 재현: 가\nprint(1)")] + [nbformat.v4.new_code_cell("print(1)") for _ in range(11)]
+    text = "**관찰할 것.** 읽습니다. " * 3 + "**먼저 예측하세요.** 적으세요. " * 2 + "설명 " * 2000
+    return [*code, nbformat.v4.new_markdown_cell(text), *[nbformat.v4.new_markdown_cell("연결") for _ in range(8)]]
+
+
+def test_good_half_notebook_passes_the_30_minute_floor():
+    assert static_problems(make_half_notebook(*good_half_cells()), 30, FLOORS[30]) == []
+
+
+def test_30_minute_floors_fail_when_short():
+    problems = static_problems(make_half_notebook(), 30, FLOORS[30])
+    assert any("cells 하한" in p for p in problems) and any("markdown 하한" in p for p in problems)
+
+
+def test_30_minute_timetable_sum_fails():
+    problems = static_problems(make_half_notebook(*good_half_cells(), minutes=60), 30, FLOORS[30])
+    assert any("분 합계" in p for p in problems)
+
+
+def test_half_notebook_does_not_pass_the_60_minute_floor():
+    """30분 기준을 더해도 60분 기준은 약해지지 않았다: 절반짜리가 60분 검사를 통과하면 안 된다."""
+    problems = static_problems(make_half_notebook(*good_half_cells(), minutes=60), 60, FLOORS[60])
+    assert any("cells 하한" in p for p in problems) and any("code 하한" in p for p in problems)

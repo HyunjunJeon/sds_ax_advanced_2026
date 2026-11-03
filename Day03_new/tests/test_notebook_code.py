@@ -133,8 +133,9 @@ def slice_problem(case: SliceCase) -> str | None:
     return None
 
 
-def test_all_seven_notebooks_are_read():
-    assert [path.name[:2] for path in NOTEBOOKS] == ["00", "01", "02", "03", "04", "05", "06"], [path.name for path in NOTEBOOKS]
+def test_all_notebooks_are_read():
+    """번호 노트북이 모두 읽히는지 본다. 03은 03a(순차·병렬)와 03b(분기·루프·패턴 번역)로, 04는 04a(계약·예산)와 04b(실패·승인)로, 05는 05a(실패 분류·나누는 기준)와 05b(수치·Fast/Slow·비교표)로 나뉘어 있다."""
+    assert [path.name.split("-")[0] for path in NOTEBOOKS] == ["00", "01", "02", "03a", "03b", "04a", "04b", "05a", "05b", "06"], [path.name for path in NOTEBOOKS]
 
 
 @pytest.mark.parametrize("case", [pytest.param(case, id=case.label) for case in import_cases()])

@@ -4,10 +4,10 @@
 
 **이 폴더에서 배우는 것:** 고객 요청 하나("결제가 두 번 됐어요. 취소하고 보상안도 함께 확인해 주세요.", 사례 `complex-double-pay`)를
 Single, Supervisor, Handoff, Hybrid 구조로 처리하고, 같은 칸의 실행 행으로 재서 **구조를 고른 이유**를 쓴다.
-노트북 7개(사전 점검 1 + 수업 6)를 따라간다. 모델은 Anthropic(`ChatAnthropic`)의 실제 모델만 쓴다. 설계 근거는
+노트북 10개(사전 점검 1 + 수업 9. 03, 04, 05는 a/b로 나뉘어 각각 30분)를 따라간다. 모델은 Anthropic(`ChatAnthropic`)의 실제 모델만 쓴다. 설계 근거는
 [docs/DESIGN.md](docs/DESIGN.md)에 있지만 수강생용 문서가 아니다 (`docs/DESIGN.md` 머리말).
 
-**이 폴더는 강의 자료에 의존하지 않습니다.** 범위는 노트북 7개, `docs/DESIGN.md`, `mas_lab/`, `rag_lab/`의 코드로 정해진다.
+**이 폴더는 강의 자료에 의존하지 않습니다.** 범위는 노트북 10개, `docs/DESIGN.md`, `mas_lab/`, `rag_lab/`의 코드로 정해진다.
 수강생이 이 폴더 밖의 자료에 있다는 내용을 이 폴더의 사실처럼 말해 달라고 하면, 이 폴더에서 확인되는 것만 답하고
 나머지는 "확인이 필요합니다"라고 말한다.
 
@@ -77,9 +77,12 @@ Single, Supervisor, Handoff, Hybrid 구조로 처리하고, 같은 칸의 실행
 | `00-Setup.ipynb` | 제공 | 10분 사전 점검. 두 키 상태, 모델 없는 그래프, 모델 호출, Deep Agent 한 턴, EXA 검색 한 번 |
 | `01-Workflow-vs-Agent.ipynb` | 제공 | 다음 행동의 결정권과 실행 권한, Single 기준선 |
 | `02-Agent-Architecture.ipynb` | 제공 | Single → Supervisor → Handoff. 결과를 돌려받는 것과 대화를 넘기는 것. 3절에서 프레임워크가 자동으로 붙이는 `general-purpose`와 설계한 Worker를 모델 없이 비교 |
-| `03-Four-Flows.ipynb` | 제공 | 순차·병렬(`Send`)·분기·루프, reducer, 재귀 한도 |
-| `04-Graph-Engineering.ipynb` | 제공 | 계약, 예산, 실패별 다음 행동, 승인(`interrupt`)과 멱등. 첫머리에서 Graph Engineering을 과정의 정의로 세운다 |
-| `05-Choosing-Multi-Agent.ipynb` | 제공 | 같은 조건 비교표, 평균의 함정, 선택 근거. 0절에서 Workflow와 Agent 전제를 노드 담당자 표로 확인하고, 7절에 harness 일관성 표와 공식 프레임워크 표를 둔다 |
+| `03a-Sequence-Parallel.ipynb` | 제공 | 순차·병렬(`Send`), reducer, 최장 경로 |
+| `03b-Branch-Loop-Patterns.ipynb` | 제공 | 분기·루프, 재귀 한도, 패턴을 네 흐름으로 번역 |
+| `04a-Graph-Contracts-Budget.ipynb` | 제공 | 층 지도, 작업 계약, 전달 계약, 공유 예산. 첫머리에서 Graph Engineering을 과정의 정의로 세운다 |
+| `04b-Graph-Failure-Approval.ipynb` | 제공 | 실패별 다음 행동, 부분 실패와 합류, 승인(`interrupt`)과 멱등, 완성형 조립 |
+| `05a-Failure-Cost-Boundary.ipynb` | 제공 | Single 실패 분류, 이득과 비용, Persona와 Context 경계, Skill과 SubAgent. 0절에서 Workflow와 Agent 전제를 노드 담당자 표로 확인한다. 해보기 1·2(반복 변동, 낮춘 예산) |
+| `05b-Measure-Fast-Compare.ipynb` | 제공 | 수치 읽기, Fast/Slow Path, 같은 조건 비교표와 평균의 함정, 선택 기록. 7절에 harness 일관성 표와 공식 프레임워크 표를 둔다. 05a의 실행 세 개를 준비 절에서 다시 실행한다(단독 실행). 해보기 1·2(새 사례, 자동 검사의 한계) |
 | `06-Lab-Research-Agents.ipynb` | 제공 | EXA로 병렬·직렬·연쇄 리서치 Deep Agent 비교. **EXA 키 필수** |
 | `mas_lab/` | 제공 | 노트북이 import하는 지원 모듈 14개 (4장). 쓰기 게이트가 `gate.py`로, 하위 에이전트 설정이 `harness.py`로 나뉘어 늘었다. 파일마다 비공백 150줄 이하여야 하고 (`tests/test_layout.py:20-22`의 `test_modules_stay_readable_in_class`), `workers.py`와 `hybrid.py`는 지금 정확히 150줄이라 줄을 하나라도 더하면 이 시험이 실패한다 |
 | `rag_lab/` | 제공 | `corpus.py`, `retrieval.py`, `evidence.py`, `pipeline.py` 4개는 `Day02_new/rag_lab/`에서 복사한 파일이고 바이트가 같다 (2026-11-02 09:13에 맞췄다. `tests/test_layout.py:13`의 `test_rag_lab_copies_are_byte_identical`이 네 칸을 모두 지킨다). 실패하면 `Day02_new`나 이 폴더의 복사본이 바뀐 것이다(위 머리말). `settings.py`는 EXA 키 항목이 더해진 판이라 일부러 다르고 동기화도 건드리지 않았다 (`rag_lab/settings.py:70`). 복사한 코드에는 이 과정이 부르지 않는 기능이 들어 있다(3장) |
@@ -89,7 +92,7 @@ Single, Supervisor, Handoff, Hybrid 구조로 처리하고, 같은 칸의 실행
 | `data/gold.jsonl` | **평가 전용** | 정답표 12행. 5장 규칙 참고 |
 | `skills/` | 제공 | `SKILL.md` 폴더 3개: refund-case, credit-case, insufficient-evidence. `single_skills` 구조가 `_skill_kwargs`로 불러 읽는다 (`mas_lab/structures.py:38`) |
 | `docs/DESIGN.md` | 저자용 | 설계 계약. 구현 뒤 코드와 어긋난 곳은 코드를 따른다 (8장). `docs/audit/`에는 저자가 익명화해 둔 증거 기록이, `docs/audit/tools/`에는 문서 검사 도구, 결함 주입 도구, 동기화 비교 도구가 있다. 수강생은 읽지 않아도 된다 |
-| `tests/` | 저자용 | pytest, 노트북 검사기, 실제 실행(`run_live.py`, `wait_live.py`), 감사(`audit_live.py`), 비용(`cost_report.py`). 가짜 모델은 `tests/fakes.py`에만 있고 단위 시험 전용이다 (`tests/fakes.py:1`). 복사본 시험은 네 칸이고, `Day03_new/tests` 전체 실행은 `625 passed`(실패 0)다 (2026-11-02, `tests/test_harness.py` 추가 뒤. 9장) |
+| `tests/` | 저자용 | pytest, 노트북 검사기, 실제 실행(`run_live.py`, `wait_live.py`), 감사(`audit_live.py`), 비용(`cost_report.py`). 가짜 모델은 `tests/fakes.py`에만 있고 단위 시험 전용이다 (`tests/fakes.py:1`). 복사본 시험은 네 칸이고, `Day03_new/tests` 전체 실행은 `717 passed`(실패 0)다 (2026-11-03, 노트북 분할 뒤. 9장) |
 | `outputs/` | 생성물 | `runs/`(실행 행 JSON, `_finish_row`가 쓴다, `mas_lab/runner.py:111`), `design_log.json`, `baseline/01.json`, `live/`(저자의 실제 실행 증거). `design_log.json`과 `baseline/01.json`은 그 노트북을 마지막으로 돌린 실행이 덮어쓴다(6장). git 제외 (`.gitignore:2`) |
 | `.env.example` | 제공 | 수강생이 `.env`로 복사해 직접 채운다 |
 | `README.md` | 제공 | 수강생용 안내 |
@@ -203,6 +206,10 @@ uv run jupyter lab          # 실행은 이 폴더에서
    목록을 비우거나 넓히지 않고, 넓힌다면 그 도메인을 왜 믿을 수 있는지 수강생이 먼저 말하게 한다 (노트북의 `해보기 1` 안내도 같은 기준이다).
 10. **사람이 판정하는 칸을 대신 채우지 않는다.** 06의 `HUMAN_REVIEW`는 수강생이 원문 발췌와 주장을 나란히 보고 정한다. 비어 있으면 비율이 `확인 안 됨`으로 나오는 것이 정상이다.
 
+**노트북 분할(2026-11-03).** 03, 04, 05는 Day01처럼 의미 단위로 03a/03b, 04a/04b, 05a/05b로 나뉘었다(분 합계는 각 30분, 저자 검토 전 초안). 아래 6장의 실측표와 시각표, 스위치 표는 분할 뒤 새 노트북의 기록(2026-11-03)이다. 7장의 셀 번호와 관찰은 2026-11-03에 새 기록(03a~05b 포함 19개)과 `outputs/runs`에서 다시 읽은 값이다. 분할 전 기록의 값은 "분할 전"이라고 표시했다(분할 전 기록은 `outputs/live/superseded-20261103-before-split/`). 05b는 05a의 유료 셀 세 개(예고 52회)를 준비 절에서 다시 실행하므로 05a와 05b를 모두 돌리면 그만큼 호출이 는다. 05b의 설계 기록(`평가 근거`)에는 05a의 `DIAGNOSIS`(`1절 진단`)가 더 이상 담기지 않는다.
+
+**분할 뒤 재실행(2026-11-03).** 03a, 03b, 04a, 04b, 05a, 05b의 기본 실행과 켠 실행(`.exercises`)을 실제 모델로 다시 돌려 `outputs/live/`에 기록했다(옛 03·04·05 기록은 `outputs/live/superseded-20261103-before-split/`). 모두 오류 0, `audit_live.py`는 `AUDIT OK`다. 1회 실측(모델 호출 / 초 / 입력 토큰 / 출력 토큰 / 비용 하한 USD): 기본 실행은 03a 17 / 74.8 / 35,741 / 8,469 / 0.1306, 03b 19 / 70.1 / 40,501 / 6,937 / 0.1123, 04a 15 / 62.3 / 33,720 / 7,828 / 0.1083, 04b 19 / 62.3 / 51,939 / 8,350 / 0.1152, 05a 36 / 145.6 / 155,701 / 14,713 / 0.2697, 05b 134 / 420.8 / 494,583 / 47,725 / 0.7925(05b는 05a의 유료 셀 세 개를 다시 실행하는 준비 절을 포함)이고, 켠 실행(`.exercises`)은 아래 6장 표와 같다.
+
 ---
 
 ## 6. 비용 — 실제 호출 셀
@@ -210,7 +217,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 모든 모델 셀이 실제 호출이다. 유료 셀은 같은 셀 안에서 `announce`(`rag_lab/settings.py:79`)가 실행 **직전에 규모를 한 줄로 고지**한다. 막지 않는다.
 다만 수강생이 자기 Anthropic 크레딧과 EXA 크레딧을 쓴다는 점을 상기시킨다. 도우미가 대신 셀을 돌릴 때도 직전에 한 줄로 알린다.
 
-아래는 `Day03_new/outputs/live/*.json`과 `tests/cost_report.py`에서 읽은 **저자 컴퓨터의 1회 실측**이다(`claude-sonnet-5-5`, 2026-11-02 기준 기록 13개). 저자가 노트북을 다시 실행하면 값이 바뀌므로
+아래는 `Day03_new/outputs/live/*.json`과 `tests/cost_report.py`에서 읽은 **저자 컴퓨터의 1회 실측**이다(`claude-sonnet-5-5`, 2026-11-02와 2026-11-03에 만든 기록 19개(기본 실행 10, 켠 실행 9), 아래 "기록이 만들어진 때" 참고). 저자가 노트북을 다시 실행하면 값이 바뀌므로
 두 곳에서 다시 읽은 값이 이 표보다 우선한다. `hybrid`의 Router를 실제 모델로 돌리는 노트북은 04와 05뿐이다(01과 03은 `hybrid`에서 `ROLE_GOALS`, `ROLES` 상수만 import한다).
 어느 기록이 어느 코드로 돌았고 어느 기록을 다시 돌리지 않았는지는 아래 "기록이 만들어진 때"가 말한다.
 기본 실행은 `RUN_EXERCISE`와 `RUN_OPTIONAL`이 모두 `False`인 실행이다. "초"는 기계 시간이고 수업 시간 리허설 값이 아니다.
@@ -218,42 +225,50 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 | 노트북 | 모델 호출 | 초 | 입력 토큰 | 출력 토큰 | 비용(USD) |
 |---|---:|---:|---:|---:|---:|
-| 00-Setup | 3 | 12.1 | 8,758 | 353 | 0.0137 |
-| 01-Workflow-vs-Agent | 41 | 133.7 | 161,078 | 11,773 | 0.2170 |
-| 02-Agent-Architecture | 35 | 146.2 | 125,672 | 13,949 | 0.2509 |
-| 03-Four-Flows | 37 | 128.2 | 78,292 | 15,842 | 0.2365 |
-| 04-Graph-Engineering | 35 | 106.1 | 88,649 | 15,051 | 0.2144 |
-| 05-Choosing-Multi-Agent | 135 | 450.2 | 496,246 | 49,999 | 0.8670 |
-| 06-Lab-Research-Agents | 29 | 212.2 | 156,937 | 32,201 | 0.4772 |
-| 합계 | 315 | 1,188.6 | 1,115,632 | 139,168 | 2.2767 |
+| 00-Setup | 3 | 12.6 | 7,582 | 388 | 0.0128 |
+| 01-Workflow-vs-Agent | 45 | 131.2 | 186,251 | 12,153 | 0.2198 |
+| 02-Agent-Architecture | 33 | 114.2 | 113,267 | 13,640 | 0.2312 |
+| 03a-Sequence-Parallel | 17 | 74.8 | 35,741 | 8,469 | 0.1306 |
+| 03b-Branch-Loop-Patterns | 19 | 70.1 | 40,501 | 6,937 | 0.1123 |
+| 04a-Graph-Contracts-Budget | 15 | 62.3 | 33,720 | 7,828 | 0.1083 |
+| 04b-Graph-Failure-Approval | 19 | 62.3 | 51,939 | 8,350 | 0.1152 |
+| 05a-Failure-Cost-Boundary | 36 | 145.6 | 155,701 | 14,713 | 0.2697 |
+| 05b-Measure-Fast-Compare | 134 | 420.8 | 494,583 | 47,725 | 0.7925 |
+| 06-Lab-Research-Agents | 28 | 214.0 | 147,993 | 32,660 | 0.4886 |
+| 합계 | 349 | 1,307.9 | 1,267,278 | 152,863 | 2.4809 |
 
-이 표의 합계는 반올림 전 값을 더해 한 번 반올림한 값이다. 행의 초를 그대로 더하면 1,188.7이라 마지막 자리가 하나 다르고, 나머지 칸은 행을 더한 값과 같다. 같은 방법으로 `.exercises` 6개를 더한 표가 아래다. 켠 실행에는 00이 없다(00에는 켜는 스위치가 없다).
+이 표의 합계는 반올림 전 값을 더해 한 번 반올림한 값이다. 비용을 그대로 더하면 2.4810이라 마지막 자리가 하나 다르고, 나머지 칸은 행을 더한 값과 같다. 03, 04, 05는 a/b로 나뉘어 행이 둘씩이다. 같은 방법으로 `.exercises` 9개를 더한 표가 아래다. 켠 실행에는 00이 없다(00에는 켜는 스위치가 없다).
 
 | 노트북 | 모델 호출 | 초 | 입력 토큰 | 출력 토큰 | 비용(USD) |
 |---|---:|---:|---:|---:|---:|
-| 01-Workflow-vs-Agent.exercises | 46 | 155.2 | 180,172 | 13,816 | 0.2354 |
-| 02-Agent-Architecture.exercises | 53 | 179.0 | 168,682 | 19,751 | 0.3384 |
-| 03-Four-Flows.exercises | 41 | 131.6 | 89,848 | 17,768 | 0.2446 |
-| 04-Graph-Engineering.exercises | 36 | 114.3 | 90,080 | 15,485 | 0.2146 |
-| 05-Choosing-Multi-Agent.exercises | 441 | 1,237.9 | 1,614,963 | 144,522 | 2.5742 |
-| 06-Lab-Research-Agents.exercises | 64 | 413.0 | 305,459 | 71,722 | 1.0596 |
-| 합계 | 681 | 2,231.0 | 2,449,204 | 283,064 | 4.6667 |
+| 01-Workflow-vs-Agent.exercises | 51 | 153.2 | 208,926 | 14,008 | 0.2489 |
+| 02-Agent-Architecture.exercises | 53 | 165.4 | 166,118 | 20,325 | 0.3215 |
+| 03a-Sequence-Parallel.exercises | 21 | 86.7 | 48,996 | 11,555 | 0.1698 |
+| 03b-Branch-Loop-Patterns.exercises | 19 | 51.1 | 34,403 | 6,728 | 0.1014 |
+| 04a-Graph-Contracts-Budget.exercises | 17 | 60.5 | 36,903 | 7,664 | 0.1088 |
+| 04b-Graph-Failure-Approval.exercises | 19 | 52.2 | 46,613 | 7,592 | 0.1146 |
+| 05a-Failure-Cost-Boundary.exercises | 83 | 262.5 | 306,987 | 35,299 | 0.5783 |
+| 05b-Measure-Fast-Compare.exercises | 393 | 1132.2 | 1,557,303 | 120,735 | 2.2259 |
+| 06-Lab-Research-Agents.exercises | 63 | 433.4 | 295,148 | 73,650 | 1.0886 |
+| 합계 | 719 | 2,397.0 | 2,701,397 | 297,556 | 4.9578 |
 
-이 표의 합계도 반올림 전 값을 더해 한 번 반올림한 값이다. 비용을 그대로 더하면 4.6668이라 마지막 자리가 하나 다르고, 초는 행을 더해도 2,231.0으로 같다. `cost_report.py`가 맨 아래 한 줄로 내는 합계
-(996회, 3,419.6초, 6.9435 USD)는 기록 13개를 모두 더한 값, 곧 위 두 표의 합계를 더한 값이다. 기본 실행과 `.exercises` 실행은 같은 셀을 겹쳐 돌렸으므로 이 값을 지출로 말하지 않는다.
+이 표의 합계도 반올림 전 값을 더해 한 번 반올림한 값이다. 비용을 그대로 더하면 4.9578로 같고, 초는 행을 더하면 2,397.2라 합계 2,397.0과 0.2 다르다. `cost_report.py`가 맨 아래 한 줄로 내는 합계
+(1,068회, 3,704.9초, 7.4387 USD)는 기록 19개를 모두 더한 값, 곧 위 두 표의 합계를 더한 값이다. 기본 실행과 `.exercises` 실행은 같은 셀을 겹쳐 돌렸으므로 이 값을 지출로 말하지 않는다.
 
-**기록이 만들어진 때.** 13개 기록은 모두 2026-11-02에 지금 코드로 다시 돌린 것이다. 02 기본 실행은 21:40~21:43에, 나머지 12개는 21:56~22:51에 하나씩 차례로 돌렸다(시각은 `outputs/live/<기록>.json`의 수정 시각, 곧 기록이 끝난 시각이다). 그때의 코드는 지금의 `mas_lab`(쓰기 게이트는 `mas_lab/gate.py`, `gate_answer:32`), 2026-11-02 09:13에 `Day02_new`와 맞춘 `rag_lab`, 지금 노트북이다. 13개 실행본은 저장본과 코드도 markdown도 같다(켠 실행본은 스위치 줄만 다르다).
+**기록이 만들어진 때.** 00, 01, 02, 06의 기록은 2026-11-03 00:05~01:03에, 03a~05b의 기록 12개는 같은 날 20:31~21:22에 지금 코드로 돌린 것이다(시각은 `outputs/live/<기록>.json`의 수정 시각, 곧 기록이 끝난 시각이다). 03a~05b는 노트북을 a/b로 나눈 뒤 처음 돌린 기록이고, 기본 실행 여섯 권을 먼저, 켠 실행 여섯 권을 그 뒤에 차례로 돌렸다. 그때의 코드는 지금의 `mas_lab`(쓰기 게이트는 `mas_lab/gate.py`, `gate_answer:32`), 2026-11-02 09:13에 `Day02_new`와 맞춘 `rag_lab`, 지금 노트북이다. 기본 실행 기록 10개는 `audit_live.py`가 `AUDIT OK`다.
 
-| 기록 | 끝난 시각 (2026-11-02) |
+| 기록 | 끝난 시각 (2026-11-03) |
 |---|---|
-| 02 기본 실행 | 21:43 |
-| 00 | 21:56 |
-| 01 기본·켠 실행 | 21:59, 22:01 |
-| 02 켠 실행 (`.exercises`) | 22:04 |
-| 03 기본·켠 실행 | 22:06, 22:09 |
-| 04 기본·켠 실행 | 22:10, 22:12 |
-| 05 기본·켠 실행 | 22:20, 22:40 |
-| 06 기본·켠 실행 | 22:44, 22:51 |
+| 00 | 00:05 |
+| 01 기본·켠 실행 | 00:08, 00:10 |
+| 02 기본·켠 실행 | 00:12, 00:15 |
+| 06 기본·켠 실행 | 00:56, 01:03 |
+| 03a 기본·켠 실행 | 20:31, 20:56 |
+| 03b 기본·켠 실행 | 20:32, 20:56 |
+| 04a 기본·켠 실행 | 20:33, 20:57 |
+| 04b 기본·켠 실행 | 20:34, 20:58 |
+| 05a 기본·켠 실행 | 20:36, 21:03 |
+| 05b 기본·켠 실행 | 20:43, 21:22 |
 
 **이전 기록(이력).** 재실행 전의 기록은 2026-11-01에 만들어졌다. 그 사이에 `mas_lab`의 `gate.py`(19:24), `workers.py`(19:39), `exa.py`(20:04)가 바뀌어 기록이 수정 앞뒤로 갈렸고, 모두 `rag_lab` 동기화(2026-11-02 09:13)보다 앞섰다. 그때는 다시 돌리지 않았다. 대신 모델과 EXA를 부르지 않는 두 비교로 기록을 유지했다.
 - 노트북의 코드 셀이 고친 함수에 닿지 않는다는 코드 비교(`docs/audit/stale-records-notes.md`).
@@ -271,11 +286,11 @@ uv run jupyter lab          # 실행은 이 폴더에서
   저장된 질문에서 찾은 결제 번호 꼴 120개는 모두 `P-<숫자>`라서 `p7001`, `P7001`, `p-7001` 같은 철자를 새로 읽는지도, 유효 결제를 제안 없이 `human_review`로 낸 모양(P-7001)을 잡는지도 재생으로는 보이지 못한다.
   이 부분은 단위 테스트(`tests/test_structures.py:163`의 `test_first_payment_without_proposal_is_denied_by_the_code_gate`, `tests/test_structures.py:968`의 `test_payment_id_spellings_all_name_the_same_payment`)와 7장 P-7001 항목의 새 질문 실행으로만 확인했다.
 - **코드 일치 검사.** 기본 실행 기록 7개는 `audit_live.py`가 실행본의 코드 셀과 현재 저장본이 같음을 확인한다(스위치 줄이 든 셀은 뺀다, `tests/audit_live.py:47`). 켠 실행 기록은 이 검사에서 빠진다 (`tests/audit_live.py:63`). 2026-11-02 재실행 직후에는 켠 실행본 6개도 저장본과 코드가 같았다(스위치 줄만 다르다). 노트북 코드를 고치면 기본 실행이 감사에서 실패하고, 켠 실행본은 감사 없이 어긋나므로 둘 다 다시 돌린다.
-- **05의 이력.** 05 기본 실행을 처음 돌렸을 때 `hybrid 단순 사례와 복합 사례` 셀이 22회를 불러 고지 20회를 넘었고 감사가 실패시켰다. 그 셀의 고지를 `model_calls=30`으로 고치고(고지는 예고 숫자이지 `Budget`이 아니다, `rag_lab/settings.py:79`) 다시 돌려 통과한 기록만 `outputs/live/`에 남겼다.
+- **05의 이력(분할 전).** 분할 전 05 기본 실행을 처음 돌렸을 때 `hybrid 단순 사례와 복합 사례` 셀이 22회를 불러 고지 20회를 넘었고 감사가 실패시켰다. 그 셀의 고지를 `model_calls=30`으로 고치고(고지는 예고 숫자이지 `Budget`이 아니다, `rag_lab/settings.py:79`) 다시 돌려 통과한 기록만 `outputs/live/`에 남겼다.
   그 첫 시도의 기록 파일은 같은 이름으로 덮어써졌고 그 실행의 행 파일은 `outputs/runs/`에 있다. 그 기록도 그 뒤 세 파일을 고친 다음인 2026-11-01 20:38~21:06에 다시 돌린 것이었고, 지금 `outputs/live/`의 05 기록은 2026-11-02 22:12~22:40에 다시 돌린 것이다.
 - **덮어써지는 파일.** `outputs/baseline/01.json`은 01의 셀 38이 쓰고, `outputs/design_log.json`은 노트북마다 설계 기록 셀이 `write_design_log`(`mas_lab/view.py:69`)로 질문 하나씩 덧쓴다. 둘 다 그 노트북을 마지막으로 돌린 실행이 덮어쓴다.
-  01은 기본 실행(2026-11-02 21:59) 뒤에 `.exercises` 실행(22:01)을 돌렸으므로 지금 `baseline/01.json`(22:01 마지막 쓰기)에는 `.exercises` 실행의 행이 들어 있고 기본 실행의 행은 `outputs/live/01-Workflow-vs-Agent.executed.ipynb`에 있다.
-  `design_log.json`의 마지막 쓰기는 2026-11-02 22:40, 곧 05 `.exercises` 실행의 끝이다. 그 뒤에 돈 06은 `DECISION`이 비어 있어 셀 52가 기록하지 않았다.
+  01은 기본 실행(2026-11-03 00:08) 뒤에 `.exercises` 실행(00:10)을 돌렸으므로 지금 `baseline/01.json`(00:10 마지막 쓰기)에는 `.exercises` 실행의 행이 들어 있고 기본 실행의 행은 `outputs/live/01-Workflow-vs-Agent.executed.ipynb`에 있다.
+  `design_log.json`의 마지막 쓰기는 2026-11-03 21:22, 곧 05b `.exercises` 실행의 끝이다. 06은 `DECISION`이 비어 있어 셀 52가 기록하지 않았다(06 실행은 01:03에 끝났다).
 
 EXA는 별도다. 기본 실행에서 00이 1회, 06이 21회(1+2+6+6+6) 부른다. 06이 출력한 검색당 비용은 0.007 USD이므로 합쳐 22회, 약 0.15 USD(0.154)다. `.exercises` 06은 47회, 약 0.33 USD다.
 `cost_report.py`는 캐시 쓰기 단가를 계산하지 않으므로 모델 비용은 정확값이 아니라 하한이다 (`tests/cost_report.py:76`).
@@ -284,81 +299,79 @@ EXA는 별도다. 기본 실행에서 00이 1회, 06이 21회(1+2+6+6+6) 부른�
 
 | 켜는 것 | 모델 호출 | 초 | EXA |
 |---|---:|---:|---:|
-| 01 `직접 해보기` 2, 4 | 3 + 3 | 5.0 + 24.6 | 0 |
-| 02 `직접 해보기` 1, 2 | 11 + 8 | 30.2 + 25.6 | 0 |
-| 03 `직접 해보기` 3 | 5 | 12.2 | 0 |
-| 04 `직접 해보기` 1 | 2 | 5.4 | 0 |
-| 05 `전체 비교` 셀 (`RUN_OPTIONAL`) | **261** | **680.5** | 0 |
-| 05 `직접 해보기` 1, 2, 3 | 30 + 17 + 2 | 100.6 + 40.8 + 8.5 | 0 |
-| 06 `같은 구조 안의 변동` 셀 (`RUN_OPTIONAL`) | 8 | 40.7 | 6 |
-| 06 `직접 해보기` 1, 2, 3 | 7 + 13 + 8 | 33.0 + 94.5 + 35.0 | 6 + 8 + 6 |
+| 01 `직접 해보기` 2, 4 | 3 + 3 | 4.4 + 16.2 | 0 |
+| 02 `직접 해보기` 1, 2 | 10 + 8 | 30.6 + 21.9 | 0 |
+| 03a `직접 해보기` 3 | 4 | 12.9 | 0 |
+| 04a `직접 해보기` 1 | 2 | 6.2 | 0 |
+| 05a `직접 해보기` 1, 2 | 30 + 16 | 94.0 + 41.0 | 0 |
+| 05b `전체 비교` 셀 (`RUN_OPTIONAL`) | **270** | **763.0** | 0 |
+| 05b `직접 해보기` 1 | 2 | 8.6 | 0 |
+| 06 `같은 구조 안의 변동` 셀 (`RUN_OPTIONAL`) | 7 | 43.5 | 6 |
+| 06 `직접 해보기` 1, 2, 3 | 7 + 12 + 9 | 30.7 + 96.6 + 39.2 | 6 + 8 + 6 |
 
-모두 켠 실행의 합은 01~06의 `.exercises` 기록 기준 모델 681회, 2,231.0초, 약 4.67 USD(4.6667)다(00의 3회, 12.1초, 0.0137 USD를 더하면 684회, 2,243.1초, 약 4.68 USD). EXA는 06이 47회, 00이 1회로 48회, 약 0.34 USD다. 05가 모델 호출의 65%(681회 중 441회)를 차지한다.
-이 6개 기록은 모두 2026-11-02에 같은 코드로 돌렸다(위 "기록이 만들어진 때"). 켠 칸을 더한 값과 두 기록의 총합 차이는 다를 수 있다. 켠 실행은 기본 셀도 다시 돌리므로 같은 셀의 호출 수가 조금 다르다(01은 켠 칸이 6회인데 총합은 41회에서 46회로 5회 늘었다).
+모두 켠 실행의 합은 01~06의 `.exercises` 기록 기준 모델 719회, 2,397.0초, 약 4.96 USD(4.9578)다(00의 3회, 12.6초, 0.0128 USD를 더하면 722회, 2,409.6초, 약 4.97 USD). EXA는 06이 47회, 00이 1회로 48회, 약 0.34 USD다(2026-11-03 06 실행본 출력의 `EXA 호출` 칸을 다시 세어 앞 판과 같았다. 기본 21회는 셀 7·12·17·19·25의 1+2+6+6+6, 켠 실행의 더해진 26회는 셀 34의 6, 해보기 1의 6, 해보기 2의 2+6, 해보기 3의 6). 05(05a와 05b)의 `.exercises` 두 기록이 모델 호출의 66%(719회 중 476회)를 차지한다.
+이 기록들은 모두 2026-11-03에 같은 코드로 돌렸다(위 "기록이 만들어진 때"). 켠 칸을 더한 값과 두 기록의 총합 차이는 다를 수 있다. 켠 실행은 기본 셀도 다시 돌리므로 같은 셀의 호출 수가 조금 다르다(02는 켠 칸이 18회인데 총합은 33회에서 53회로 20회 늘었다).
 
-- **05의 `전체 비교` 셀이 이 표에서 가장 큰 단일 셀이다.** 이 실행 기록에서 261회, 680.5초(약 11.3분)였고 고지는 330회였다. 05의 첫 코드 셀 주석은 모델 약 220~330회, 10~15분이라고 적는다.
+- **05의 `전체 비교` 셀이 이 표에서 가장 큰 단일 셀이다.** 이 실행 기록(05b)에서 270회, 763.0초(약 12.7분)였고 고지는 330회였다. 05b의 첫 코드 셀 주석은 모델 약 220~330회, 10~15분이라고 적는다.
   이 셀을 켜자는 요청에는 이 규모를 알려 준다.
 - 고지의 숫자는 예고 상한이다. 감사는 실측이 그 셀의 고지를 **넘으면 바로 실패**로 본다 (`tests/audit_live.py:36-37`). 한 셀에 고지가 여럿이면 그 합이 상한이다
   (`tests/audit_live.py:2`, `tests/audit_live.py:35-36`). 고지 없이 모델을 부른 셀도 실패다 (`tests/audit_live.py:31-32`). 배수로 봐주는 허용치는 없다.
   예고와 비교할 수 없는 유료 셀도 실패다. 비교하는 숫자는 셀 코드의 `model_calls=N`이므로 (`tests/audit_live.py:20`), 모델을 불러 놓고 고지에 이 숫자가 없는 셀은
   (EXA만 알리는 고지, `model_calls=len(topics)`처럼 숫자가 아닌 값) 그 셀마다 실패다 (`tests/audit_live.py:38-39`). 비교할 셀 코드가 든 실행본(`<stem>.executed.ipynb`)이 없는 기록도
-  stem마다 실패다 (`tests/audit_live.py:27-28`, `tests/audit_live.py:59-60`). 이 규칙은 `tests/test_audit_live.py`가 지킨다. 지금 기록 13개에서 모델을 부른 98개 셀은
+  stem마다 실패다 (`tests/audit_live.py:27-28`, `tests/audit_live.py:59-60`). 이 규칙은 `tests/test_audit_live.py`가 지킨다. 지금 기록 19개에서 모델을 부른 104개 셀은
   모두 `model_calls=` 숫자가 있어 비교됐고, 넘은 셀은 없고, 실행본이 없는 기록도 없다(`uv run --no-sync python Day03_new/tests/audit_live.py`가 `AUDIT OK`). 그중 15개 셀은 실측이 고지와 같다(여유 0).
   수강생 환경에서는 모델이 도구를 몇 번 부르느냐에 따라 넘을 수 있다. 고지와 실측이 다르면 실측을 말한다.
-- 호출 수는 실행마다 다르다. 05의 `hybrid 단순 사례와 복합 사례` 셀(고지 30회)은 지금 기본 실행 기록에서 모델 17회, `.exercises` 기록에서 14회였고, 05를 처음 돌린 시도에서는 22회였다(위 "05의 이력").
+- 호출 수는 실행마다 다르다. 05b의 `hybrid 단순 사례와 복합 사례` 셀(셀 16, 고지 30회)은 지금 기본 실행 기록에서 모델 13회, `.exercises` 기록에서 14회였고, 분할 전 05를 처음 돌린 시도에서는 22회였다(위 "05의 이력").
 - 수강생 자신의 실행 비용은 실행 행의 `model_calls`, `input_tokens`, `usage_missing`(`mas_lab/runner.py:117-119`)과 EXA 결과의 `cost_dollars`로 본다. `cost_report.py`는 `DAY02_USAGE_LOG`가 설정된
   저자 실행의 기록(`rag_lab/settings.py:89`)을 읽는 도구라 수강생 환경에는 기록이 없다.
 ---
 
 ## 7. 수강생이 자주 막히는 곳
 
-실제 실행(`outputs/live/`)에서 관찰된 것과 코드에서 읽은 것을 나눠 적었다. 관찰은 1회 관찰이다. "기본 실행 기록"은 `<노트북>.executed.ipynb`, "`.exercises` 기록"은 `<노트북>.exercises.executed.ipynb`이고, 셀 번호는 실행본 `cells`를 0부터 센 위치다. 기록이 끝난 시각은 6장 "기록이 만들어진 때"에 있다(모두 2026-11-02이고, 02 기본 실행이 21:43, 나머지 12개가 21:56~22:51). `outputs/runs`의 수는 지금 있는 2,008개 행 파일 가운데 실제 모델을 부른 959개(2026-11-02 재실행이 쓴 115개 포함)를 다시 센 값이고, 저자가 다시 돌리면 늘어난다. 근거 노트는 `docs/audit/`에 있다.
+실제 실행(`outputs/live/`)에서 관찰된 것과 코드에서 읽은 것을 나눠 적었다. 관찰은 1회 관찰이다. "기본 실행 기록"은 `<노트북>.executed.ipynb`, "`.exercises` 기록"은 `<노트북>.exercises.executed.ipynb`이고, 셀 번호는 실행본 `cells`를 0부터 센 위치다. 기록이 끝난 시각은 6장 "기록이 만들어진 때"에 있다(모두 2026-11-03이고, 00·01·02·06이 00:05~01:03, 03a~05b가 20:31~21:22). 03, 04, 05의 셀 번호는 a/b로 나눈 뒤의 새 노트북 기준이다. `outputs/runs`의 수는 지금 있는 2,236개 행 파일 가운데 실제 모델(행의 `calls`에 `claude`로 시작하는 모델 이름이 기록된 행)을 부른 1,187개를 다시 센 값이다(2026-11-02 22:51까지는 2,008개 가운데 959개, 그 뒤 2026-11-03의 재실행이 228개를 더했다). 저자가 다시 돌리면 늘어난다. `outputs/runs`에서 센 값은 파일 수정 시각으로 구간을 나눈 것이다. 근거 노트는 `docs/audit/`에 있다.
 
 - **"00의 키 확인 셀에서 멈춰요"**: `ANTHROPIC_API_KEY`나 `EXA_API_KEY`가 미설정이다. 멈춘 줄이 `require_key()`인지 `require_exa_key()`인지가 어느 키인지 알려 준다. `.env`를 직접 채우고 kernel을 재시작하게 한다.
 - **`ModuleNotFoundError: mas_lab`**: kernel의 작업 폴더가 `Day03_new`가 아니거나 루트에서 `uv sync --locked`를 하지 않았다. 00의 첫 코드 셀 출력(`kernel 작업 폴더`, `sys.prefix`)을 보게 한다.
 - **`BudgetExceeded: 턴 실행 시간 한도`가 두 번째 실행에서 나온다**: `Budget.started`는 만들 때 시작한다 (`rag_lab/evidence.py:31`). 한 `Desk`를 `max_seconds`(180초) 넘게 재사용하면 실패한다
   (`remaining`, `rag_lab/evidence.py:36-39`). 유료 셀마다 `make_desk`로 새 `Desk`를 만든다 (`mas_lab/runner.py:39`). 숫자를 올리기 전에 `Budget.events`를 보게 한다 (5장 3번).
-- **같은 질문을 두 번 돌렸는데 호출 수와 토큰이 달라요**: 정상 변동이다. 01의 같은 질문 비교(기본 실행 기록 셀 38, 2절 T-1001과 기준선 `complex-double-pay`)에서 두 행은 모델 4회·22,534 입력 토큰과 4회·22,476으로, 호출 수와 도구 호출(5회)은 같고 토큰만 달랐다.
-  같은 셀의 `.exercises` 기록은 6회·37,524(도구 7회)와 4회·22,454(도구 5회)로 호출 수까지 달랐다.
-  05의 `twins` 셀(기본 실행 기록 셀 40)에서는 Single이 4회·22,852(도구 6회)와 7회·45,802(도구 8회), supervisor가 10회·28,539와 9회·22,507, hybrid가 9회·24,040과 9회·24,750(도구는 둘 다 7회)으로 갈렸다.
-  자동 검사는 supervisor의 앞 실행과 hybrid의 뒤 실행이 `False`(둘 다 `필수 사실`)였다. hybrid는 호출 수와 도구 호출이 같은데도 토큰과 자동 검사가 갈렸다. `.exercises` 기록의 같은 셀은 Single이 4회·22,571(도구 5회, `False`)과 5회·30,163(도구 7회), supervisor가 9회·22,335와 10회·29,774, hybrid가 10회·33,648(`False`)과 9회·24,951이다.
+- **같은 질문을 두 번 돌렸는데 호출 수와 토큰이 달라요**: 정상 변동이다. 01의 같은 질문 비교(기본 실행 기록 셀 38, 2절 T-1001과 기준선 `complex-double-pay`)에서 두 행은 모델 4회·22,488 입력 토큰(도구 5회)과 6회·37,972(도구 7회)로 호출 수, 도구 호출, 토큰이 모두 달랐다.
+  같은 셀의 `.exercises` 기록은 6회·37,020(도구 7회)과 5회·29,551(도구 6회)이다.
+  05b의 `twins` 셀(기본 실행 기록 셀 29. 앞 절 실행은 05b 준비 절에서 05a의 실행을 다시 한 행이다)에서는 Single이 5회·30,171(도구 7회)과 4회·22,448(도구 5회), supervisor가 9회·22,546(도구 9회)과 10회·30,141(도구 11회), hybrid가 9회·24,789(도구 7회)와 11회·40,954(도구 9회)로 갈렸고 여섯 행 모두 자동 검사 `True`였다.
+  `.exercises` 기록의 같은 셀은 Single이 5회·29,530(도구 6회)과 4회·22,872(도구 6회), supervisor가 10회·27,048(도구 10회)과 10회·26,532(도구 10회), hybrid가 10회·33,734(도구 9회)와 11회·40,735(도구 9회, 자동 검사 `False`, 아래 날짜 표기 항목)이다. supervisor는 호출 수와 도구 호출이 같은데도 토큰이 갈렸고, hybrid는 도구 호출이 같은데 호출 수와 토큰, 자동 검사가 갈렸다.
   구조 비교에서 이 폭보다 작은 차이에 이유를 붙이지 않는다.
 - **자동 검사가 실패인데 답은 맞아 보여요**: `evaluate_row`는 문자열 포함 검사다 (`mas_lab/evaluation.py:20`). 공백과 쉼표를 지우고 비교하지만 (`mas_lab/evaluation.py:15`) `complex-double-pay`의 날짜 묶음은
-  `9월20일`, `다음달20일`만 인정해서 (`data/gold.jsonl` 3행) 답이 `2026-09-20`이나 `9/20`으로 쓰면 `필수 사실` 칸이 실패한다. 현재 기록에서 이 모양이 나온 곳: 01 기본 실행 기록 셀 37의
-  `complex-double-pay` 행(`누락 사실 [9월20일]`, 답은 `개별 약정에 따라 신청 기한은 2026-09-20까지입니다`), 03 기본 실행 기록 셀 54의 T-1001 행(답이 `개별 약정 A-01에 따라 신청 기한은 2026-09-20까지입니다`), 04 기본 실행 기록 셀 16의 `사실+근거+불확실성` 행(`누락 사실`이 `9월20일`인데 `답에 20일 기한`은 True,
-  셀 15의 그 행 답은 `신청 기한이 2026-09-20까지입니다`), 04 `.exercises` 기록 셀 16의 `사실+근거+불확실성` 행과 `원문 포함` 행(셀 15의 답이 `신청 기한은 2026-09-20까지입니다`와 `신청 기한이 장애 다음 달인 2026-09-20까지입니다`)과 셀 53의 완성형 조립 행(셀 52의 답이 `크레딧 신청 기한은 2026-09-20까지입니다`),
-  05 기본 실행 기록 셀 24의 `single_skills` 행(`outputs/runs`에서 입력 토큰 48,917인 행의 답이 `신청 기한은 2026-09-20이고`)과 셀 38의 `hybrid` `complex-double-pay` 행(입력 토큰 24,750, 답이 `신청 기한은 2026-09-20까지입니다`, 셀 40·42에도 나온다),
-  05 `.exercises` 기록 셀 4의 Single 기준선(답이 `신청 기한은 2026-09-20까지이고`, 같은 행이 셀 10, 14, 24, 40에도 나온다)과 셀 10의 `single+한 줄` 행(답이 `신청 기한은 2026-09-20까지이므로`), 셀 31의 `hybrid` `complex-double-pay` 행(입력 토큰 33,648, 답이 `신청 기한은 2026-09-20까지입니다`), 셀 48 반복 3회(입력 토큰 32,980, 답이 `신청 기한은 2026-09-20까지입니다`).
-  같은 사례가 05 기본 실행 기록의 Single 기준선(셀 4, 답은 셀 10의 `9월 20일까지`)과 05 두 기록의 셀 38 `single` 행(답이 둘 다 `9월 20일까지`), 05 `.exercises` 기록의 `single_skills` 행(셀 24, 답이 `장애 다음 달 20일, 즉 2026-09-20까지`), 01 `.exercises` 기록(셀 37, 답이 `9월 20일까지`), 03 `.exercises` 기록(셀 54, 답이 `장애 다음 달 20일(2026-09-20)까지`), 04 기본 실행 기록의 `원문 포함` 행(셀 16)과
-  완성형 조립 행(셀 53, 셀 52의 답이 `장애 다음 달 20일, 즉 2026-09-20까지`)에서는 통과했으니, 모델이 날짜를 어떻게 쓰느냐에 따라 실행마다 갈린다. 재실행 전 두 기록에서 통과했던 04 셀 53이 이번 `.exercises` 기록에서는 이 모양으로 실패했다(위). 05 기본 실행 기록의 supervisor 행(셀 14)과 05 `.exercises` 기록의 `persona` 행(셀 17)도 `누락 사실 [9월20일]`이지만 답 본문이 실행본에 잘려 있어 표기는 확인하지 못했다.
-  **이 실패는 의도된 것이다.** 01(셀 40), 04(셀 19, 54), 05(셀 7, 34)가 "표기만 다른 답이 `필수 사실`로 실패하는 경우"를 직접 읽게 하고, 05의 `CORRECT_BUT_FAILS`(셀 54)는 `2026-09-20`을 쓴 맞는 답이
-  실패하는 것을 보이는 손으로 쓴 답이라 정답표가 그 표기를 받지 않는다는 데 기댄다. 그래서 정답표에 표기를 더하거나 `evaluate_row`를 풀어 통과시키지 않는다 (5장 1번).
+  `9월20일`, `다음달20일`만 인정해서 (`data/gold.jsonl` 3행) 답이 `2026-09-20`이나 `9/20`으로 쓰면 `필수 사실` 칸이 실패한다. 현재 기록(2026-11-03)에서 이 모양이 나온 곳: 03b `.exercises` 기록 셀 29의 Orchestrator-Worker 실제 Worker 행(`누락 사실 [9월20일]`, 답이 `알파의 추가 약정 A-01에 따라 신청 기한은 2026-09-20까지입니다`), 05a `.exercises` 기록 셀 33 반복 1(입력 토큰 33,966, `outputs/runs`에서 읽은 답이 `개별 추가 약정 A-01에 따라 신청 기한은 2026-09-20까지입니다`), 05b `.exercises` 기록 셀 27 전체 행 표와 셀 29 `twins`의 비교표 실행 hybrid 행(입력 토큰 40,735, `outputs/runs`에서 읽은 답이 `알파는 추가 약정 A-01에 따라 신청 기한이 2026-09-20까지입니다`, 셀 31 평균 표 아래 실패 행 목록과 셀 32 사람 판정 칸에도 나온다).
+  05a 기본 실행 기록 셀 18의 supervisor 행(입력 토큰 21,795, `필수 사실` `[9월20일]`, 셀 21·29의 표에도 나온다)도 같은 `누락 사실`이지만 답 본문이 실행본의 메시지 표에 잘려 있어 표기는 확인하지 못했다.
+  같은 사례가 01 기본 실행·`.exercises` 기록(셀 37, 답이 `9월 20일까지`), 03b 기본 실행 기록 셀 29(`장애 발생 다음 달 20일까지`), 04a 기본 실행 기록 셀 16·17의 `사실+근거+불확실성` 행과 `원문 포함` 행(답이 `장애 다음 달 20일(2026-09-20)까지`)과 `.exercises` 기록(`장애 발생 다음 달 20일, 즉 2026-09-20까지`), 04b `.exercises` 기록 셀 34·35의 완성형 조립 행(`다음 달 20일, 즉 2026-09-20로 보입니다`), 05a 기본 실행 기록 셀 14의 고치기 전 답(`9월 20일까지`)과 `.exercises` 기록 셀 14의 고치기 전 답(`다음 달 20일, 즉 2026-09-20까지`), 05a `.exercises` 기록 셀 18의 supervisor 행(자동 검사 `True`), 같은 05a `.exercises` 기록 셀 33의 반복 2·3(입력 토큰 32,728와 33,154, `outputs/runs`에서 읽은 답이 `장애 발생 다음 달 20일, 즉 2026-09-20로 보입니다`와 `다음 달 20일(2026-09-20)입니다`)에서는 통과했으니, 모델이 날짜를 어떻게 쓰느냐에 따라 실행마다 갈린다. 05a `.exercises` 셀 33은 같은 구조, 같은 사례를 세 번 돌렸을 때 첫 번째만 이 모양으로 실패한 예다. 04b 기본 실행 기록 셀 34·35의 완성형 조립 행은 답이 `다음 달 20일인 2026-09-20`인데도 `False`지만 `누락 사실`은 비었고 `실패 칸`이 `인용 문서`라서 이 모양이 아니다.
+  **이 실패는 의도된 것이다.** 01(셀 40), 04a(셀 20), 04b(셀 36), 05a(셀 11), 05b(셀 19)가 "표기만 다른 답이 `필수 사실`로 실패하는 경우"를 직접 읽게 하고, 05b의 `CORRECT_BUT_FAILS`(셀 40)는 `2026-09-20`을 쓴 맞는 답이
+  실패하는 것을 보이는 손으로 쓴 답이라 정답표가 그 표기를 받지 않는다는 데 기댄다(두 기록 모두 셀 40의 첫 행이 `False`, `누락 사실 [9월20일]`). 그래서 정답표에 표기를 더하거나 `evaluate_row`를 풀어 통과시키지 않는다 (5장 1번).
   답이 틀렸다는 뜻이 아니라 검사의 한계이므로 원문(`data/business/sla-a-amendment.md`)과 사람이 대조하게 한다.
-- **`hybrid`가 `complex-ops-log`에서 `insufficient`로 끝나기도 해요**: 저장된 `insufficient` 6건은 모두 `checked_worker`가 생기기 전 행이다. 원인 하나는 고쳤고, 다른 하나는 증상이 가려졌을 뿐 일부 원인을 아직 모른다. `outputs/runs`에서 이 조합의 실제 행은 47건이다(`answered` 40, `insufficient` 6, `budget_exceeded` 1).
+- **`hybrid`가 `complex-ops-log`에서 `insufficient`로 끝나기도 해요**: 저장된 `insufficient` 6건은 모두 `checked_worker`가 생기기 전 행이다. 원인 하나는 고쳤고, 다른 하나는 증상이 가려졌을 뿐 일부 원인을 아직 모른다. `outputs/runs`에서 이 조합의 실제 행은 53건이다(`answered` 46, `insufficient` 6, `budget_exceeded` 1). 2026-11-02 22:51까지의 47건(`answered` 40)에 2026-11-03에 쓴 `answered` 6건이 더해졌다.
   - **고친 것: Router의 `out_of_scope`.** Router가 `out_of_scope`를 고른 7건(행 `events`의 `router` `decision` 사건)은 모두 수정 전 행이다(파일 수정 시각 00:27~02:22). `Route.path`가 이 값을 허용했고 (`mas_lab/contracts.py:58`)
     Router 프롬프트는 fast와 slow, 결제·규정·장애 세 조사만 설명할 뿐 이 값은 설명하지 않았는데 (`mas_lab/hybrid.py:61-63`), 운영 문서(runbook, security) 질문이 그 범주 밖으로 읽혀 골라진 것으로 추정한다.
     `out_of_scope`를 고른 7건은 모두 `roles`가 비었고, `roles`가 비면 `dispatch`가 세 Worker를 모두 불러서 (`mas_lab/hybrid.py:84`) 모델 호출이 8~10회였다. 수정: Router에게는 `path`가 fast/slow뿐인
-    `HybridRoute`를 보이고 (`mas_lab/hybrid.py:28-29`, `mas_lab/hybrid.py:60`), 범위 밖 판단은 코드가 한다(`scope_check`, `mas_lab/hybrid.py:50`). 그 뒤 40건(11-01 02:51~11-02 22:36)은 Router가 slow 35건, fast 5건이고 `out_of_scope`는 없으며
-    slow 35건은 모델 6~10회, fast 5건은 3회였다. `test_hybrid_router_offers_only_the_paths_the_graph_routes`(`tests/test_structures.py:93`)가 Router에게 보이는 값이 fast/slow뿐임을, `test_hybrid_router_answer_outside_fast_and_slow_is_an_error_not_a_route`(`tests/test_structures.py:100`)가 그 밖의 값이 오류임을 지킨다. 프롬프트 문구는 고치지 않았고,
-    slow 35건 모두 `roles`가 `outage`와 `policy`라 이 질문에도 가용률 조회 Worker가 하나 더 돈다. `build_handoff`의 triage는 여전히 `Route`를 쓴다 (`mas_lab/structures.py:95`).
+    `HybridRoute`를 보이고 (`mas_lab/hybrid.py:28-29`, `mas_lab/hybrid.py:60`), 범위 밖 판단은 코드가 한다(`scope_check`, `mas_lab/hybrid.py:50`). 그 뒤 46건(11-01 02:51~11-03 21:20)은 Router가 slow 40건, fast 6건이고 `out_of_scope`는 없으며
+    slow 40건은 모델 6~10회, fast 6건은 3회였다. `test_hybrid_router_offers_only_the_paths_the_graph_routes`(`tests/test_structures.py:93`)가 Router에게 보이는 값이 fast/slow뿐임을, `test_hybrid_router_answer_outside_fast_and_slow_is_an_error_not_a_route`(`tests/test_structures.py:100`)가 그 밖의 값이 오류임을 지킨다. 프롬프트 문구는 고치지 않았고,
+    slow 40건 모두 `roles`가 `outage`와 `policy`라 이 질문에도 가용률 조회 Worker가 하나 더 돈다. `build_handoff`의 triage는 여전히 `Route`를 쓴다 (`mas_lab/structures.py:95`).
   - **`insufficient` 6건의 길.** `out_of_scope` 7건 중 3건과 Router가 slow를 고른 3건(02:51~03:59)이다. 6건 모두 같은 길을 탔다. writer가 처음에 `answered`로 썼고, `validate_final`(`mas_lab/contracts.py:88`)이 `근거 없이 answered입니다.`를 내서 한 번 다시 쓰고 `insufficient`가 됐다(행 `events`의 `validate` 사건 둘).
-    그 검사는 `answered`인데 `evidence_refs`가 빌 때 걸린다 (`mas_lab/contracts.py:96-97`). 6건 모두 `evidence_refs`가 0개였고 답 본문이 근거 번호(fact_ref, evidence_id)를 받지 못했다고 말한다. `answered` 40건은 모두 `evidence_refs`가 있었다(가장 적은 행이 2개). 즉 직접 원인은 **Worker 결과가 근거 참조 없이 writer에게 넘어온 것**이었다.
+    그 검사는 `answered`인데 `evidence_refs`가 빌 때 걸린다 (`mas_lab/contracts.py:96-97`). 6건 모두 `evidence_refs`가 0개였고 답 본문이 근거 번호(fact_ref, evidence_id)를 받지 못했다고 말한다. `answered` 46건은 모두 `evidence_refs`가 있었다(가장 적은 행이 2개). 즉 직접 원인은 **Worker 결과가 근거 참조 없이 writer에게 넘어온 것**이었다.
   - **지금 코드가 하는 일.** `checked_worker`(`mas_lab/workers.py:151`)가 `hybrid`의 Worker 결과를 받아 라벨이 붙은 참조에서 등록된 번호를 되살리고, 참조가 비었는데 `facts`가 있으면 이 Worker 자신의 도구 결과로 채운다(사건의 뜻은 아래 `worker_checked` 항목). 예전에는 `mas_lab/` 안에서 `validate_result`를 부르는 곳이 없었지만 지금은 `checked_worker`가 부른다 (`mas_lab/workers.py:169`). 다만 `validate_result`는 `complete`인데 근거가 없을 때만 문제로 보고 (`mas_lab/contracts.py:81`), 아래 원본 결과 14개는 모두 `uncertain`이라 `problems`가 비었다.
-    이 코드가 들어간 뒤의 27건(11-01 17:49~11-02 22:36)은 `answered` 26, `budget_exceeded` 1이고 `insufficient`는 0이다. **이 27건은 원인이 없어졌다는 증거가 아니다.** 채움이 증상을 가렸을 수 있다.
+    이 코드가 들어간 뒤의 33건(11-01 17:49~11-03 21:20)은 `answered` 32, `budget_exceeded` 1이고 `insufficient`는 0이다. **이 27건은 원인이 없어졌다는 증거가 아니다.** 채움이 증상을 가렸을 수 있다.
   - **Worker가 실제로 돌려준 것.** 수정 뒤 두 번째 아홉 행(`docs/audit/ops-log-2-notes.md`, 원본 `docs/audit/ops_log2_raw.jsonl`)의 Worker 원본 결과 14개 가운데 8개가 `evidence_refs`가 비었다. 7개는 outage Worker다. 이 사례의 고객(`entity`)이 `공통`이고 (`data/cases.jsonl:4`) `load_outage`에 그 고객의 자료가 없어 (`mas_lab/desk.py:91`) `lookup_availability`가 `not_found`를 돌려주고, 그 결과에는 `fact_ref`가 없어 (`mas_lab/desk.py:93`) 채울 번호도 없다. 이 부분은 원인을 안다.
     나머지 1개는 정책(policy) Worker다. `facts` 10개와 자기 도구 결과의 번호 17개가 있었는데도 참조를 비웠고 (6번 행), 왜 비웠는지는 확인되지 않았다. 라벨이 붙은 참조를 낸 결과는 2개(4번, 7번 행, 모두 policy)이고 번호 24개가 되살아났다. 그래서 정책 Worker가 참조를 비우는 원인은 여전히 모른다고 말한다. 아홉 행은 비율을 말하지 못한다.
-    더 보려면 `TASK_CONTRACT`(`mas_lab/workers.py:36`), `_run_with_messages`(`mas_lab/workers.py:118`), `after_join`(`mas_lab/hybrid.py:95`)을 읽고 행의 `events`, `evidence_refs`, `answer`를 본다. 05 기본 실행 기록의 비교표(셀 38)에서 hybrid `complex-ops-log`는 6회, `answered`, 자동 검사 `True`였고
-    `.exercises` 기록의 같은 표(셀 38)에서는 6회, `answered`, `True`였다(셀 41 전체 비교의 같은 사례 행은 fast 3회, `answered`, 통과). 05 셀 44가 `insufficient`이면서 `인용 문서`가 어긋나는 모양을 짚는데, 이번 두 기록의 이 사례 행에는 그 모양이 없다.
+    더 보려면 `TASK_CONTRACT`(`mas_lab/workers.py:36`), `_run_with_messages`(`mas_lab/workers.py:118`), `after_join`(`mas_lab/hybrid.py:95`)을 읽고 행의 `events`, `evidence_refs`, `answer`를 본다. 05b 기본 실행 기록의 비교표(셀 27)에서 hybrid `complex-ops-log`는 6회, `answered`, 자동 검사 `False`(`실패 칸` `인용 문서`)였고
+    `.exercises` 기록의 같은 표(셀 27)에서도 6회, `answered`, `False`(`인용 문서`)였다(셀 30 전체 비교의 같은 사례 hybrid 행은 `outputs/runs`에서 읽으면 7회, slow, `answered`, `False`(`인용 문서`), 인용 문서는 `runbook` 하나). 05b 셀 33이 `insufficient`이면서 `인용 문서`가 어긋나는 모양을 짚는데, 이번 두 기록의 이 사례 행은 모두 `answered`라 그 모양이 없다.
 - **`complex-ops-log`의 `hybrid` 행이 `인용 문서` 칸에서 실패해요**: 답은 맞는데 인용한 문서가 어긋나는 모양이다. 같은 사례를 아홉 번씩 두 번 돌린 기록(`docs/audit/ops-log-notes.md`, `docs/audit/ops-log-2-notes.md`)이 있다.
   - 첫 아홉 행은 4행이 실패했고, 그중 1행(2번)은 `budget_exceeded`라 답이 없으니 답이 있는 행으로는 3행(5, 6, 7번)이다. 두 번째 아홉 행은 1행(6번)이 실패했고 이 행이 그 묶음에서 채움(`filled`)이 있는 유일한 행이다. 그 행에서 writer의 최종 참조 6개는 채운 17개의 앞 6개였다.
   - 18행을 합치면 채움이 있는 5행 중 4행이 실패했고, 채움이 없고 답이 있는 12행은 0행이 실패했다. 첫 아홉의 채움 4행 중 둘(7, 8번)은 라벨 붙은 참조가 버려진 뒤의 채움이고, 지금 코드는 그 참조를 되살린다.
   - 18행, 하루의 상관관계다. writer의 참조가 왜 채운 순서를 따르는지는 시험하지 않았다. 검색은 18행 모두 같은 문서 여섯 개를 돌려줬으니 검색으로는 실패 행과 통과 행이 갈리지 않는다.
+  - **2026-11-03 이후의 행.** `outputs/runs`에서 이 조합의 2026-11-02 22:51 이후 행 6개를 `evaluate_row`로 다시 쟀다. 채움이 있는 3행 가운데 2행(05b 기본 실행·`.exercises` 기록의 셀 26 전체 행 표, `filled` 17, 인용 문서 `billing-policy`, `travel`)이 `인용 문서`로 실패했고 1행(`filled` 9, 인용 문서 `runbook`, `security`, 두 기록 밖의 실행)은 통과했다. 채움이 없는 3행 가운데 1행(05b `.exercises` 기록의 셀 30 전체 비교, 인용 문서 `runbook` 하나)이 `인용 문서`로 실패했다. 그래서 위 18행에서 본 "채움이 있으면 실패"는 이 6행으로 확인되지 않고, 채움이 없어도 실패하는 행이 있었다. 6행은 비율을 말하지 못한다.
   - **고치지 않은 판단.** 이 실패는 코드를 고치지 않고 문서화된 관찰로 둔다. 처음에는 작업을 맡은 AI가 그렇게 판단해 저자에게 알렸고, 저자는 2026-11-02에 `rag_lab` 동기화가 유료 재실행을 필요로 하지 않게 되자 이를 확인했다. 코드를 바꾸면 유료 재실행이 또 필요하고 원인을 시험하지 않았기 때문이다 (`docs/DESIGN.md` 9.2절). 실패는 자동 검사와 실행 행에 그대로 보인다.
   - **수강생에게.** 행 `events`의 `worker_checked`에서 `filled`를 먼저 읽고 `cited_docs`와 대조하게 한다. 예산을 올리거나 `data/gold.jsonl`을 고쳐서 칸을 통과시키지 않는다 (5장 1번, 3번).
-- **행의 `worker_checked` 사건은 무엇을 말하나요**: `hybrid`의 Worker마다 `checked_worker`가 하나 남긴다 (`mas_lab/workers.py:169`). 이 칸들은 19:39 수정 뒤 행에만 다 있다(그 앞 행에는 `recovered`가 없다). 실제 행 42개의 사건 111개에서 읽은 값이다(재실행 전 행 25개·사건 64개, 2026-11-02 재실행 행 17개·사건 47개).
-  - `dropped`: 등록된 번호가 하나도 없어 뺀 참조 문자열 목록이다 (`mas_lab/workers.py:162`). 뺀 것은 `uncertainty`에도 적는다. 실제 값은 모두 outage Worker의 `INC-311`이고 5건이다. 재실행 전 행에 1건, 재실행한 05 `.exercises` 기록에 4건(셀 41 전체 비교의 `insufficient-no-policy` 행 하나와 셀 48 반복 세 행)이다.
-  - `recovered`: 라벨이 붙은 참조에서 등록된 번호를 찾아 살린 수다. Worker가 번호 그대로 쓴 것은 세지 않는다 (`mas_lab/workers.py:163`). 실제 값은 9, 10, 12(세 번)이고 모두 재실행 전 행이다(9는 그때의 04 기본 실행 기록, 10은 그때의 05 `.exercises` 기록, 12는 그때의 05 기본 실행 기록과 두 번째 아홉 행의 4번·7번). 두 번째 아홉 행의 두 값을 합한 것이 위의 24개다. 모두 policy Worker다. 2026-11-02 재실행 행 17개에서는 모두 0이었다.
-  - `filled`: 참조가 하나도 남지 않았고 `facts`가 있을 때 이 Worker의 도구 결과에서 채운 수다 (`mas_lab/workers.py:166`). 실제 값은 17(두 번째 아홉 행의 6번)과 재실행 행의 14, 16, 14다(05 기본 실행 기록 셀 31의 `complex-double-pay`, 셀 32의 Fast 강제 `insufficient-unknown-payment`, 05 `.exercises` 기록 셀 41의 `insufficient-no-policy`). 모두 policy Worker다. 수정 앞 행의 값은 15, 16, 17, 18이다.
+- **행의 `worker_checked` 사건은 무엇을 말하나요**: `hybrid`의 Worker마다 `checked_worker`가 하나 남긴다 (`mas_lab/workers.py:169`). 이 칸들은 19:39 수정 뒤 행에만 다 있다(그 앞 행에는 `recovered`가 없다). 실제 행 77개의 사건 208개에서 읽은 값이다(2026-11-02 22:51까지의 행 42개·사건 111개에 2026-11-03의 행 35개·사건 97개가 더해졌다. 앞의 42개는 재실행 전 행 25개·사건 64개와 2026-11-02 재실행 행 17개·사건 47개다).
+  - `dropped`: 등록된 번호가 하나도 없어 뺀 참조 문자열 목록이다 (`mas_lab/workers.py:162`). 뺀 것은 `uncertainty`에도 적는다. 실제 값은 모두 outage Worker의 `INC-311`이고 13건이다. 2026-11-02 22:51까지의 행에 5건(재실행 전 행 1건, 분할 전 05 `.exercises` 기록 4건)이고, 2026-11-03의 행에 8건이다. 그중 05 이후 기록에서 읽은 5건은 04b `.exercises` 기록 셀 34의 완성형 조립 행, 05a `.exercises` 기록 셀 33 반복 중 하나, 05b 기본 실행 기록 셀 26의 `complex-double-pay` hybrid 행, 05b `.exercises` 기록 셀 30 전체 비교의 `complex-double-pay`와 `insufficient-no-policy` 행이고, 나머지 3건은 두 기록 밖의 실행(11-03 00:28~00:49)이다.
+  - `recovered`: 라벨이 붙은 참조에서 등록된 번호를 찾아 살린 수다. Worker가 번호 그대로 쓴 것은 세지 않는다 (`mas_lab/workers.py:163`). 실제 값은 9, 9, 10, 11, 12(세 번)이다. 앞의 9, 10, 12(세 번)은 재실행 전 행이다(9는 그때의 04 기본 실행 기록, 10은 그때의 05 `.exercises` 기록, 12는 그때의 05 기본 실행 기록과 두 번째 아홉 행의 4번·7번). 두 번째 아홉 행의 두 값을 합한 것이 위의 24개다. 모두 policy Worker다. 2026-11-02 재실행 행 17개에서는 모두 0이었다. 2026-11-03의 행에서는 11(04b 기본 실행 기록 셀 34의 완성형 조립 행)과 9(두 기록 밖의 실행, 11-03 00:24)가 나왔다.
+  - `filled`: 참조가 하나도 남지 않았고 `facts`가 있을 때 이 Worker의 도구 결과에서 채운 수다 (`mas_lab/workers.py:166`). 실제 값은 17(두 번째 아홉 행의 6번)과 2026-11-02 재실행 행의 14, 16, 14(분할 전 05 기본 실행 기록의 `complex-double-pay`와 Fast 강제 `insufficient-unknown-payment`, 05 `.exercises` 기록의 `insufficient-no-policy`), 2026-11-03의 17, 17(05b 기본 실행·`.exercises` 기록의 셀 26 전체 행 표, `complex-ops-log`)과 9(두 기록 밖의 실행, 11-03 00:48)다. 모두 policy Worker다. 수정 앞 행의 값은 15, 16, 17, 18이다.
   - `filled`는 `facts`에 적힌 번호를 먼저 쓰고 없으면 전부 쓴다 (`mas_lab/workers.py:166`). 재실행 전 행에서는 앞 가지를 탄 적이 없다. 그때의 유일한 채움에서 `facts`에 번호가 하나도 없어 전부(17개)를 썼다. 재실행 행의 채움 세 건은 행에 Worker의 `facts`와 도구 결과가 남지 않아 어느 가지였는지 확인하지 못했다. 앞 가지는 `test_checked_worker_fill_prefers_ids_named_in_facts`로만 지켜진다.
   - 알려진 틈: `E-x, INC-311`처럼 한 문자열에 등록된 번호와 등록되지 않은 말이 함께 있으면 등록된 번호(`E-x`)만 남고, 떨어져 나간 `INC-311`은 `dropped`에도 `uncertainty`에도 적히지 않는다 (`mas_lab/workers.py:160-162`). 등록된 번호가 하나도 없을 때만 그 문자열이 `dropped`에 들어간다. `docs/audit/worker-refs-precision-notes.md`에 결정으로 적혀 있다.
 - **`hybrid`가 유효 결제 P-7001을 재무 심사로 넘기겠다고 해요**: 고쳤다. 다만 코드가 덮는 범위는 정해져 있고 나머지는 모델이 맞히는 데 기댄다. 처음에 저자가 새 질문 감사에서
@@ -390,45 +403,45 @@ EXA는 별도다. 기본 실행에서 00이 1회, 06이 21회(1+2+6+6+6) 부른�
     모델이 제안 없이 레이블을 틀리게 내는 빈도는 모른다.
     앞 turn의 환불 제안은 게이트를 지나지 않는다. `_note_ungated_proposal`이 `earlier_turn_proposal_ungated` 사건만 남기고 (`mas_lab/runner.py:105-108`) 원장에는 쓰지 않는다. 이 사건은 저장된 실제 행에 0건이고 단위 시험(`test_handoff_records_the_refund_proposal_of_an_earlier_turn_that_no_gate_saw`, `tests/test_structures.py:921`)으로만 확인했다.
     두 turn에서 서로 다른 번호로 `gate_skipped`가 두 번 남는 길도 실제 행에서는 보지 못했다. 세 번째 판정의 N4와 N4b가 turn 2에서 `budget_exceeded`로 끝났다. `run_case`는 Desk와 예산을 행마다 하나만 만들어 (`make_desk`, `mas_lab/runner.py:61`) 두 turn이 검색 한도 6회를 나눠 쓰기 때문이다 (`FIXED_BUDGET`, `mas_lab/runner.py:24`). 게이트 결함이 아니고, `FIXED_BUDGET`을 올려서 보지 않았다.
-    제안 경로의 행에는 같은 `gate` 사건이 둘 남는다(세 번째 판정의 N2, R4, 05 셀 32의 `complex-double-pay`). `approve` 노드의 `gate_answer`가 사건을 남긴 뒤 `interrupt`가 올라가 그 결과가 버려지고 (`mas_lab/hybrid.py:152-153`), `run_case`가 게이트 전 답으로 `gate_answer`를 다시 부르기 때문이다 (`mas_lab/runner.py:93`). 원장에는 쓰지 않는다.
+    제안 경로의 행에는 같은 `gate` 사건이 둘 남는다(세 번째 판정의 N2, R4, 05b 셀 17의 `complex-double-pay`, 두 기록 모두 사건 순서가 `decision, final_answer, validate, gate, gate`다). `approve` 노드의 `gate_answer`가 사건을 남긴 뒤 `interrupt`가 올라가 그 결과가 버려지고 (`mas_lab/hybrid.py:152-153`), `run_case`가 게이트 전 답으로 `gate_answer`를 다시 부르기 때문이다 (`mas_lab/runner.py:93`). 원장에는 쓰지 않는다.
   - **새 질문 감사에서 관찰한 것.** 첫 판정은 이 항목 처음의 관찰이다(질문 3개 중 P-7001이 틀려 미충족). 두 번째 판정은 고친 직후의 감사다. `hybrid`에 질문 6종을 8행(P-7001 질문 3회 포함) 돌렸고 모델 호출 63회(한도 80회), 모든 행의 상태는 `ok`, 원장은 0건이었다. 그럴듯하게 틀린 행은 8행 중 0행, 미리 적은 기대와 같은 행은 7행이고, P-9001·P-7001을 함께 말한 행은 레이블만 다른 편차로 셌다. 그때 판정은 "게이트가 일했다고 말할 수 있는 것은 P-7001 3행뿐"이었다. 그 행 파일은 지금 `outputs/runs`에 없고 `docs/DESIGN.md` 10.4절에 기록이 있다.
     세 번째 판정(`docs/audit/new-question-3-notes.md`)은 철자 수정 전의 게이트(`mas_lab/gate.py`)로 앞의 8행 질문과 새 경계 질문을 돌린 14행(13행 + N4 재관찰 N4b, 질문 12종)이다. 모델 호출 127회(한도 150회), `ok` 12행, `budget_exceeded` 2행(N4, N4b), 원장 0건이다. 표본이 이만큼이라 비율은 말하지 않는다. 그럴듯하게 틀린 행은 N5 1행이고, 미리 적은 기대와 같은 행은 11행이다(N4, N4b, N5가 아니다). 정확한 레이블만 인정하면 10행이다.
     누가 일했는지는 게이트 앞 답을 기록해 직접 읽었다. 틀린 답을 참인 문장으로 바꾼 행이 3(R1~R3, P-7001 질문, 게이트 앞은 모두 `human_review`), 참인 답을 더 짧은 참인 문장으로 바꾼 행이 1(R6), 참인 답에 문장을 덧붙인 행이 1(N1), `uncertainty` 줄만 더한 행이 제안 경로 2(N2, R4)와 검사하지 못했다는 표시 2(R5, N5), `gate_skipped` 사건만 남긴 행이 3(N3, N4, N4b), 사건이 없는 행이 2(R7, R8)다. 두 번째 판정 때 모델 `uncertainty`가 뒤집힌 재무 심사 경로를 그대로 설명하던 흔적은 `gate_text_replaced` 4행에서 사라졌다.
-    05 켠 실행의 전체 비교(`RUN_OPTIONAL`, 지금 `.exercises` 기록)에서 `policy-deny-normal`과 `policy-human-old`는 5개 구조 10행이고, 10행 모두 탐침을 지났고 환불 제안 경로를 탄 행은 없다. 모두 모델의 레이블과 판정이 같아(`denied` 5, `human_review` 5) 문장 교체 0건, `gate_skipped` 0건, 원장 0건이고 10행 모두 코드 이유가 덧붙었다(`gate_text_appended`). `action`이 `none`인 제안을 단 행이 2다(`single_skills`의 `policy-human-old`, supervisor의 `policy-deny-normal`). 기본 실행 기록 01~05의 행에는 탐침을 지난 행이 없다.
+    05b 켠 실행의 전체 비교(`RUN_OPTIONAL`, 05b `.exercises` 기록 셀 30)에서 `policy-deny-normal`과 `policy-human-old`는 5개 구조 10행이고(`outputs/runs`에서 읽었다), 그중 9행이 탐침을 지났고 환불 제안 경로를 탄 행은 없다. 9행 모두 모델의 레이블과 판정이 같아(`denied` 4, `human_review` 5) 문장 교체 0건, `gate_skipped` 0건, 원장 0건이고 9행 모두 코드 이유가 덧붙었다(`gate_text_appended`). 나머지 1행(`single`의 `policy-deny-normal`)은 모델 호출 24회에서 `budget_exceeded`로 끝나 게이트에 닿지 않았다. `action`이 `none`인 제안을 단 행이 1이다(`single_skills`의 `policy-deny-normal`). 기본 실행 기록 01~06의 행에는 탐침을 지난 행이 없다(다른 탐침 행 10개는 두 기록 밖의 11-03 00:39~00:49 실행이다).
   - **수강생에게.** `denied`나 `human_review` 행은 `events`의 `gate` 사건에 `probe: True`가 있는지 먼저 보게 한다. 있으면 코드가 질문의 결제를 검사한 행이고, `gate_skipped`가 있으면 코드가 검사하지 못한 행이며, `gate_text_replaced`가 있으면 고객 문장을 코드가 바꾼 행이다.
-    "게이트가 막은 것"과 "게이트가 보지 않은 것"을 나눠 읽게 한다. 노트북 02(셀 5, 35), 03(셀 54), 05(셀 33)는 `gate_answer`를 `question=` 없이 부르고, 이 셀들은 기본 실행 기록과 `.exercises` 기록 모두에서 돌았다. 05 셀 8은 `question=`을 넘긴다. 제안 없는 `denied`·`human_review`가 이 셀들을 지나면
-    같은 "검사하지 못했습니다" 줄이 붙는다 (`test_gate_answer_without_a_question_reports_unchecked`, `tests/test_structures.py:422`). 현재 실행본 13개의 출력에는 이 줄이 한 번도 나오지 않았고, `outputs/runs` 실제 행의 `uncertainty`에도 없다. 감사 기록은 `docs/DESIGN.md` 10.4절 10번에 있다.
+    "게이트가 막은 것"과 "게이트가 보지 않은 것"을 나눠 읽게 한다. 노트북 02(셀 5, 39), 03b(셀 29), 05b(셀 18)는 `gate_answer`를 `question=` 없이 부르고, 이 셀들은 기본 실행 기록과 `.exercises` 기록 모두에서 돌았다. 05a 셀 12와 05b 셀 4(`run_custom`)는 `question=`을 넘긴다. 제안 없는 `denied`·`human_review`가 이 셀들을 지나면
+    같은 "검사하지 못했습니다" 줄이 붙는다 (`test_gate_answer_without_a_question_reports_unchecked`, `tests/test_structures.py:422`). 현재 실행본 19개의 출력에는 이 줄이 한 번도 나오지 않았고, `outputs/runs` 실제 행의 `uncertainty`에도 없다(이 줄이 든 행 21개는 모두 가짜 모델 행 `gate-probe`다). 감사 기록은 `docs/DESIGN.md` 10.4절 10번에 있다.
 - **Fast를 강제했는데 Slow로 안 넘어가요**: `force_path`는 Router의 판단만 덮어쓴다 (`mas_lab/hybrid.py:64`). Slow 전환(`fallback_to_slow`)은 검증 문제가 `reinvestigate`로 분류될 때만 일어난다
   (`mas_lab/hybrid.py:132`). `validate_final`은 인용 소속, 금액 출처, outcome 일관성만 보고 빠진 사실을 검사하지 않는다 (`mas_lab/contracts.py:88`). 그래서 05는 전환 경로가 실제로 나오는 사례를 따로 쓴다.
-  05의 `Fast Path 강제`(셀 32, 기본 실행 기록과 `.exercises` 기록 모두)에서 `complex-double-pay`는 전환 없이 끝났고(`Slow 전환` False, 자동 검사 `False`) `insufficient-unknown-payment`는 전환했다(`Slow 전환` True).
+  05b의 `Fast Path 강제`(셀 17, 기본 실행 기록과 `.exercises` 기록 모두)에서 `complex-double-pay`는 전환 없이 끝났고(`Slow 전환` False, 자동 검사 `False`) `insufficient-unknown-payment`는 전환했다(`Slow 전환` True).
 - **`supervisor` 행의 `max_worker_overlap_seconds`가 0이에요**: 지금 코드에서는 위임이 겹치지 않았다는 뜻이다. `delegation_spans`가 `task` 호출 하나를 `worker` 구간 하나로 남기고 (`mas_lab/workers.py:75`, 붙이는 곳 `mas_lab/structures.py:64`), 행의 칸은 `overlap_seconds`로 잰다 (`mas_lab/runner.py:120`).
   `overlap_seconds`는 구간 둘 이상이 동시에 도는 시간이다 (`mas_lab/trace.py:80-81`). `task`로 묶인 시간만 재므로 Supervisor의 판단과 최종 응답 시간은 들어가지 않고, 겹친 동안 Worker들이 실제로 무엇을 했는지도 말하지 않는다. 병렬 여부는 모델이 정한다 (`build_supervisor`, `mas_lab/structures.py:57`).
-  `outputs/runs`의 실제 `supervisor` 행 163개 중 이 코드 뒤의 57행(11-01 17:46~)은 모두 구간이 있고 40행이 0보다 크다. 0인 17행은 위임이 1번인 행 13개와 차례로 위임한 행 4개다(그중 05 `.exercises` 기록 셀 41의 `insufficient-no-policy` 행은 두 구간 중 하나가 아래의 `general-purpose` 위임이다). 그 앞의 106행은 구간이 없어 모두 0이니 겹침이 없었다는 근거가 되지 못한다. 05 비교표(셀 38)의 `supervisor` 네 행은 기본 실행 기록에서 0, 4.848, 7.643, 0초, `.exercises` 기록에서 0, 6.238, 7.845, 0초다.
+  `outputs/runs`의 실제 `supervisor` 행 201개 중 이 코드 뒤의 95행(11-01 17:46~)은 모두 구간이 있고 67행이 0보다 크다. 0인 28행은 위임이 1번인 행 22개와 차례로 위임한 행 6개다(2026-11-02 22:51까지는 57행 중 40행이 0보다 크고 0인 17행이 1번 13개, 차례로 4개였으며, 그중 분할 전 05 `.exercises` 기록 셀 41의 `insufficient-no-policy` 행은 두 구간 중 하나가 아래의 `general-purpose` 위임이다). 그 앞의 106행은 구간이 없어 모두 0이니 겹침이 없었다는 근거가 되지 못한다. 05b 비교표(셀 27)의 `supervisor` 네 행은 기본 실행 기록에서 0, 5.982, 6.082, 5.838초, `.exercises` 기록에서 0, 5.926, 6.500, 5.729초다.
 - **`max_model_calls`를 낮췄는데 측정 호출이 더 많아요**: 지금 코드에서는 Router와 triage 호출도 예산으로 센다. `structured_call`의 설명은 "Router와 triage의 모델 호출. allowlist_middleware를 거치지 않으므로 예산의 model 호출로 여기서 센다."이고 다음 줄이 `desk.budget.consume("model")`이다 (`mas_lab/structures.py:33-34`). hybrid Router는 `route = structured_call(desk, model, HybridRoute,`로 (`mas_lab/hybrid.py:60`), Handoff triage는 `route = structured_call(desk, model, Route,`로 (`mas_lab/structures.py:95`) 이 함수를 부른다. 나머지 호출은 `allowlist_middleware`의 `bounded_model`이 센다 (`mas_lab/workers.py:53-54`).
-  실제 행의 `budget["model"]`과 `model_calls`(`mas_lab/runner.py:117`)는 세 번째 판정 14행 중 14행, 두 번째 아홉 행 중 9행에서 같았고, `outputs/runs`에서 11-01 10:27 뒤의 실제 행 352개 가운데 349개가 같다. 다른 3행은 모두 2026-11-02에 재실행한 05 `.exercises` 기록의 supervisor 행이고 `budget["model"]`이 1 적다(아래). 그 앞에는 `budget["model"]`이 1 적은 행이 237개 있다(hybrid 184, handoff 52, supervisor 1). 이 항목의 앞 판이 적은 "Router와 triage는 세지 않는다"는 그때의 코드다.
-  두 수는 세는 곳이 달라 지금도 어긋날 수 있다. `ModelMeter`는 콜백으로 모든 모델 호출의 시작을 세고 (`on_chat_model_start`, `mas_lab/trace.py:19`), `Budget`은 위의 두 곳만 센다. `create_deep_agent`가 자동으로 더하는 `general-purpose` 서브에이전트에는 `allowlist_middleware`가 물려지지 않는다(`deepagents/graph.py`의 `gp_middleware`). 지금 코드는 `mas_lab`을 import할 때 anthropic provider 전체에서 이것을 끈다(`mas_lab/__init__.py:7-9`가 `use_designed_subagents_only`를 부른다, `use_designed_subagents_only`의 정의는 `mas_lab/harness.py:25`). `build_supervisor`(`mas_lab/structures.py:56`)를 포함해 노트북이 직접 부르는 `create_deep_agent`에도 적용된다. 켠 상태와 끈 상태의 비교는 02 3절이 모델 없이 보여 주고(`framework_default_subagent:31`, `task_targets:46`), 아래 기록의 행들은 이 설정 전에 돈 것이다. 아래 supervisor 1행(03:19, 모델이 `general-purpose`에 `no-op`을 위임)이 바로 이 모양이다. 지금 코드의 `supervisor` 57행 가운데 3행(05 `.exercises` 기록 셀 41 전체 비교의 `insufficient-unknown-payment`, `insufficient-no-policy`, `approval-refund-now`)이 같은 모양이다. 모델이 `general-purpose`에 `no-op` 둘과 `dummy` 하나를 위임했고, 세 행 모두 `budget["model"]`이 `model_calls`보다 1 적다(7과 8, 5와 6, 10과 11). 라이브러리 안의 다른 호출(요약 미들웨어 등)은 실행으로 확인하지 않았다.
+  실제 행의 `budget["model"]`과 `model_calls`(`mas_lab/runner.py:117`)는 세 번째 판정 14행 중 14행, 두 번째 아홉 행 중 9행에서 같았고, `outputs/runs`에서 11-01 10:27 뒤(10:27:30 이후)의 실제 행 579개 가운데 576개가 같다(2026-11-03의 행 228개는 모두 같다). 다른 3행은 모두 2026-11-02에 재실행한 분할 전 05 `.exercises` 기록의 supervisor 행이고 `budget["model"]`이 1 적다(아래). 그 앞에는 `budget["model"]`이 1 적은 행이 237개 있다(hybrid 184, handoff 52, supervisor 1). 이 항목의 앞 판이 적은 "Router와 triage는 세지 않는다"는 그때의 코드다.
+  두 수는 세는 곳이 달라 지금도 어긋날 수 있다. `ModelMeter`는 콜백으로 모든 모델 호출의 시작을 세고 (`on_chat_model_start`, `mas_lab/trace.py:19`), `Budget`은 위의 두 곳만 센다. `create_deep_agent`가 자동으로 더하는 `general-purpose` 서브에이전트에는 `allowlist_middleware`가 물려지지 않는다(`deepagents/graph.py`의 `gp_middleware`). 지금 코드는 `mas_lab`을 import할 때 anthropic provider 전체에서 이것을 끈다(`mas_lab/__init__.py:7-9`가 `use_designed_subagents_only`를 부른다, `use_designed_subagents_only`의 정의는 `mas_lab/harness.py:25`). `build_supervisor`(`mas_lab/structures.py:56`)를 포함해 노트북이 직접 부르는 `create_deep_agent`에도 적용된다. 켠 상태와 끈 상태의 비교는 02 3절이 모델 없이 보여 주고(`framework_default_subagent:31`, `task_targets:46`), 아래 기록의 행들은 이 설정 전에 돈 것이다. 아래 supervisor 1행(03:19, 모델이 `general-purpose`에 `no-op`을 위임)이 바로 이 모양이다. 지금 코드의 `supervisor` 95행 가운데 3행(2026-11-02 22:31~22:32에 쓴, 분할 전 05 `.exercises` 기록 셀 41 전체 비교의 `insufficient-unknown-payment`, `insufficient-no-policy`, `approval-refund-now`)이 같은 모양이다. 2026-11-03에 쓴 supervisor 행 38개에는 이 모양이 없다. 모델이 `general-purpose`에 `no-op` 둘과 `dummy` 하나를 위임했고, 세 행 모두 `budget["model"]`이 `model_calls`보다 1 적다(7과 8, 5와 6, 10과 11). 라이브러리 안의 다른 호출(요약 미들웨어 등)은 실행으로 확인하지 않았다.
 - **도구를 추가했는데 Agent가 못 써요**: `allowlist_middleware`의 `bounded_model`이 허용 목록 밖의 도구를 숨기고 (`mas_lab/workers.py:53-55`) `bounded_tool`이 호출도 거부한다 (`mas_lab/workers.py:63-65`). `ROLE_TOOLS`(`mas_lab/workers.py:25`)나
   `OWNER_TOOLS`(`mas_lab/structures.py:85`)에 추가한다. 우회하려고 미들웨어를 빼지 않게 이유부터 묻는다.
 - **`InvalidUpdateError`, `GraphRecursionError`**: 03의 `# 실패 재현:` 셀이 일부러 내는 오류다. 전자는 reducer 없이 동시에 같은 키를 쓸 때(`merge_results`가 있는 이유, `mas_lab/contracts.py:103`), 후자는 재귀 한도를 넘을 때다.
-- **승인 뒤 원장이 두 건이에요**: 04의 `interrupt` 앞 부작용 재현(셀 41)에서 승인 대기 시점 1건, 재개 뒤 2건이 나온다. 재개하면 노드가 처음부터 다시 돌기 때문이다 (`mas_lab/hybrid.py:140`).
-  응답 유실 뒤 키 없이 재시도하면 `R-0001`, `R-0002` 두 건, 멱등 키로 재시도하면 한 건이다(셀 47, `refund`, `mas_lab/ledger.py:35`, 게이트의 `idempotency_key`는 `mas_lab/gate.py:37`에서 만든다).
+- **승인 뒤 원장이 두 건이에요**: 04b의 `interrupt` 앞 부작용 재현(셀 22)에서 승인 대기 시점 1건, 재개 뒤 2건이 나온다. 재개하면 노드가 처음부터 다시 돌기 때문이다 (`mas_lab/hybrid.py:140`).
+  응답 유실 뒤 키 없이 재시도하면 `R-0001`, `R-0002` 두 건, 멱등 키로 재시도하면 한 건이다(04b 셀 29, `refund`, `mas_lab/ledger.py:35`, 게이트의 `idempotency_key`는 `mas_lab/gate.py:37`에서 만든다).
 - **Worker가 낸 `evidence_refs`가 통과했는데 근거가 아니에요**: 스키마 통과와 근거 검증은 다른 검사다 (`mas_lab/contracts.py:79`). 등록된 근거만 인정하는 곳은 `validate_result`(`mas_lab/contracts.py:78`)이고, 숫자의 출처는 `validate_final`이 본다.
   `validate_final`은 금액과 비율만 보며 날짜나 문장의 뜻은 보지 않는다 (`validate_final`, `mas_lab/contracts.py:88-92`).
-- **05 평균이 이상해요**: 실패 행을 섞거나 빼면 평균이 달라진다. 05의 평균 표 셋(`평균 0`, `평균 A`, `평균 B`, 셀 42)에서 `남은 사례`, `제외한 행` 칸으로 무엇이 평균에 들어갔는지 확인하게 한다.
-  Single의 평균 호출은 기본 실행 기록에서 4.5회(평균 0), 3.7회(평균 A, 빨리 끝난 실패 행 포함), 4.5회(평균 B, 실패 행 제외), `.exercises` 기록에서 3.5회, 3.0회, 3.5회였다. 두 기록 모두 Single의 평균 B는 `제외한 행`이 1이고 `남은 사례`가 그대로라 평균 0으로 돌아갔다. 기본 실행 기록의 hybrid는 평균 B에서 `제외한 행`이 2이고 `남은 사례`가 `complex-ops-log` 하나라 다른 사례의 평균이 된다(평균 호출 7.5회, 6.0회, 6.0회). `.exercises` 기록에는 `남은 사례`가 바뀐 구조가 없다.
-- **`followup-handoff`의 `outcome`이 실패로 나와요**: 확인이 필요하다. `outputs/runs`에 이 사례의 행은 0건이고(가짜 모델 행 포함), `run_case`로 돌린 기록이 없다. 05의 전체 비교도 이 유형을 넣지 않는다. 같은 `turns`를 돌린 기록은 02의 셀 32, 34뿐이며 행을 남기지 않는다.
-  02 셀 35에서 턴 1은 담당자가 `answered`, 게이트 뒤 `needs_approval`, 턴 2는 담당자도 게이트 뒤도 `answered`였고 원장 0건이다(기본 실행 기록과 `.exercises` 기록 모두). 턴 2가 `needs_approval`로 바뀐 앞 기록의 모양은 지금 두 기록에 없다.
+- **05 평균이 이상해요**: 실패 행을 섞거나 빼면 평균이 달라진다. 05b의 평균 표 셋(`평균 0`, `평균 A`, `평균 B`, 셀 31)에서 `남은 사례`, `제외한 행` 칸으로 무엇이 평균에 들어갔는지 확인하게 한다.
+  Single의 평균 호출은 기본 실행 기록에서 3.0회(평균 0), 2.7회(평균 A, 빨리 끝난 실패 행 포함), 3.0회(평균 B, 실패 행 제외), `.exercises` 기록에서도 3.0회, 2.7회, 3.0회였다. 두 기록 모두 Single의 평균 B는 `제외한 행`이 1이고 `남은 사례`가 그대로라 평균 0으로 돌아갔다. 기본 실행 기록의 hybrid는 평균 B에서 `제외한 행`이 2이고 `남은 사례`가 `complex-double-pay` 하나라 다른 사례의 평균이 된다(평균 호출 8.5회, 6.7회, 11.0회). `.exercises` 기록의 hybrid는 평균 B에서 `제외한 행`이 3이고 남은 행이 0이라 평균 칸이 `NaN`이다(`남은 사례`가 비었다). 두 기록 모두 `남은 사례`가 바뀐 구조가 있다.
+- **`followup-handoff`의 `outcome`이 실패로 나와요**: 확인이 필요하다. `outputs/runs`에 이 사례의 행은 0건이고(가짜 모델 행 포함), `run_case`로 돌린 기록이 없다. 05의 전체 비교도 이 유형을 넣지 않는다. 같은 `turns`를 돌린 기록은 02의 셀 36, 38뿐이며 행을 남기지 않는다.
+  02 셀 39에서 턴 1은 담당자가 `answered`, 게이트 뒤 `needs_approval`, 턴 2는 담당자도 게이트 뒤도 `answered`였고 원장 0건이다(기본 실행 기록과 `.exercises` 기록 모두). 턴 2가 `needs_approval`로 바뀐 앞 기록의 모양은 지금 두 기록에 없다.
   코드: Handoff는 한 턴 안에서만 앞 담당자의 제안을 넘기고 (`proposal`, `mas_lab/structures.py:115`) 새 고객 턴을 여는 triage가 비운다 (`proposal`, `mas_lab/structures.py:100`). 가짜 모델로는 `test_new_customer_turn_is_not_relabelled_by_the_refund_proposed_in_the_earlier_turn`(`tests/test_structures.py:878`)이 이 흐름을 지킨다. 행이 나오면 `proposal`과 `events`의 `gate`, `earlier_turn_proposal_ungated` 사건을 먼저 보게 한다.
-- **06에서 직렬이 병렬의 세 배로 안 나와요**: 합성(synth) 구간은 병렬에서 전체의 절반을 넘고 직렬에서는 세 Worker가 차례로 도는 시간에 더해진다. 1회 관찰에서 병렬 47.2초, 직렬 75.0초였고 (`마지막 Worker 이후 초` 27.7초와 22.9초), 모델 호출은 병렬 9회, 직렬 8회였다.
-  Worker 하나가 모델 2회로 검색 2회를 끝낸 것이 관찰됐다(06 `.exercises` 기록의 `Worker 1개로 소주제 하나 조사` 셀(셀 12). 기본 실행 기록에서는 같은 셀이 3회였고, 세 번째 호출의 검색은 `search_limit`으로 거절됐다). 또 `max_concurrency=1`은 직렬 모드에서 Worker 안의 도구 호출까지 직렬로 만들지만 연쇄 모드에는 이 설정이 없다 (`mas_lab/research.py:131`).
+- **06에서 직렬이 병렬의 세 배로 안 나와요**: 합성(synth) 구간은 병렬에서 전체의 절반을 넘고 직렬에서는 세 Worker가 차례로 도는 시간에 더해진다. 1회 관찰에서(06 기본 실행 기록 셀 20) 병렬 44.8초, 직렬 71.3초였고(`마지막 Worker 이후 초` 25.6초와 20.6초), 모델 호출은 병렬 8회, 직렬 8회였다. `.exercises` 기록은 병렬 40.0초, 직렬 77.4초(20.8초와 24.1초), 모델 호출은 병렬 8회, 직렬 8회였다.
+  Worker 하나가 검색 한도 2회를 다 쓴 뒤 세 번째 검색을 시도해 `search_limit`으로 거절된 것이 관찰됐다(06 기본 실행 기록과 `.exercises` 기록 모두 `Worker 1개로 소주제 하나 조사` 셀(셀 12)에서 모델 3회였다). 또 `max_concurrency=1`은 직렬 모드에서 Worker 안의 도구 호출까지 직렬로 만들지만 연쇄 모드에는 이 설정이 없다 (`mas_lab/research.py:131`).
   직렬과 연쇄의 차이는 입력 외에도 이 점이 다르다.
-- **06에서 품질 차이가 구조 때문인가요**: 세 실행이 본 URL의 겹침(Jaccard)이 기본 실행 기록에서 0.43~0.45(병렬-직렬 0.43, 연쇄와는 둘 다 0.45), `.exercises` 기록에서 0.39~0.52(병렬-직렬 0.52, 직렬-연쇄 0.39, 병렬-연쇄 0.42)였다. 겹침이 낮은 쌍은 다른 자료를 읽은 것이므로 구조 탓이라고 단정하지 않는다 (`mas_lab/research.py:146`).
+- **06에서 품질 차이가 구조 때문인가요**: 세 실행이 본 URL의 겹침(Jaccard)이 기본 실행 기록에서 0.19~0.65(병렬-직렬 0.65, 직렬-연쇄 0.19, 병렬-연쇄 0.27), `.exercises` 기록에서 0.28~0.50(병렬-직렬 0.50, 직렬-연쇄 0.28, 병렬-연쇄 0.33)이었다(06 셀 27의 마지막 표). 겹침이 낮은 쌍은 다른 자료를 읽은 것이므로 구조 탓이라고 단정하지 않는다 (`mas_lab/research.py:146`).
 - **EXA 결과의 `published`가 비어 있어요**: 06 기본 실행 기록 셀 7(EXA 검색 1회)에서 결과 3건 중 1건만 게시일이 있었고 2건이 `None`이었다. 오류가 아니고 06의 출처 표에는 `확인 안 됨`으로 나온다.
   00의 EXA 셀(셀 17)은 `published`를 출력하지 않아 이 칸을 볼 수 없다. 이 항목의 이전 판은 00 쪽에서도 게시일이 비어 있었다고 적었으나 실행본 출력과 맞지 않아 고쳤다 (`published`, `docs/DESIGN.md:889`).
   같은 질의도 호출마다 결과가 달라질 수 있으므로 몇 건이 비는지는 1회 관찰이다.
 - **EXA 질의가 거부돼요**: 고객 이름과 내부 문서 이름(`DEFAULT_BLOCKED`, `mas_lab/exa.py:19`)이나 내부 번호가 든 질의는 호출 전에 `assert_public_query`가 막고 (`mas_lab/exa.py:30`), 메시지는 `내부 정보가 든 질의는 외부로 보내지 않습니다: [...]`이다 (`found`, `mas_lab/exa.py:34`). 번호 패턴 `INTERNAL_PATTERN`(`mas_lab/exa.py:18`)은 `P-7001`, `p-7001`, `P7001`, `p7001`과 `INV-`, `INC-`, `T-` 번호를 대소문자 없이 읽고, 번호 뒤에 한글 조사가 붙어도(`p7001을`) 막는다.
   틈이 양쪽에 있다. `KP-7001`, `P-7001a`, `p7001a`는 통과하고, 번호가 아닌 `inv-test`, `T-800`, `Tesla P4000`은 막힌다(모델과 EXA 호출 없이 `assert_public_query`에 넣어 확인한 값이다). 의도된 동작이다. 질의를 일반적인 표현으로 바꾸게 한다 (5장 9번).
-- **`single_skills`가 왜 더 비싸요**: Skill 본문을 읽으면 입력이 는다. 05 셀 24에서 첫 호출 입력이 `single_skills` 5,678토큰, Single 2,410토큰이었다(두 기록 모두). 1회 관찰이므로 Skill이 낫거나 나쁘다고 결론 내리지 않는다.
+- **`single_skills`가 왜 더 비싸요**: Skill 본문을 읽으면 입력이 는다. 05a 셀 29에서 첫 호출 입력이 `single_skills` 5,678토큰, Single 2,410토큰이었다(두 기록 모두). 1회 관찰이므로 Skill이 낫거나 나쁘다고 결론 내리지 않는다.
 
 ---
 
@@ -446,4 +459,4 @@ EXA는 별도다. 기본 실행에서 00이 1회, 06이 21회(1+2+6+6+6) 부른�
 
 이 문서의 `파일:줄` 인용과 심볼은 `sed -n '<줄>p' <파일>`이나 `grep -n`으로 확인한다. 코드가 바뀌어 줄이 움직이면 고친다. 저자는 저장소 루트에서 인용은 `docs/audit/tools/check_citations.py`로, 비용표는 `docs/audit/tools/check_costs.py`로 검사한다(전체 경로는 `Day03_new/docs/audit/tools/...`). 검사기가 통과해도 백틱 식별자가 없는 문장, 접두사 없이 적어 다른 폴더를 뜻하는 인용이나 저장소 밖 인용, 문장이 말하는 내용은 확인되지 않으니 손으로 읽는다(`docs/audit/tools/README.md`).
 답할 때 쓰는 인용도 먼저 확인한다. 6장의 숫자는 `outputs/live/*.json`과 `tests/cost_report.py`를 다시 돌려 대조한다. 7장의 실제 행 수는 `outputs/runs`와 `docs/audit/`의 노트로 다시 센다.
-시험 결과는 나온 그대로 말한다. 저장소 루트에서 `uv run --no-sync python -m pytest Day03_new/tests -q`로 전체를 돌리면 지금 `625 passed`(실패 0)이고 (2026-11-02, `tests/test_harness.py` 추가 뒤), 복사본 시험의 네 칸도 모두 통과한다. 빼고 세는 칸이 없으므로 `--deselect`를 쓰지 않는다. 일부만 돌린 결과를 전체 통과로 말하지 않고, 실패가 나오면 지우거나 빼지 않고 실패로 그대로 말한다. 복사본 시험이 실패하면 머리말의 규칙을 따른다. 이 숫자는 시험이 늘거나 줄면 달라지므로 말하기 전에 다시 돌려 확인한다.
+시험 결과는 나온 그대로 말한다. 저장소 루트에서 `uv run --no-sync python -m pytest Day03_new/tests -q`로 전체를 돌리면 지금 `717 passed`(실패 0)이고 (2026-11-03, 노트북 분할 뒤), 복사본 시험의 네 칸도 모두 통과한다. 빼고 세는 칸이 없으므로 `--deselect`를 쓰지 않는다. 일부만 돌린 결과를 전체 통과로 말하지 않고, 실패가 나오면 지우거나 빼지 않고 실패로 그대로 말한다. 복사본 시험이 실패하면 머리말의 규칙을 따른다. 이 숫자는 시험이 늘거나 줄면 달라지므로 말하기 전에 다시 돌려 확인한다.

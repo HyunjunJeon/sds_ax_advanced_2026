@@ -1,0 +1,47 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 340" width="960" height="340" role="img" aria-labelledby="05b-2-fast-slow-title 05b-2-fast-slow-desc">
+<title id="05b-2-fast-slow-title">hybrid의 Fast와 Slow 경로</title>
+<desc id="05b-2-fast-slow-desc">Router가 Fast 또는 Worker 병렬로 보내고, Worker 결과는 join과 writer를 거쳐 validate로, Fast의 답은 바로 validate로 모인 뒤 gate로 간다. Fast에서 온 답이 근거 부족이면 validate가 worker로 되돌려 Slow로 전환한다.</desc>
+<defs><marker id="05b-2-fast-slow-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05b-2-fast-slow-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05b-2-fast-slow-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="340" fill="#f5f5f5"/>
+<path d="M144,132 L158,132 Q166,132 166,124 L166,96 Q166,88 174,88 L188,88" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M144,164 L158,164 Q166,164 166,172 L166,200 Q166,208 174,208 L188,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M292,88 L676,88 Q684,88 684,96 L684,120" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M292,208 L336,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M440,208 L484,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M588,208 L652,208 Q660,208 660,200 L660,176" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M736,148 L780,148" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-2-fast-slow-arr)"/>
+<path d="M710,176 L710,264 Q710,272 702,272 L248,272 Q240,272 240,264 L240,236" fill="none" stroke="#bf4520" stroke-width="1.5" stroke-dasharray="5,4" marker-end="url(#05b-2-fast-slow-arr-a)"/>
+<rect x="40" y="120" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="120" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="92.0" y="146.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">라우터</text>
+<text x="92.0" y="164.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">router</text>
+<rect x="188" y="60" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="188" y="60" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="240.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">빠른 경로</text>
+<text x="240.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">fast</text>
+<rect x="188" y="180" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="188" y="180" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="240.0" y="206.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">작업 실행</text>
+<text x="240.0" y="224.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">worker</text>
+<rect x="336" y="180" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="336" y="180" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="388.0" y="206.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">합치기</text>
+<text x="388.0" y="224.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">join</text>
+<rect x="484" y="180" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="484" y="180" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="536.0" y="206.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">합성</text>
+<text x="536.0" y="224.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">writer</text>
+<rect x="632" y="120" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="632" y="120" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="684.0" y="146.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">검증</text>
+<text x="684.0" y="164.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">validate</text>
+<rect x="780" y="120" width="104" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="780" y="120" width="104" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="832.0" y="146.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">게이트</text>
+<text x="832.0" y="164.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">gate</text>
+<rect x="320.0" y="262" width="160.0" height="20" fill="#f5f5f5"/>
+<text x="400" y="276" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#bf4520">Fast에서 온 부족한 답만</text>
+<text x="832.0" y="200" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">승인 대기 또는</text>
+<text x="832.0" y="218" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">execute로 실행</text>
+<text x="40" y="316" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">Fast와 Slow 모두 같은 validate와 gate를 지납니다. Fast가 건너뛰는 것은 조사의 폭이지 검증이 아닙니다.</text>
+</svg>

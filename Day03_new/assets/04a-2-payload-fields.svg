@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 384" width="960" height="384" role="img" aria-labelledby="04a-2-payload-fields-title 04a-2-payload-fields-desc">
+<title id="04a-2-payload-fields-title">전달물 세 가지에 들어가는 칸</title>
+<desc id="04a-2-payload-fields-desc">1줄 요약은 첫 사실만 담고, 사실+근거+불확실성은 status, facts, evidence_refs, uncertainty, error를 담고, 원문 포함은 거기에 quotes를 더한다. 줄일 때는 quotes, facts 순으로 빼고 evidence_refs와 uncertainty는 끝까지 남긴다.</desc>
+<defs><marker id="04a-2-payload-fields-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="04a-2-payload-fields-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="04a-2-payload-fields-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="384" fill="#f5f5f5"/>
+<line x1="40" y1="252" x2="920" y2="252" stroke="#bfc0c0" stroke-width="1"/>
+<path d="M208,324 L264,324" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04a-2-payload-fields-arr)"/>
+<path d="M432,324 L488,324" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#04a-2-payload-fields-arr)"/>
+<text x="40" y="52" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">전달물</text>
+<text x="304.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">status</text>
+<text x="416.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">facts</text>
+<text x="528.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">evidence_refs</text>
+<text x="640.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">uncertainty</text>
+<text x="752.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">error</text>
+<text x="864.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="12" font-weight="600" fill="#4f5d75">quotes</text>
+<text x="40" y="103.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">1줄 요약</text>
+<rect x="252" y="72" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="304.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<rect x="364" y="72" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="416.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">첫 사실만</text>
+<rect x="476" y="72" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="528.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<rect x="588" y="72" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="640.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<rect x="700" y="72" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="752.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<rect x="812" y="72" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="864.0" y="103.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<text x="40" y="163.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">사실+근거+불확실성</text>
+<rect x="252" y="132" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="304.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="364" y="132" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="416.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="476" y="132" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="528.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="588" y="132" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="640.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="700" y="132" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="752.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="812" y="132" width="104" height="52" rx="4" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="864.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="500" fill="#5a6580">빠짐</text>
+<text x="40" y="223.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">원문 포함</text>
+<rect x="252" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="304.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="364" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="416.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="476" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="528.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="588" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="640.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="700" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="752.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<rect x="812" y="192" width="104" height="52" rx="4" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<text x="864.0" y="223.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">있음</text>
+<text x="40" y="276" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">trim_payload가 예산에 맞춰 줄이는 순서</text>
+<rect x="40" y="300" width="168" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="300" width="168" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="124.0" y="322.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">① 원문 빼기</text>
+<text x="124.0" y="340.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">quotes</text>
+<rect x="264" y="300" width="168" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="264" y="300" width="168" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="348.0" y="322.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">② 사실 빼기</text>
+<text x="348.0" y="340.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">facts</text>
+<rect x="488" y="300" width="296" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="488" y="300" width="296" height="48" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="636.0" y="322.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">끝까지 남김</text>
+<text x="636.0" y="340.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">evidence_refs, uncertainty</text>
+<text x="40" y="370" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">항목 단위로 빼고, 뺀 항목을 dropped에 기록합니다. 바이트에서 그냥 자르면 예외 문장이 사라집니다.</text>
+</svg>

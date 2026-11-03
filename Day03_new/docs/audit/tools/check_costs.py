@@ -36,7 +36,7 @@ from pathlib import Path
 sys.dont_write_bytecode = True
 
 DAY03_NEW = Path(__file__).resolve().parents[3]  # tools -> audit -> docs -> Day03_new
-RECORD_NAME = re.compile(r"^\d{2}-[\w-]+?(?:\.exercises)?$")
+RECORD_NAME = re.compile(r"^\d{2}[ab]?-[\w-]+?(?:\.exercises)?$")  # 03, 04, 05는 a/b로 나뉜 이름도 읽는다
 COLUMNS = {
     "calls": lambda h: "모델 호출" in h or h in {"호출", "calls"},
     "seconds": lambda h: h in {"초", "seconds"} or h.startswith("초 ") or h.startswith("초("),
@@ -193,7 +193,7 @@ def self_test() -> None:
     printed, exact = reference(DAY03_NEW)
     base = [n for n in printed if not n.endswith(".exercises")]
     exer = [n for n in printed if n.endswith(".exercises")]
-    assert len(base) == 7 and len(exer) == 6, (base, exer)
+    assert len(base) == 10 and len(exer) == 9, (base, exer)  # 03~05는 a/b, 켠 실행도 01~06(9개) 모두 있음
 
     def table(names: list[str], total: bool = True, commas: bool = False) -> str:
         head = "| 노트북 | 모델 호출 | 초 | 입력 토큰 | 출력 토큰 | 모델 비용(USD) |\n|---|---:|---:|---:|---:|---:|\n"
@@ -238,7 +238,7 @@ def self_test() -> None:
     assert any("no such record" in e for e in verdict(unknown, "base"))
     switches = "| 노트북 | 켜는 것 | 더해진 모델 호출 |\n|---|---|---:|\n| 01 | RUN_EXERCISE | 6 |\n"
     assert verdict(switches, "none") == []
-    _, skipped, _, _ = check_doc("| 노트북 | 켜는 것 | 초 |\n|---|---|---:|\n| 05-Choosing-Multi-Agent | RUN_OPTIONAL | 700.9 |\n", printed, exact, require="none")
+    _, skipped, _, _ = check_doc("| 노트북 | 켜는 것 | 초 |\n|---|---|---:|\n| 05b-Measure-Fast-Compare | RUN_OPTIONAL | 700.9 |\n", printed, exact, require="none")
     assert len(skipped) == 1
     print("self-test ok")
 

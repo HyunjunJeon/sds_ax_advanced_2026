@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 356" width="960" height="356" role="img" aria-labelledby="05b-1-critical-path-title 05b-1-critical-path-desc">
+<title id="05b-1-critical-path-title">지연은 Agent 수가 아니라 가장 긴 경로</title>
+<desc id="05b-1-critical-path-desc">Supervisor가 Worker 셋에게 위임하고 결과를 받아 집계할 때 Worker는 병렬로 돌지만, 경로는 Supervisor 호출, 가장 느린 Worker, Supervisor 집계 호출을 지난다.</desc>
+<defs><marker id="05b-1-critical-path-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05b-1-critical-path-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05b-1-critical-path-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="356" fill="#f5f5f5"/>
+<path d="M184,156 L240,156 Q248,156 248,148 L248,80 Q248,72 256,72 L344,72" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<path d="M488,72 L592,72 Q600,72 600,80 L600,148 Q600,156 608,156 L648,156" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<path d="M184,172 L344,172" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<path d="M488,172 L648,172" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<path d="M184,188 L240,188 Q248,188 248,196 L248,248 Q248,256 256,256 L344,256" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<path d="M488,256 L592,256 Q600,256 600,248 L600,196 Q600,188 608,188 L648,188" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-1-critical-path-arr)"/>
+<rect x="40" y="140" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="140" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="112.0" y="170.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Supervisor</text>
+<text x="112.0" y="188.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">위임 호출</text>
+<rect x="344" y="48" width="144" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="344" y="48" width="144" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="416.0" y="70.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">billing</text>
+<text x="416.0" y="88.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker 호출</text>
+<rect x="344" y="148" width="144" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="344" y="148" width="144" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="416.0" y="170.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">policy</text>
+<text x="416.0" y="188.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker 호출</text>
+<rect x="344" y="232" width="144" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="344" y="232" width="144" height="48" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="416.0" y="254.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">outage</text>
+<text x="416.0" y="272.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker 호출</text>
+<rect x="648" y="140" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="648" y="140" width="144" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="720.0" y="170.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Supervisor</text>
+<text x="720.0" y="188.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">집계 호출</text>
+<text x="416.0" y="304" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">Worker끼리는 겹쳐서 돕니다</text>
+<text x="720" y="120" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">나누면서 새로 생긴 시간</text>
+<text x="40" y="340" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">경로 = Supervisor 호출 + 가장 느린 Worker + Supervisor 집계 호출. 직렬 합과 최장 경로의 차이가 병렬이 줄인 시간의 상한입니다.</text>
+</svg>

@@ -13,6 +13,7 @@ import nbformat
 from nbformat.reader import NotJSONError
 
 FLOORS = {60: {"cells": 46, "code": 24, "markdown": 11000, "observe": 6, "predict": 3, "failure": 3, "exercise": 4, "questions": 5},
+          30: {"cells": 23, "code": 12, "markdown": 5500, "observe": 3, "predict": 2, "failure": 1, "exercise": 2, "questions": 3},
           10: {"cells": 14, "code": 7, "markdown": 2500, "observe": 2, "predict": 0, "failure": 0, "exercise": 2, "questions": 2}}
 REQUIRED_HEADINGS = ("## 직접 해보기", "## 확인 질문", "## 정리")
 OBSERVE, PREDICT, FAILURE = "**관찰할 것.**", "**먼저 예측하세요.**", "# 실패 재현:"

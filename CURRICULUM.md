@@ -10,7 +10,7 @@
 
 **Day02_new:** `Day02_new/`는 Day02와 나란히 놓인 새 버전으로 노트북 `00-Setup`~`06-Lab-DeepAgents-RAG`(00~06)를 따라가며 Agentic RAG를 배웁니다. 아래 Day02 항목은 그대로 두며, Day02_new는 병렬 선택지입니다. 루트 환경을 쓰고 `ANTHROPIC_API_KEY`를 `Day02_new/.env`에 따로 둡니다(`Day02_new/README.md`).
 
-**Day03_new:** `Day03_new/`는 Day03과 나란히 놓인 새 버전으로 노트북 `00-Setup`~`06-Lab-Research-Agents`(00~06)를 따라가며 Workflow와 Agent의 경계부터 Multi-Agent 선택 기준까지 배웁니다. 아래 Day03 항목은 그대로 두며, Day03_new는 병렬 선택지이고 채점 과제는 없습니다. 루트 환경을 쓰고 `ANTHROPIC_API_KEY`와 `EXA_API_KEY`를 `Day03_new/.env`에 둡니다. 00의 키 확인 셀이 두 키를 모두 확인하고 EXA는 06의 필수 실습에서 씁니다(`Day03_new/README.md`).
+**Day03_new:** `Day03_new/`는 Day03과 나란히 놓인 새 버전으로 노트북 `00-Setup`~`06-Lab-Research-Agents`(00~06, 03·04·05는 a/b로 나뉨)를 따라가며 Workflow와 Agent의 경계부터 Multi-Agent 선택 기준까지 배웁니다. 아래 Day03 항목은 그대로 두며, Day03_new는 병렬 선택지이고 채점 과제는 없습니다. 루트 환경을 쓰고 `ANTHROPIC_API_KEY`와 `EXA_API_KEY`를 `Day03_new/.env`에 둡니다. 00의 키 확인 셀이 두 키를 모두 확인하고 EXA는 06의 필수 실습에서 씁니다(`Day03_new/README.md`).
 
 **읽는 법:** 학습 항목은 Day가 아니라 내용으로 묶었고, 번호는 전 과정에서 하나로 이어집니다. 앞서 정리한 항목 1\~20은 번호를 그대로 두고, Day04\~08 내용을 항목 21부터 추가했습니다. 각 Day의 확인 질문은 저자 제안이며 수업 자료에 있는 문구가 아닙니다.
 

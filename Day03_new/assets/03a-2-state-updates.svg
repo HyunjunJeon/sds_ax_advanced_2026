@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 376" width="960" height="376" role="img" aria-labelledby="03a-2-state-updates-title 03a-2-state-updates-desc">
+<title id="03a-2-state-updates-title">순차 그래프에서 State 칸이 쌓이는 모습</title>
+<desc id="03a-2-state-updates-desc">verify, billing, credit이 차례로 실행되며 각 Node는 자기가 바꾼 칸 하나만 돌려주고, State에는 그 칸이 하나씩 채워진다.</desc>
+<defs><marker id="03a-2-state-updates-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="03a-2-state-updates-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="03a-2-state-updates-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="376" fill="#f5f5f5"/>
+<path d="M72.0,116 L72.0,136" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03a-2-state-updates-arr)"/>
+<path d="M72.0,180 L72.0,200" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03a-2-state-updates-arr)"/>
+<path d="M72.0,244 L72.0,264" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03a-2-state-updates-arr)"/>
+<text x="72.0" y="52" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">단계</text>
+<text x="266.0" y="52" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">stream(updates)이 내는 한 줄</text>
+<text x="486.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">entity</text>
+<text x="608.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">customer_verified</text>
+<text x="730.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">billing_facts</text>
+<text x="852.0" y="52" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="600" fill="#2d3142">credit</text>
+<rect x="32" y="72" width="80" height="44" rx="6" fill="#f5f5f5"/>
+<rect x="32" y="72" width="80" height="44" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="72.0" y="99.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">START</text>
+<rect x="124" y="72" width="284" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="136" y="98.0" text-anchor="start" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">{&#x27;entity&#x27;: &#x27;알파&#x27;}</text>
+<rect x="428" y="72" width="116" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="486.0" y="98.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">알파</text>
+<rect x="550" y="72" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="672" y="72" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="794" y="72" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="32" y="136" width="80" height="44" rx="6" fill="#f5f5f5"/>
+<rect x="32" y="136" width="80" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="72.0" y="163.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">verify</text>
+<rect x="124" y="136" width="284" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="136" y="162.0" text-anchor="start" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">{&#x27;verify&#x27;: {&#x27;customer_verified&#x27;: True}}</text>
+<rect x="428" y="136" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="486.0" y="162.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">알파</text>
+<rect x="550" y="136" width="116" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="608.0" y="162.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">True</text>
+<rect x="672" y="136" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="794" y="136" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="32" y="200" width="80" height="44" rx="6" fill="#f5f5f5"/>
+<rect x="32" y="200" width="80" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="72.0" y="227.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">billing</text>
+<rect x="124" y="200" width="284" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="136" y="226.0" text-anchor="start" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">{&#x27;billing&#x27;: {&#x27;billing_facts&#x27;: {…}}}</text>
+<rect x="428" y="200" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="486.0" y="226.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">알파</text>
+<rect x="550" y="200" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="608.0" y="226.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">True</text>
+<rect x="672" y="200" width="116" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="730.0" y="226.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">{base_fee}</text>
+<rect x="794" y="200" width="116" height="44" rx="6" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<rect x="32" y="264" width="80" height="44" rx="6" fill="#f5f5f5"/>
+<rect x="32" y="264" width="80" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="72.0" y="291.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">credit</text>
+<rect x="124" y="264" width="284" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="136" y="290.0" text-anchor="start" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#2d3142">{&#x27;credit&#x27;: {&#x27;credit&#x27;: …}}</text>
+<rect x="428" y="264" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="486.0" y="290.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">알파</text>
+<rect x="550" y="264" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="608.0" y="290.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">True</text>
+<rect x="672" y="264" width="116" height="44" rx="6" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="730.0" y="290.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">{base_fee}</text>
+<rect x="794" y="264" width="116" height="44" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="852.0" y="290.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#2d3142">base_fee의 15%</text>
+<rect x="40" y="328" width="20" height="16" rx="3" fill="#f5f5f5" stroke="#2d3142" stroke-width="2"/>
+<text x="68" y="341" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">이번 단계에 쓴 칸</text>
+<rect x="228" y="328" width="20" height="16" rx="3" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="256" y="341" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">앞 단계에서 이어진 칸</text>
+<rect x="448" y="328" width="20" height="16" rx="3" fill="none" stroke="#bfc0c0" stroke-width="1" stroke-dasharray="5,4"/>
+<text x="476" y="341" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">아직 비어 있는 칸</text>
+</svg>

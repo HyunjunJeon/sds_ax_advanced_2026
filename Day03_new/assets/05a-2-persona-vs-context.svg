@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 372" width="960" height="372" role="img" aria-labelledby="05a-2-persona-vs-context-title 05a-2-persona-vs-context-desc">
+<title id="05a-2-persona-vs-context-title">역할 이름만 다른 Worker와 도구 범위가 다른 Worker</title>
+<desc id="05a-2-persona-vs-context-desc">위쪽 Persona는 이름만 다른 Worker 셋이 모든 도구를 보고 같은 Desk와 원장에 닿는다. 아래쪽 Context 분리는 ROLE_TOOLS로 Worker마다 보이는 도구가 다르지만 같은 Desk와 원장에 닿는 점은 같아서 보안 격리는 아니다.</desc>
+<defs><marker id="05a-2-persona-vs-context-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05a-2-persona-vs-context-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05a-2-persona-vs-context-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="372" fill="#f5f5f5"/>
+<path d="M464,84 L520,84" fill="none" stroke="#bf4520" stroke-width="1.5" marker-end="url(#05a-2-persona-vs-context-arr-a)"/>
+<path d="M696,84 L760,84" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-2-persona-vs-context-arr)"/>
+<path d="M464,232 L520,232" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-2-persona-vs-context-arr)"/>
+<path d="M696,232 L760,232" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05a-2-persona-vs-context-arr)"/>
+<text x="40" y="40" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#bf4520">Persona: 이름만 다름</text>
+<rect x="40" y="56" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="56" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="104.0" y="82.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">결제 담당</text>
+<text x="104.0" y="100.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="188" y="56" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="188" y="56" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="252.0" y="82.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">규정 담당</text>
+<text x="252.0" y="100.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="336" y="56" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="336" y="56" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="400.0" y="82.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">장애 담당</text>
+<text x="400.0" y="100.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="520" y="56" width="176" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="56" width="176" height="56" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="608.0" y="82.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">도구</text>
+<text x="608.0" y="100.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">모든 도구가 보임</text>
+<rect x="760" y="56" width="160" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="760" y="56" width="160" height="56" rx="6" fill="#ececec" stroke="#4f5d75" stroke-width="1.5"/>
+<text x="840.0" y="89.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">같은 Desk, 같은 원장</text>
+<text x="40" y="188" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#2d3142">Context 분리: 도구 범위가 다름</text>
+<rect x="40" y="204" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="204" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="104.0" y="230.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">billing</text>
+<text x="104.0" y="248.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="188" y="204" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="188" y="204" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="252.0" y="230.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">policy</text>
+<text x="252.0" y="248.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="336" y="204" width="128" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="336" y="204" width="128" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="400.0" y="230.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">outage</text>
+<text x="400.0" y="248.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Worker</text>
+<rect x="520" y="204" width="176" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="520" y="204" width="176" height="56" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="608.0" y="230.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">도구</text>
+<text x="608.0" y="248.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">ROLE_TOOLS로 보이는 도구만</text>
+<rect x="760" y="204" width="160" height="56" rx="6" fill="#f5f5f5"/>
+<rect x="760" y="204" width="160" height="56" rx="6" fill="#ececec" stroke="#4f5d75" stroke-width="1.5"/>
+<text x="840.0" y="237.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">같은 Desk, 같은 원장</text>
+<text x="40" y="330" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">줄어드는 것은 보이는 도구와 넘기는 Context입니다. 두 경우 모두 같은 프로세스의 같은 객체에 닿으므로 Context 분리는 보안 격리가 아닙니다.</text>
+</svg>
