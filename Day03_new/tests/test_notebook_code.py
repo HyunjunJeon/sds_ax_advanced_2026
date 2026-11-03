@@ -67,6 +67,22 @@ def parse_cell(source: str) -> list[ast.Module]:
         return trees
 
 
+def without_magic(source: str) -> str:
+    """IPython 매직(`%`, `!`)으로 시작하는 줄을 빈 줄로 바꾼다. 오류의 줄 번호가 셀의 줄 번호와 같게 줄 수는 그대로 둔다."""
+    return "\n".join("" if line.lstrip().startswith(("%", "!")) else line for line in source.splitlines())
+
+
+def syntax_problems(cells) -> list[str]:
+    """(노트북, 셀 번호, 셀 id, 소스) 묶음마다 셀 전체를 한 번에 파싱하고, 파싱되지 않는 셀을 위치와 함께 돌려준다."""
+    problems = []
+    for notebook, index, cell_id, source in cells:
+        try:
+            ast.parse(without_magic(source))
+        except SyntaxError as error:
+            problems.append(f"{notebook}:cell{index}({cell_id}) {error.lineno}행: {error.msg}")
+    return problems
+
+
 def lab_imports(source: str) -> list[tuple[str, str | None]]:
     """셀이 mas_lab·rag_lab에서 가져오는 (모듈, 이름)을 순서대로 중복 없이 돌려준다. `import 모듈` 꼴의 이름은 None이다."""
     found = []
@@ -136,6 +152,25 @@ def slice_problem(case: SliceCase) -> str | None:
 def test_all_notebooks_are_read():
     """번호 노트북이 모두 읽히는지 본다. 03은 03a(순차·병렬)와 03b(분기·루프·패턴 번역)로, 04는 04a(계약·예산)와 04b(실패·승인)로, 05는 05a(실패 분류·나누는 기준)와 05b(수치·Fast/Slow·비교표)로 나뉘어 있다."""
     assert [path.name.split("-")[0] for path in NOTEBOOKS] == ["00", "01", "02", "03a", "03b", "04a", "04b", "05a", "05b", "06"], [path.name for path in NOTEBOOKS]
+
+
+@pytest.mark.parametrize("path", NOTEBOOKS, ids=lambda path: path.name)
+def test_every_code_cell_parses(path):
+    """코드 셀이 모두 Python으로 파싱되는지 본다. parse_cell은 SyntaxError가 나면 줄 단위 파싱으로 넘어가므로 아래 import·표식 검사는 깨진 셀도 통과시킨다.
+    2026-11-03 문구 다듬기가 01 코드 셀 5개와 02 코드 셀 2개의 문자열 속 `\\n`을 실제 줄바꿈으로 바꿨을 때 그 검사들이 통과했고, 유료 재실행에서야 드러났다."""
+    problems = syntax_problems(cell for cell in code_cells() if cell[0] == path.name)
+    assert not problems, "\n".join(problems)
+
+
+def test_real_newline_inside_string_literal_is_reported():
+    broken = ("02-Agent-Architecture.ipynb", 43, "abc", 'print("첫 줄\n둘째 줄")')
+    fixed = ("02-Agent-Architecture.ipynb", 43, "abc", 'print("첫 줄\\n둘째 줄")')
+    assert syntax_problems([broken]) == ["02-Agent-Architecture.ipynb:cell43(abc) 1행: unterminated string literal (detected at line 1)"]
+    assert syntax_problems([fixed]) == []
+
+
+def test_ipython_magic_lines_do_not_count_as_syntax_errors():
+    assert syntax_problems([("00-Setup.ipynb", 1, "abc", "%load_ext autoreload\n!ls outputs\nvalue = 1")]) == []
 
 
 @pytest.mark.parametrize("case", [pytest.param(case, id=case.label) for case in import_cases()])

@@ -5,6 +5,7 @@
       (fast → check_kinds → 부족한 자료 종류가 있으면 slow, 없으면 END, slow → END). 4절 표의 비용(낮음, 높음, 없음).
 - f2: 5절 `build_retry_loop`의 `check`. 판정 순서는 complete, same_failure, retry_limit, 그 밖(다시)이다.
 - f3: 6절 `build_orchestrator`의 간선과 `FLOW_OF_NODE`(plan 순차, worker 병렬, aggregate 순차, validate 분기, replan 루프).
+- f4: 6절 `build_agent_loop`의 간선. START → model, model → tools 또는 END(`tools_condition`), tools → model.
 숫자는 쓰지 않는다.
 """
 from __future__ import annotations
@@ -127,7 +128,28 @@ def f3_orchestrator_flows() -> Fig:
     return f
 
 
-FIGURES = [f1_branch_placement, f2_loop_exits, f3_orchestrator_flows]
+def f4_agent_loop() -> Fig:
+    f = Fig("03b-4-agent-loop", 960, 288, "Agent Loop 안의 분기와 루프",
+            "START에서 model로 가고, model의 응답에 도구 호출이 있으면 tools로, 없으면 END로 간다(분기). tools는 실행 결과를 들고 다시 model로 돌아간다(루프).")
+    f.node(40, 54, 96, 48, "시작", "START", kind="ghost")
+    f.node(200, 46, 176, 64, "model", "다음 행동을 고름", kind="focal")
+    f.node(744, 54, 176, 48, "끝", "END", kind="ghost")
+    f.node(472, 156, 176, 64, "tools", "고른 도구를 실행")
+    f.arrow([(136, 78), (200, 78)])
+    f.arrow([(376, 78), (744, 78)])
+    f.label(560, 78, "도구 호출이 없으면", size=12)
+    f.arrow([(336, 110), (336, 176), (472, 176)])
+    f.text(348, 166, "도구 호출이 있으면", size=12, anchor="start", fill=TOKENS["muted"])
+    f.arrow([(472, 204), (240, 204), (240, 110)], kind="accent")
+    f.text(356, 226, "도구 결과를 들고 돌아감", size=12, weight=600, fill=TOKENS["accent"])
+    chip(f, 432, 44, "분기")
+    chip(f, 196, 184, "루프", accent=True)
+    f.text(40, 272, "분기 하나(tools_condition)와 루프 하나(tools → model)가 Agent Loop의 전부입니다. 끝낼지는 모델이 정하고, 코드는 재귀 한도로만 멈춥니다.",
+           size=12, anchor="start", weight=600, fill=TOKENS["accent"])
+    return f
+
+
+FIGURES = [f1_branch_placement, f2_loop_exits, f3_orchestrator_flows, f4_agent_loop]
 
 if __name__ == "__main__":
     for make in FIGURES:

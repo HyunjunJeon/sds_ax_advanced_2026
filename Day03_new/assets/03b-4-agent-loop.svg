@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 288" width="960" height="288" role="img" aria-labelledby="03b-4-agent-loop-title 03b-4-agent-loop-desc">
+<title id="03b-4-agent-loop-title">Agent Loop 안의 분기와 루프</title>
+<desc id="03b-4-agent-loop-desc">START에서 model로 가고, model의 응답에 도구 호출이 있으면 tools로, 없으면 END로 간다(분기). tools는 실행 결과를 들고 다시 model로 돌아간다(루프).</desc>
+<defs><marker id="03b-4-agent-loop-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="03b-4-agent-loop-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="03b-4-agent-loop-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="288" fill="#f5f5f5"/>
+<path d="M136,78 L200,78" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03b-4-agent-loop-arr)"/>
+<path d="M376,78 L744,78" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03b-4-agent-loop-arr)"/>
+<path d="M336,110 L336,168 Q336,176 344,176 L472,176" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#03b-4-agent-loop-arr)"/>
+<path d="M472,204 L248,204 Q240,204 240,196 L240,110" fill="none" stroke="#bf4520" stroke-width="1.5" marker-end="url(#03b-4-agent-loop-arr-a)"/>
+<rect x="40" y="54" width="96" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="54" width="96" height="48" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="88.0" y="76.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">시작</text>
+<text x="88.0" y="94.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">START</text>
+<rect x="200" y="46" width="176" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="200" y="46" width="176" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="288.0" y="76.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">model</text>
+<text x="288.0" y="94.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">다음 행동을 고름</text>
+<rect x="744" y="54" width="176" height="48" rx="6" fill="#f5f5f5"/>
+<rect x="744" y="54" width="176" height="48" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="832.0" y="76.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">끝</text>
+<text x="832.0" y="94.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">END</text>
+<rect x="472" y="156" width="176" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="472" y="156" width="176" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="560.0" y="186.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">tools</text>
+<text x="560.0" y="204.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">고른 도구를 실행</text>
+<rect x="498.0" y="68" width="124.0" height="20" fill="#f5f5f5"/>
+<text x="560" y="82" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">도구 호출이 없으면</text>
+<text x="348" y="166" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">도구 호출이 있으면</text>
+<text x="356" y="226" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">도구 결과를 들고 돌아감</text>
+<rect x="404.0" y="44" width="56" height="20" rx="2" fill="#ececec" stroke="#bfc0c0" stroke-width="1"/>
+<text x="432" y="58.5" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#4f5d75">분기</text>
+<rect x="168.0" y="184" width="56" height="20" rx="2" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1"/>
+<text x="196" y="198.5" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">루프</text>
+<text x="40" y="272" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="600" fill="#bf4520">분기 하나(tools_condition)와 루프 하나(tools → model)가 Agent Loop의 전부입니다. 끝낼지는 모델이 정하고, 코드는 재귀 한도로만 멈춥니다.</text>
+</svg>
