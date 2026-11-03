@@ -62,6 +62,8 @@ OWN_PATH = "Day05_new/"
 SWITCH_NAMES = ("RUN_EXERCISE", "RUN_OPTIONAL")
 SWITCH_USE = re.compile(rf"\b(?:{'|'.join(SWITCH_NAMES)})\b")
 SWITCH_ASSIGN = re.compile(rf"^\s*(?:{'|'.join(SWITCH_NAMES)})\s*=", re.MULTILINE)
+DEEPEVAL_IMPORT = re.compile(r"\s*(?:import|from)\s+deepeval\b")
+EVAL_LAB_IMPORT = re.compile(r"\s*(?:import|from)\s+eval_lab\b")
 
 
 def _table_cells(line: str) -> list[str]:
@@ -138,6 +140,22 @@ def switch_problems(cells: list) -> list[str]:
     return problems
 
 
+def import_order_problem(cells: list) -> str | None:
+    """deepeval을 처음 import하는 줄이 eval_lab을 처음 import하는 줄보다 앞서면 그 셀 번호를 알린다.
+
+    eval_lab이 DEEPEVAL_TELEMETRY_OPT_OUT을 먼저 설정해야 하기 때문이다. 주석 줄과 markdown 셀은 보지 않는다.
+    """
+    for index, cell in enumerate(cells):
+        if cell.cell_type != "code":
+            continue
+        for line in cell.source.splitlines():
+            if EVAL_LAB_IMPORT.match(line):
+                return None
+            if DEEPEVAL_IMPORT.match(line):
+                return f"셀 {index}이 eval_lab보다 먼저 deepeval을 import합니다. eval_lab이 DeepEval 텔레메트리를 먼저 꺼야 합니다."
+    return None
+
+
 def announce_problem(index: int, source: str) -> str | None:
     """유료 호출 셀이면 첫 유료 호출보다 앞에 announce(…, model_calls=정수)가 있는지 본다."""
     paid = PAID_CALL.search(source)
@@ -195,6 +213,8 @@ def static_problems(nb: nbformat.NotebookNode, minutes: int) -> list[str]:
     problems += switch_problems(nb.cells)
     for index, cell in enumerate(nb.cells):
         problems += cell_problems(index, cell)
+    if problem := import_order_problem(nb.cells):
+        problems.append(problem)
     return problems
 
 

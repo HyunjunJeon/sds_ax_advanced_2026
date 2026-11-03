@@ -38,7 +38,12 @@ from eval_lab.rsi import (
     scripted_improver,
 )
 from eval_lab.traffic import make_mistake_driver, pilot_items, run_traffic
-from eval_lab.trajectory_rules import RuleHit, TrajectoryVerdict, evaluate_trajectory
+from eval_lab.trajectory_rules import (
+    RULES,
+    RuleHit,
+    TrajectoryVerdict,
+    evaluate_trajectory,
+)
 from langchain_core.messages import AIMessage
 from pydantic import Field
 from tests.fakes import FakeChatModel
@@ -241,6 +246,32 @@ def test_p5_rejects_malformed_rows():
         holdout_decision(good + [holdout_row("hx-a", 4, "PASS", [], True)], good)
     with pytest.raises(ValueError):  # 알 수 없는 상태
         holdout_row("hx-a", 1, "PASSED", [], True)
+
+
+def test_holdout_row_refuses_a_warn_rule_and_names_it():
+    with pytest.raises(ValueError, match="blind-retry"):
+        holdout_row("case-b", 1, "FAIL", ["blind-retry"], False)
+
+
+def test_holdout_decision_refuses_a_raw_row_with_a_warn_rule():
+    good = rows_for({"hx-a": [WBA, OK, OK]})
+    raw = dict(good[0], fatal_rule_ids=["blind-retry"])
+    with pytest.raises(ValueError, match="blind-retry"):
+        holdout_decision([raw], good)
+    with pytest.raises(ValueError, match="blind-retry"):
+        holdout_decision(good, [raw])
+
+
+def test_holdout_row_refuses_an_unknown_rule_id():
+    with pytest.raises(ValueError, match="no-such-rule"):
+        holdout_row("case-b", 1, "FAIL", ["no-such-rule"], False)
+
+
+def test_holdout_row_accepts_every_fatal_rule_in_the_rule_table():
+    fatal_ids = [rule_id for rule_id, grade, _ in RULES if grade == "fatal"]
+    assert fatal_ids
+    for rule_id in fatal_ids:
+        assert holdout_row("case-b", 1, "FAIL", [rule_id], False)["fatal_rule_ids"] == [rule_id]
 
 
 # ---------------------------------------------------------------- pilot

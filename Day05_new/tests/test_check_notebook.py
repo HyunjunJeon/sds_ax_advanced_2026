@@ -404,3 +404,46 @@ def test_all_exits_zero_when_every_registered_notebook_passes(tmp_path, monkeypa
         write(tmp_path, build_cells(minutes), name)
     assert main(["--all"]) == 0
     assert capsys.readouterr().out.splitlines() == [f"구조 검사 통과: {name}" for name, _ in NOTEBOOKS.values()]
+
+
+def deepeval_problem(index: int) -> str:
+    return f"셀 {index}이 eval_lab보다 먼저 deepeval을 import합니다. eval_lab이 DeepEval 텔레메트리를 먼저 꺼야 합니다."
+
+
+def test_deepeval_in_an_earlier_cell_than_eval_lab_is_reported(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("from deepeval.metrics import GEval"))
+    cells.insert(4, new_code_cell("from eval_lab import settings"))
+    assert verdict(tmp_path, cells) == [deepeval_problem(3)]
+
+
+def test_deepeval_line_before_eval_lab_line_in_the_same_cell_is_reported(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("import deepeval\n    import eval_lab"))
+    assert verdict(tmp_path, cells) == [deepeval_problem(3)]
+
+
+def test_eval_lab_before_deepeval_passes(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("import eval_lab\nfrom deepeval.metrics import GEval"))
+    cells.insert(4, new_code_cell("    import deepeval"))
+    assert verdict(tmp_path, cells) == []
+
+
+def test_deepeval_without_eval_lab_is_reported(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("x = 1\nimport deepeval"))
+    assert verdict(tmp_path, cells) == [deepeval_problem(3)]
+
+
+def test_notebook_without_deepeval_import_passes(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("from eval_lab import settings"))
+    assert verdict(tmp_path, cells) == []
+
+
+def test_deepeval_in_comment_or_markdown_does_not_count(tmp_path):
+    cells = build_cells(M)
+    cells.insert(3, new_code_cell("# import deepeval\nvalue = 1"))
+    cells.insert(4, new_markdown_cell("import deepeval 은 eval_lab 뒤에 한다."))
+    assert verdict(tmp_path, cells) == []

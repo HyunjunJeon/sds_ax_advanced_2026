@@ -156,8 +156,10 @@ def test_signal_ranks_the_mistake_record_first(mixed_records):
     # 승인 전 쓰기는 서비스가 막지 않으므로 도구 오류가 아니라 규칙 위반 신호다.
     # 같은 라운드의 깨끗한 기록에도 도구 오류(타임아웃·결제 장애)가 있어 그쪽이 앞선다.
     # 그래서 도구 오류 신호가 전혀 없는 기록 집합으로 좁혀 순위를 본다.
-    no_tool_error = [r for r in mixed_records if not any(e.result.get("status") in {"error", "denied"}
-                                                        for e in r["artifact"].events)]
+    # 대본 Episode의 지연은 실행 시계 시간이라 매번 달라지는 잡음이다. 지연·비용 신호가
+    # 규칙 위반보다 앞서지 않도록 두 값을 0으로 두고 규칙 위반 순위만 본다.
+    no_tool_error = [{**r, "latency_ms": 0.0, "cost_usd": 0.0} for r in mixed_records
+                     if not any(e.result.get("status") in {"error", "denied"} for e in r["artifact"].events)]
     mistake_index = next(i for i, r in enumerate(no_tool_error) if r["injected_mistakes"])
     picked = select_traces(no_tool_error, "signal", 3, seed=0)
     assert picked[0].record_index == mistake_index
