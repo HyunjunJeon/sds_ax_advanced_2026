@@ -1,0 +1,5 @@
+{
+  "name": "example-tasks",
+  "version": "0.1.0",
+  "description": "Capability Challenge 예시: 할 일을 추가하고, 보고, 끝내는 능력 (Skill 하나 + MCP 서버 하나)"
+}
