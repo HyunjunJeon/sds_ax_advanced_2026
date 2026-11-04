@@ -1,0 +1,12 @@
+notes/
+# Capability Challenge: 수강생이 만드는 plugin과 실행 결과는 각자의 것이라 올리지 않는다.
+challenge/work/
+challenge/runs/
+**/evals/results/
+.capability-data/
+
+# 강사·저자용 자료: 수강생에게 배포하지 않는다
+part1/recordings/
+part1/instructor_notes.md
+challenge/instructor_notes.md
+tests/
