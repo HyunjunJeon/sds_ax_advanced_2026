@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 400" width="960" height="400" role="img" aria-labelledby="05b-4-decision-flow-title 05b-4-decision-flow-desc">
+<title id="05b-4-decision-flow-title">흩어진 선택 기준을 묻는 순서</title>
+<desc id="05b-4-decision-flow-desc">코드로 정해지나, Single로 고쳐지나, 격리나 병렬이 필요한가, 주도권이 넘어가나를 차례로 묻는다. 예이면 아래 칸의 구조에서 멈추고, 모두 아니오이면 나누지 않는다. 어느 칸이든 돈을 움직이는 쓰기는 코드 게이트 하나를 지난다.</desc>
+<defs><marker id="05b-4-decision-flow-arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#4f5d75"/></marker><marker id="05b-4-decision-flow-arr-a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#bf4520"/></marker><marker id="05b-4-decision-flow-arr-l" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#2e5aa8"/></marker></defs>
+<rect width="960" height="400" fill="#f5f5f5"/>
+<path d="M184,88 L232,88" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M112,120 L112,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M376,88 L424,88" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M304,120 L304,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M568,88 L616,88" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M496,120 L496,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M760,88 L808,88" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<path d="M688,120 L688,208" fill="none" stroke="#4f5d75" stroke-width="1.5" marker-end="url(#05b-4-decision-flow-arr)"/>
+<rect x="40" y="324" width="912" height="56" rx="8" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.25"/>
+<rect x="40" y="56" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="56" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="112.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">코드로 정해지나?</text>
+<text x="112.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">05a 0절</text>
+<rect x="232" y="56" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="232" y="56" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="304.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Single로 고쳐지나?</text>
+<text x="304.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">05a 1절, 4절</text>
+<rect x="424" y="56" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="424" y="56" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="496.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">격리·병렬이 필요?</text>
+<text x="496.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">05a 2~3절, 05b 5절</text>
+<rect x="616" y="56" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="616" y="56" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="688.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">주도권이 넘어가나?</text>
+<text x="688.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">02 4절</text>
+<rect x="808" y="56" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="808" y="56" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#bfc0c0" stroke-width="1"/>
+<text x="880.0" y="86.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">나누지 않음</text>
+<text x="880.0" y="104.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">더 재고 기록</text>
+<text x="208.0" y="78" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="11" font-weight="500" fill="#4f5d75">아니오</text>
+<rect x="40" y="208" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="40" y="208" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="112.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">코드 노드</text>
+<text x="112.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">Workflow</text>
+<text x="122" y="168.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">예</text>
+<text x="400.0" y="78" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="11" font-weight="500" fill="#4f5d75">아니오</text>
+<rect x="232" y="208" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="232" y="208" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="304.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Single</text>
+<text x="304.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">+ Skill</text>
+<text x="314" y="168.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">예</text>
+<text x="592.0" y="78" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="11" font-weight="500" fill="#4f5d75">아니오</text>
+<rect x="424" y="208" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="424" y="208" width="144" height="64" rx="6" fill="rgba(191,69,32,0.08)" stroke="#bf4520" stroke-width="1.5"/>
+<text x="496.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Supervisor·Send</text>
+<text x="496.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">분해는 누가?</text>
+<text x="506" y="168.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">예</text>
+<text x="784.0" y="78" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="11" font-weight="500" fill="#4f5d75">아니오</text>
+<rect x="616" y="208" width="144" height="64" rx="6" fill="#f5f5f5"/>
+<rect x="616" y="208" width="144" height="64" rx="6" fill="#f5f5f5" stroke="#2d3142" stroke-width="1.5"/>
+<text x="688.0" y="238.0" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="14" font-weight="600" fill="#2d3142">Handoff</text>
+<text x="688.0" y="256.0" text-anchor="middle" font-family="'Geist Mono','SF Mono',Menlo,monospace" font-size="11" font-weight="500" fill="#5a6580">owner 전환</text>
+<text x="698" y="168.0" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#4f5d75">예</text>
+<text x="496" y="296" text-anchor="middle" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="11" font-weight="500" fill="#5a6580">Worker가 늘고 걸러 낼 판단이 생기면 Hierarchical</text>
+<text x="56" y="348" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="13" font-weight="600" fill="#bf4520">어느 칸에서 끝나든 돈을 움직이는 쓰기는 코드 게이트 하나(gate_answer)를 지납니다.</text>
+<text x="56" y="368" text-anchor="start" font-family="'Geist','Noto Sans KR','Apple SD Gothic Neo','Malgun Gothic',sans-serif" font-size="12" font-weight="500" fill="#2d3142">나누기 쉬운 것은 읽기(조사)이고, 쓰기와 결정은 한 곳에 모읍니다. 셋째와 넷째 질문은 다른 축이라 둘 다 예일 수 있습니다.</text>
+</svg>

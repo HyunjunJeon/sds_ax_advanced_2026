@@ -5,6 +5,8 @@
 - f2: 6절 `build_hybrid`(mas_lab/hybrid.py)의 간선. router→fast 또는 worker, worker→join→writer, fast와 writer→validate,
       validate→gate, 그리고 Fast에서 온 부족한 답만 worker로 돌리는 fallback_to_slow.
 - f3: 7절 하네스 표. 다섯 구조가 같은 예산, 허용 목록, 응답 형식, 쓰기 게이트를 지난다.
+- f4: 8절 선택 순서도. 05a 0절(담당 표), 05a 1절·4절(실패 분류, Skill), 05a 2~3절과 05b 5절(격리·병렬), 02 4절(Handoff)의
+      기준을 묻는 순서로 놓는다. 칸 아래 숫자는 절 번호이고 측정값이 아니다.
 측정값은 쓰지 않는다.
 """
 from __future__ import annotations
@@ -92,7 +94,36 @@ def f3_same_harness() -> Fig:
     return f
 
 
-FIGURES = [f1_critical_path, f2_fast_slow, f3_same_harness]
+def f4_decision_flow() -> Fig:
+    f = Fig("05b-4-decision-flow", 960, 400, "흩어진 선택 기준을 묻는 순서",
+            "코드로 정해지나, Single로 고쳐지나, 격리나 병렬이 필요한가, 주도권이 넘어가나를 차례로 묻는다. 예이면 아래 칸의 구조에서 멈추고, 모두 아니오이면 나누지 않는다. 어느 칸이든 돈을 움직이는 쓰기는 코드 게이트 하나를 지난다.")
+    w, h, gap = 144, 64, 48
+    xs = [40 + k * (w + gap) for k in range(5)]
+    qy, oy = 56, 208
+    questions = [("코드로 정해지나?", "05a 0절"), ("Single로 고쳐지나?", "05a 1절, 4절"), ("격리·병렬이 필요?", "05a 2~3절, 05b 5절"),
+                 ("주도권이 넘어가나?", "02 4절")]
+    outcomes = [("코드 노드", "Workflow", "step"), ("Single", "+ Skill", "step"), ("Supervisor·Send", "분해는 누가?", "focal"),
+                ("Handoff", "owner 전환", "step")]
+    for k, (name, sub) in enumerate(questions):
+        f.node(xs[k], qy, w, h, name, sub)
+    f.node(xs[4], qy, w, h, "나누지 않음", "더 재고 기록", kind="ghost")
+    for k in range(4):
+        y = qy + h // 2
+        f.arrow([(xs[k] + w, y), (xs[k + 1], y)])
+        f.text(xs[k] + w + gap / 2, y - 10, "아니오", size=11, fill=TOKENS["muted"])
+        name, sub, kind = outcomes[k]
+        cx = xs[k] + w // 2
+        f.node(xs[k], oy, w, h, name, sub, kind=kind)
+        f.arrow([(cx, qy + h), (cx, oy)])
+        f.text(cx + 10, (qy + h + oy) / 2 + 4, "예", size=12, anchor="start", fill=TOKENS["muted"])
+    f.text(xs[2] + w // 2, oy + h + 24, "Worker가 늘고 걸러 낼 판단이 생기면 Hierarchical", size=11, fill=TOKENS["soft"])
+    f.band(40, 324, 912, 56, accent=True, dashed=False)
+    f.text(56, 348, "어느 칸에서 끝나든 돈을 움직이는 쓰기는 코드 게이트 하나(gate_answer)를 지납니다.", size=13, anchor="start", weight=600, fill=TOKENS["accent"])
+    f.text(56, 368, "나누기 쉬운 것은 읽기(조사)이고, 쓰기와 결정은 한 곳에 모읍니다. 셋째와 넷째 질문은 다른 축이라 둘 다 예일 수 있습니다.", size=12, anchor="start", fill=TOKENS["ink"])
+    return f
+
+
+FIGURES = [f1_critical_path, f2_fast_slow, f3_same_harness, f4_decision_flow]
 
 if __name__ == "__main__":
     for make in FIGURES:
