@@ -19,3 +19,21 @@
 4. https://www.skills.sh/
 5. https://github.com/heygen-com/hyperframes
 6. https://github.com/trending
+
+---
+
+잘 작성된 스킬이란?
+1. 구분이 잘 되어 있을 것 - XML
+2. Desc 가 너무 길지 않을 것.
+3. 내 업무 Flow 를 모두 담고 있을 것.
+
+---
+
+### 다양한 Tool, Skills
+1. https://engineering.atspotify.com/2026/9/portal-by-spotify-cut-my-claude-code-token-usage-by-90
+   - https://github.com/sorantis/portal-ai-plugins/tree/add-shunt-claude/plugins/shunt
+2. https://github.com/browser-use/jev-ultrafast
+3. https://github.com/vercel-labs/agent-desktop
+4. https://github.com/tembo/voxl
+5. https://github.com/UpstageAI/korean-tax-calc-mcp
+6. https://github.com/NVIDIA/auto-ontology
