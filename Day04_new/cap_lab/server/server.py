@@ -52,11 +52,18 @@ from cap_lab.settings import load_settings
 READ_ONLY = ToolAnnotations(read_only_hint=True, open_world_hint=False)
 
 ToolName = Literal[
-    "start_interview", "record_answer", "get_session", "freeze_seed",
-    "list_evidence", "read_evidence", "save_evidence",
+    "start_interview",
+    "record_answer",
+    "get_session",
+    "freeze_seed",
+    "list_evidence",
+    "read_evidence",
+    "save_evidence",
 ]
 AnswerField = Literal["constraints", "acceptance_criteria"]
-FAULT_EXAMPLE = '{"permission_denied": ["save_evidence"], "transient": {"record_answer": 1}}'
+FAULT_EXAMPLE = (
+    '{"permission_denied": ["save_evidence"], "transient": {"record_answer": 1}}'
+)
 # --transport streamable-http가 여는 주소. 인증이 없는 서버라 같은 컴퓨터의 클라이언트만 접속하게 한다.
 LOOPBACK = "127.0.0.1"
 
@@ -89,7 +96,9 @@ def fault_middleware(plan: FaultPlan):
         name = (ctx.params or {}).get("name")
         if name in plan.permission_denied:
             return business_failure(
-                WorkflowError("permission_denied", "이 도구를 사용할 권한이 없습니다.").result
+                WorkflowError(
+                    "permission_denied", "이 도구를 사용할 권한이 없습니다."
+                ).result
             )
         if remaining.get(name, 0) > 0:
             remaining[name] -= 1
@@ -113,7 +122,9 @@ class RevisedCriteria(BaseModel):
     )
 
 
-def without_output_schema(tool: Callable[..., dict[str, Any]]) -> Callable[..., CallToolResult]:
+def without_output_schema(
+    tool: Callable[..., dict[str, Any]],
+) -> Callable[..., CallToolResult]:
     """plain 인터페이스의 도구 사본. outputSchema는 공개하지 않고 결과 모양은 rich와 같게 돌려준다.
 
     본문 텍스트는 rich에서 SDK가 dict 결과로 만드는 텍스트와 같은 방식으로 만든다
@@ -126,7 +137,9 @@ def without_output_schema(tool: Callable[..., dict[str, Any]]) -> Callable[..., 
     def unadvertised(**arguments: Any) -> CallToolResult:
         result = tool(**arguments)
         text = pydantic_core.to_json(result, fallback=str, indent=2).decode()
-        return CallToolResult(content=[TextContent(type="text", text=text)], structured_content=result)
+        return CallToolResult(
+            content=[TextContent(type="text", text=text)], structured_content=result
+        )
 
     return unadvertised
 
@@ -186,11 +199,17 @@ def create_server(
         plain은 plain_description만 공개한다. 등록한 원래 함수를 그대로 돌려준다.
         """
 
-        def register(tool: Callable[..., dict[str, Any]]) -> Callable[..., dict[str, Any]]:
+        def register(
+            tool: Callable[..., dict[str, Any]],
+        ) -> Callable[..., dict[str, Any]]:
             if interface == "rich":
                 mcp.add_tool(tool, annotations=annotations)
             else:
-                mcp.add_tool(without_output_schema(tool), description=plain_description, structured_output=False)
+                mcp.add_tool(
+                    without_output_schema(tool),
+                    description=plain_description,
+                    structured_output=False,
+                )
             return tool
 
         return register
@@ -214,7 +233,9 @@ def create_server(
         nonlocal testability_gate
         if testability_gate is None:
             try:
-                decider = fake_decider_from_env(os.environ) or make_decider(load_settings())
+                decider = fake_decider_from_env(os.environ) or make_decider(
+                    load_settings()
+                )
             except (RuntimeError, ValueError) as error:
                 # 두 함수가 직접 쓴 메시지다. 키 이름만 담고 키 값은 담지 않는다.
                 raise GateUnavailable(f"판정기를 만들 수 없습니다({error}).") from error
@@ -247,9 +268,15 @@ def create_server(
 
     # 기록을 추가만 하고 지우지 않는다(destructive=false). 호출마다 새 세션 ID를 만들므로
     # 응답을 놓쳤다고 다시 부르면 업무가 중복된다(idempotent=false).
-    @publish(ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=False, open_world_hint=False),
-        "인터뷰를 시작한다.")
+    @publish(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=False,
+            open_world_hint=False,
+        ),
+        "인터뷰를 시작한다.",
+    )
     def start_interview(goal: str) -> dict[str, Any]:
         """새 업무의 목표를 저장하고 세션 ID와 첫 질문을 반환한다."""
         return invoke(lambda: workflow.start_interview(goal))
@@ -263,7 +290,9 @@ def create_server(
             field: answer_field,
             answer: str,
             assessment: Annotated[Assessment, Resolve(assess)],
-            revision: Annotated[ElicitationResult[RevisedCriteria], Resolve(ask_if_untestable)],
+            revision: Annotated[
+                ElicitationResult[RevisedCriteria], Resolve(ask_if_untestable)
+            ],
         ) -> dict[str, Any]:
             """세션의 제약 또는 완료 기준을 기록한다. 확정 뒤에는 수정할 수 없다."""
             if assessment.failure:
@@ -280,7 +309,11 @@ def create_server(
                     "criteria_not_testable",
                     "사용자가 실행 결과로 확인할 수 있는 완료 기준을 주지 않았습니다. 아무것도 기록하지 않았습니다.",
                 ).result
-            record = {"score": decision.score, "threshold": decision.threshold, "source": "agent"}
+            record = {
+                "score": decision.score,
+                "threshold": decision.threshold,
+                "source": "agent",
+            }
             if not decision.passed:
                 record |= {"source": "elicited", "original": answer.strip()}
             return invoke(
@@ -304,7 +337,10 @@ def create_server(
     # 게이트를 켜면 완료 기준을 외부 Decision API로 판정하므로 열린 세계다(openWorld=gate on).
     publish(
         ToolAnnotations(
-            read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=gate == "h1"
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=True,
+            open_world_hint=gate == "h1",
         ),
         "답변을 기록한다.",
     )(record_answer)
@@ -312,17 +348,29 @@ def create_server(
     # 조회처럼 보이지만 읽기 전용이 아니다: 파일에만 있는 기록을 DB로 복원하고 근거 파일을 다시 내보낸다.
     # 빠진 기록만 추가하고 내용이 다른 기존 파일은 덮어쓰지 않는다(destructive=false).
     # 다시 불러도 같은 상태와 같은 파일이 된다(idempotent=true).
-    @publish(ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
-        "세션을 조회한다.")
+    @publish(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=True,
+            open_world_hint=False,
+        ),
+        "세션을 조회한다.",
+    )
     def get_session(session_id: str) -> dict[str, Any]:
         """세션을 조회하고 근거 파일을 복구한다. DB가 없으면 근거에서 복원한다."""
         return invoke(lambda: workflow.get_session(session_id))
 
     # 확정 기록을 추가만 한다. 이미 확정한 세션을 다시 확정하면 같은 명세를 반환한다(idempotent=true).
-    @publish(ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
-        "명세를 확정한다.")
+    @publish(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=True,
+            open_world_hint=False,
+        ),
+        "명세를 확정한다.",
+    )
     def freeze_seed(session_id: str) -> dict[str, Any]:
         """제약과 완료 기준이 기록된 명세를 확정한다. 업무 구현을 실행하지 않는다."""
         return invoke(lambda: workflow.freeze_seed(session_id))
@@ -339,9 +387,15 @@ def create_server(
 
     # 같은 제목·본문·원본 ID는 같은 산출물 ID라 다시 보내도 파일이 늘지 않는다(idempotent=true).
     # 내용이 바뀌면 별도 파일로 남기고 기존 파일을 덮어쓰지 않는다(destructive=false).
-    @publish(ToolAnnotations(
-        read_only_hint=False, destructive_hint=False, idempotent_hint=True, open_world_hint=False),
-        "근거를 저장한다.")
+    @publish(
+        ToolAnnotations(
+            read_only_hint=False,
+            destructive_hint=False,
+            idempotent_hint=True,
+            open_world_hint=False,
+        ),
+        "근거를 저장한다.",
+    )
     def save_evidence(
         session_id: str, title: str, content: str, source_evidence_id: str = ""
     ) -> dict[str, Any]:
@@ -422,7 +476,9 @@ if __name__ == "__main__":
     except ValidationError as error:
         first = error.errors()[0]
         where = ".".join(str(part) for part in first["loc"])
-        parser.error(f"--fault 형식이 잘못되었습니다({where}: {first['msg']}). 예: {FAULT_EXAMPLE}")
+        parser.error(
+            f"--fault 형식이 잘못되었습니다({where}: {first['msg']}). 예: {FAULT_EXAMPLE}"
+        )
     server = create_server(
         args.db.resolve(),
         args.evidence_dir.resolve(),

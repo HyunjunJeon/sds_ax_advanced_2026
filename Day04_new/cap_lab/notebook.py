@@ -3,6 +3,7 @@
 - 키 값은 어디에도 출력하지 않는다(설정됨/미설정만).
 - run_small_compare는 dev 사례만 돌리고 Langfuse에 연결하지 않는다. 기록은 로컬 rows.jsonl뿐이다.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -28,18 +29,31 @@ from cap_lab.settings import ROOT, Settings, key_status, load_settings
 from cap_lab.stats import wilson_ci
 
 OUTPUT_ROOT = ROOT / "outputs" / "notebook"
-_ENV_FILE_VARIABLE = "DAY04_ENV_FILE"  # 서버가 load_settings로 키를 읽을 .env를 가리키는 변수다.
-_SCORE_VALUE_KEYS = ("variant", "repeat", "case_id", "first_failure", "error", "evidence_dir")
+_ENV_FILE_VARIABLE = (
+    "DAY04_ENV_FILE"  # 서버가 load_settings로 키를 읽을 .env를 가리키는 변수다.
+)
+_SCORE_VALUE_KEYS = (
+    "variant",
+    "repeat",
+    "case_id",
+    "first_failure",
+    "error",
+    "evidence_dir",
+)
 
 
-def announce(purpose: str, *, model_calls: int, jev_calls: int = 0, runs: int = 0) -> None:
+def announce(
+    purpose: str, *, model_calls: int, jev_calls: int = 0, runs: int = 0
+) -> None:
     """유료 호출 직전에 규모를 한 줄로 알린다. 알리기만 하고 멈추지 않는다."""
     parts = [
-        text for count, text in (
+        text
+        for count, text in (
             (model_calls, f"Claude 약 {model_calls}회"),
             (jev_calls, f"Jev 최대 {jev_calls}회"),
             (runs, f"실행 {runs}회"),
-        ) if count
+        )
+        if count
     ]
     if not parts:
         print(f"[{purpose}] 유료 호출 없음. 진행합니다.")
@@ -50,8 +64,16 @@ def announce(purpose: str, *, model_calls: int, jev_calls: int = 0, runs: int = 
 def show_table(rows: list[dict], columns: list[str] | None = None) -> None:
     """행을 줄이지 않고 표로 보여 준다."""
     frame = pd.DataFrame(rows, columns=columns)
-    with pd.option_context("display.max_rows", None, "display.max_columns", None,
-                           "display.width", 200, "display.max_colwidth", None):
+    with pd.option_context(
+        "display.max_rows",
+        None,
+        "display.max_columns",
+        None,
+        "display.width",
+        200,
+        "display.max_colwidth",
+        None,
+    ):
         display(frame)
 
 
@@ -59,9 +81,19 @@ def key_table(settings: Settings | None = None) -> None:
     """실습에 쓰는 키가 설정됐는지만 보여 준다. 값, 앞자리, 길이는 보여 주지 않는다."""
     settings = settings or load_settings()
     status = key_status(settings)
-    names = ("ANTHROPIC_API_KEY", "TYPESAFE_API_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY")
+    names = (
+        "ANTHROPIC_API_KEY",
+        "TYPESAFE_API_KEY",
+        "LANGFUSE_PUBLIC_KEY",
+        "LANGFUSE_SECRET_KEY",
+    )
     rows = [{"환경 변수": name, "상태": status[name]} for name in names]
-    rows.append({"환경 변수": "LANGFUSE_HOST", "상태": "설정됨" if settings.langfuse_host.strip() else "미설정"})
+    rows.append(
+        {
+            "환경 변수": "LANGFUSE_HOST",
+            "상태": "설정됨" if settings.langfuse_host.strip() else "미설정",
+        }
+    )
     show_table(rows)
 
 
@@ -87,10 +119,22 @@ async def connect_server(
     서버가 사용자에게 묻는 질문(elicitation)에는 elicitation_callback(context, params)이 답한다.
     """
     workdir = Path(workdir)
-    args = server_argv(workdir / "sessions.sqlite3", workdir / "evidence",
-                       gate=gate, threshold=threshold, fault=fault, interface=interface)
-    env = {_ENV_FILE_VARIABLE: os.environ[_ENV_FILE_VARIABLE]} if _ENV_FILE_VARIABLE in os.environ else {}
-    params = StdioServerParameters(command=sys.executable, args=[str(SERVER_SCRIPT), *args], env=env, cwd=str(ROOT))
+    args = server_argv(
+        workdir / "sessions.sqlite3",
+        workdir / "evidence",
+        gate=gate,
+        threshold=threshold,
+        fault=fault,
+        interface=interface,
+    )
+    env = (
+        {_ENV_FILE_VARIABLE: os.environ[_ENV_FILE_VARIABLE]}
+        if _ENV_FILE_VARIABLE in os.environ
+        else {}
+    )
+    params = StdioServerParameters(
+        command=sys.executable, args=[str(SERVER_SCRIPT), *args], env=env, cwd=str(ROOT)
+    )
     async with Client(params, elicitation_callback=elicitation_callback) as client:
         yield client
 
@@ -101,12 +145,14 @@ def show_events(evidence_dir: Path | str) -> None:
     for path in sorted(Path(evidence_dir).glob("*/event-*.json")):
         record = json.loads(path.read_text(encoding="utf-8"))
         content = record["content"]
-        rows.append({
-            "세션": record["session_id"][:8],
-            "이벤트": content["event"],
-            "필드": content["payload"].get("field", ""),
-            "시간": record["exported_at"],
-        })
+        rows.append(
+            {
+                "세션": record["session_id"][:8],
+                "이벤트": content["event"],
+                "필드": content["payload"].get("field", ""),
+                "시간": record["exported_at"],
+            }
+        )
     if rows:
         show_table(rows)
     else:
@@ -133,9 +179,13 @@ def _dev_cases(case_ids: list[str]) -> list[dict]:
     by_id = {case["id"]: case for case in load_cases()}
     for case_id in case_ids:
         if case_id not in by_id:
-            raise ValueError(f"사례 {case_id}가 없습니다. dev-01부터 dev-10까지만 쓸 수 있습니다.")
+            raise ValueError(
+                f"사례 {case_id}가 없습니다. dev-01부터 dev-10까지만 쓸 수 있습니다."
+            )
         if by_id[case_id]["split"] != "dev":
-            raise ValueError(f"{case_id}는 dev 사례가 아닙니다. 수업 중 비교는 dev 사례만 실행합니다.")
+            raise ValueError(
+                f"{case_id}는 dev 사례가 아닙니다. 수업 중 비교는 dev 사례만 실행합니다."
+            )
     return [by_id[case_id] for case_id in case_ids]
 
 
@@ -160,20 +210,34 @@ def run_small_compare(
     for repeat in range(1, repeats + 1):
         for variant in variants:
             for case in cases:
-                record = _run_blocking(run_case(case, variant=variant, settings=settings, workdir=workdir,
-                                                repeat=repeat, model=model, decider=decider))
+                record = _run_blocking(
+                    run_case(
+                        case,
+                        variant=variant,
+                        settings=settings,
+                        workdir=workdir,
+                        repeat=repeat,
+                        model=model,
+                        decider=decider,
+                    )
+                )
                 scores = score_run(record)
                 row = {
-                    "variant": variant.name, "repeat": repeat, "case_id": case["id"],
+                    "variant": variant.name,
+                    "repeat": repeat,
+                    "case_id": case["id"],
                     **{score.name: score.value for score in scores},
-                    "first_failure": first_failure(scores), "error": record.error,
+                    "first_failure": first_failure(scores),
+                    "error": record.error,
                     "evidence_dir": str(record.evidence_dir),
                 }
                 with (workdir / "rows.jsonl").open("a", encoding="utf-8") as rows_file:
                     rows_file.write(json.dumps(row, ensure_ascii=False) + "\n")
                 rows.append(row)
-                print(f"[{label}] {variant.name} 반복 {repeat} {case['id']}: "
-                      f"{'오류' if record.error else '완료'}")
+                print(
+                    f"[{label}] {variant.name} 반복 {repeat} {case['id']}: "
+                    f"{'오류' if record.error else '완료'}"
+                )
     return rows
 
 
@@ -185,9 +249,13 @@ def pass_rate_table(rows: list[dict], scores: list[str]) -> list[dict]:
     for name in scores:
         values = [row[name] for row in rows if name in row]
         if rows and not values:
-            raise ValueError(f"{name}은 어느 행에도 없는 점수입니다. 이름을 확인하세요.")
+            raise ValueError(
+                f"{name}은 어느 행에도 없는 점수입니다. 이름을 확인하세요."
+            )
         if any(value is not None and not isinstance(value, bool) for value in values):
-            raise ValueError(f"{name}은 참/거짓 검사가 아닙니다. 통과율은 참/거짓 검사만 셉니다.")
+            raise ValueError(
+                f"{name}은 참/거짓 검사가 아닙니다. 통과율은 참/거짓 검사만 셉니다."
+            )
     table = []
     for variant in dict.fromkeys(row["variant"] for row in rows):
         for name in scores:
@@ -195,11 +263,16 @@ def pass_rate_table(rows: list[dict], scores: list[str]) -> list[dict]:
             passed = values.count(True)
             checked = passed + values.count(False)
             interval = wilson_ci(passed, checked)
-            table.append({
-                "variant": variant, "score": name, "passed": passed, "checked": checked,
-                "unchecked": values.count(None),
-                "rate": passed / checked if checked else None,
-                "ci_low": interval[0] if interval else None,
-                "ci_high": interval[1] if interval else None,
-            })
+            table.append(
+                {
+                    "variant": variant,
+                    "score": name,
+                    "passed": passed,
+                    "checked": checked,
+                    "unchecked": values.count(None),
+                    "rate": passed / checked if checked else None,
+                    "ci_low": interval[0] if interval else None,
+                    "ci_high": interval[1] if interval else None,
+                }
+            )
     return table

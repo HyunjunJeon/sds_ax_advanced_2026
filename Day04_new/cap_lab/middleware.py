@@ -5,6 +5,7 @@ Decision API(Jev)의 Noul 질문 goal_preserved 하나로 묻는다.
 decision_unavailable을 돌려준다(fail-closed). 확률은 보정을 가정하지 않으며 기본 문턱값 0.5는 라벨로 재지 않은 자리값이다.
 사용자 요청과 goal 문장은 선택한 Decision API 공급자에게 그대로 전송된다.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -59,7 +60,9 @@ class GoalGuard(AgentMiddleware):
         self.decisions: list[GuardDecision] = []
 
     def wrap_tool_call(
-        self, request: ToolCallRequest, handler: Callable[[ToolCallRequest], ToolMessage | Command]
+        self,
+        request: ToolCallRequest,
+        handler: Callable[[ToolCallRequest], ToolMessage | Command],
     ) -> ToolMessage | Command:
         if request.tool_call["name"] != GUARDED_TOOL:
             return handler(request)
@@ -67,7 +70,9 @@ class GoalGuard(AgentMiddleware):
         return handler(request) if refusal is None else refusal
 
     async def awrap_tool_call(
-        self, request: ToolCallRequest, handler: Callable[[ToolCallRequest], Awaitable[ToolMessage | Command]]
+        self,
+        request: ToolCallRequest,
+        handler: Callable[[ToolCallRequest], Awaitable[ToolMessage | Command]],
     ) -> ToolMessage | Command:
         if request.tool_call["name"] != GUARDED_TOOL:
             return await handler(request)
@@ -83,14 +88,18 @@ class GoalGuard(AgentMiddleware):
         )
         probability, failure = self._judge(state)
         if probability is not None and probability >= self.threshold:
-            self.decisions.append(GuardDecision(GUARDED_TOOL, probability, self.threshold, True, None))
+            self.decisions.append(
+                GuardDecision(GUARDED_TOOL, probability, self.threshold, True, None)
+            )
             return None
         if probability is None:
             error = "decision_unavailable"
             message = f"{failure} start_interview를 호출하지 않았습니다. 판정기 설정을 확인한 뒤 다시 호출하세요."
         else:
             error, message = "goal_changed", GOAL_CHANGED_MESSAGE
-        self.decisions.append(GuardDecision(GUARDED_TOOL, probability, self.threshold, False, error))
+        self.decisions.append(
+            GuardDecision(GUARDED_TOOL, probability, self.threshold, False, error)
+        )
         result = {"success": False, "error": error, "message": message}
         # 서버의 업무 오류와 같은 모양이다: success=false JSON, 상태는 기본값. artifact도 MCP 도구 결과와 같은 키에 둔다.
         return ToolMessage(
@@ -103,13 +112,18 @@ class GoalGuard(AgentMiddleware):
     def _judge(self, state: str) -> tuple[float | None, str]:
         """(확률, 실패 이유). 판정하지 못했으면 확률이 None이고 이유를 담는다. 어떤 실패도 통과로 바꾸지 않는다."""
         try:
-            verdict = self.decider.judge(state, [GOAL_PRESERVED]).verdicts[GOAL_PRESERVED.name]
+            verdict = self.decider.judge(state, [GOAL_PRESERVED]).verdicts[
+                GOAL_PRESERVED.name
+            ]
         except DecisionError as error:
             # DecisionError 메시지는 공급자 이름과 HTTP 상태만 담는다(cap_lab/decisions.py:81). 키와 state는 없다.
             return None, f"목표 유지 여부를 판정하지 못했습니다({error})."
         except Exception as error:
             # 내용을 모르는 예외라 메시지는 싣지 않고 종류만 전한다(cap_lab/server/gate.py:78과 같다).
-            return None, f"목표 유지 여부를 판정하지 못했습니다({type(error).__name__})."
+            return (
+                None,
+                f"목표 유지 여부를 판정하지 못했습니다({type(error).__name__}).",
+            )
         if verdict.probability is None:
             return None, "판정기가 goal_preserved 확률을 주지 않았습니다(refused)."
         return verdict.probability, ""
@@ -141,14 +155,29 @@ class DeferralSafePromptCaching(AnthropicPromptCachingMiddleware):
     def _apply_caching(self, request: ModelRequest) -> ModelRequest:
         cached = super()._apply_caching(request)
         tools = cached.tools or []
-        deferred = [tool for tool in tools if _is_deferred(tool) and _has_cache_control(tool)]
+        deferred = [
+            tool for tool in tools if _is_deferred(tool) and _has_cache_control(tool)
+        ]
         if not deferred:
             return cached
         cache_control = self._cache_control
-        target = next((tool for tool in reversed(tools) if isinstance(tool, BaseTool) and not _is_deferred(tool)), None)
+        target = next(
+            (
+                tool
+                for tool in reversed(tools)
+                if isinstance(tool, BaseTool) and not _is_deferred(tool)
+            ),
+            None,
+        )
         fixed = [
-            _with_extras(tool, {k: v for k, v in tool.extras.items() if k != "cache_control"}) if tool in deferred
-            else _with_extras(tool, {**(tool.extras or {}), "cache_control": cache_control}) if tool is target
+            _with_extras(
+                tool, {k: v for k, v in tool.extras.items() if k != "cache_control"}
+            )
+            if tool in deferred
+            else _with_extras(
+                tool, {**(tool.extras or {}), "cache_control": cache_control}
+            )
+            if tool is target
             else tool
             for tool in tools
         ]
@@ -156,7 +185,9 @@ class DeferralSafePromptCaching(AnthropicPromptCachingMiddleware):
 
 
 def _is_deferred(tool: object) -> bool:
-    return isinstance(tool, BaseTool) and (tool.extras or {}).get("defer_loading") is True
+    return (
+        isinstance(tool, BaseTool) and (tool.extras or {}).get("defer_loading") is True
+    )
 
 
 def _has_cache_control(tool: object) -> bool:

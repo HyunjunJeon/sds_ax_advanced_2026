@@ -55,7 +55,9 @@ def paired_bootstrap_diff(
     }
 
 
-def noise_band(a1: Values, a2: Values, *, iters: int = 10000, seed: int = 0) -> float | None:
+def noise_band(
+    a1: Values, a2: Values, *, iters: int = 10000, seed: int = 0
+) -> float | None:
     """같은 구성을 두 번 돌린 A/A 쌍에서 우연만으로 생기는 차이의 폭."""
     result = paired_bootstrap_diff(a1, a2, iters=iters, seed=seed)
     if result is None:
@@ -76,7 +78,10 @@ def decide(
 ) -> dict[str, object]:
     """사전 등록된 판정 규칙. 반환: {"verdict": str, "reasons": list[str]}."""
     if target is None:
-        return {"verdict": VERDICT_NO_DATA, "reasons": ["목표 지표의 비교 결과가 없습니다."]}
+        return {
+            "verdict": VERDICT_NO_DATA,
+            "reasons": ["목표 지표의 비교 결과가 없습니다."],
+        }
     if target["hi"] < 0:
         return {
             "verdict": VERDICT_REGRESSED,
@@ -85,7 +90,9 @@ def decide(
     if target["lo"] <= 0:
         return {
             "verdict": VERDICT_UNCONFIRMED,
-            "reasons": [f"목표 지표 구간 하한 {target['lo']:.3f}이 0 이하라 개선을 확인할 수 없습니다."],
+            "reasons": [
+                f"목표 지표 구간 하한 {target['lo']:.3f}이 0 이하라 개선을 확인할 수 없습니다."
+            ],
         }
 
     missing = [
@@ -94,7 +101,10 @@ def decide(
     if missing:
         return {
             "verdict": VERDICT_NO_DATA,
-            "reasons": [f"가드 지표 {name}의 비교 결과 또는 잡음 폭이 없습니다." for name in missing],
+            "reasons": [
+                f"가드 지표 {name}의 비교 결과 또는 잡음 폭이 없습니다."
+                for name in missing
+            ],
         }
 
     worse = []
@@ -108,5 +118,7 @@ def decide(
         return {"verdict": VERDICT_TRADEOFF, "reasons": worse}
     return {
         "verdict": VERDICT_IMPROVED,
-        "reasons": [f"목표 지표 구간 하한 {target['lo']:.3f}이 0보다 크고 가드 지표는 잡음 폭 안입니다."],
+        "reasons": [
+            f"목표 지표 구간 하한 {target['lo']:.3f}이 0보다 크고 가드 지표는 잡음 폭 안입니다."
+        ],
     }

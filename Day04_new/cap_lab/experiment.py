@@ -6,6 +6,7 @@
 - 로컬 사본은 오류가 난 항목을 포함해 모든 항목을 남긴다. 같은 실행 이름의 기록이 있으면 시작하지 않는다.
 - 비교는 cap_lab.stats의 쌍체 부트스트랩과 사전 등록된 decide()를 그대로 쓴다.
 """
+
 from __future__ import annotations
 
 import asyncio
@@ -19,7 +20,10 @@ from dataclasses import asdict, dataclass, field
 from pathlib import Path
 from typing import Literal
 
-from langchain_anthropic._client_utils import _AsyncHttpxClientWrapper, _get_default_async_httpx_client
+from langchain_anthropic._client_utils import (
+    _AsyncHttpxClientWrapper,
+    _get_default_async_httpx_client,
+)
 from langchain_core.callbacks import BaseCallbackHandler
 from langchain_core.language_models import BaseChatModel
 from langchain_core.messages import AIMessage, BaseMessage, ToolMessage
@@ -33,7 +37,14 @@ from langgraph.types import Command, Interrupt
 
 from cap_lab.agent import SERVER_SCRIPT, SKILLS_DIR, build_agent, server_argv
 from cap_lab.decisions import BACKENDS, DecisionBackend, make_decider
-from cap_lab.scorers import STAGE_OF, STAGE_ORDER, RunRecord, Score, first_failure, score_run
+from cap_lab.scorers import (
+    STAGE_OF,
+    STAGE_ORDER,
+    RunRecord,
+    Score,
+    first_failure,
+    score_run,
+)
 from cap_lab.server.server import FaultPlan
 from cap_lab.settings import ROOT, Settings, require
 from cap_lab.stats import decide, noise_band, paired_bootstrap_diff, wilson_ci
@@ -43,7 +54,9 @@ DATASET_NAME = "day04_new-capability-v1"
 MIRROR_DIR = ROOT / "outputs" / "runs"
 SKILL_FILE = "requirements-interview/SKILL.md"
 # 서버 코드 sha256에 넣는 파일. 서버 스크립트 뒤에 이 순서로 이어 붙인다.
-SERVER_MODULES = tuple(SERVER_SCRIPT.parent / name for name in ("workflow.py", "evidence.py", "gate.py"))
+SERVER_MODULES = tuple(
+    SERVER_SCRIPT.parent / name for name in ("workflow.py", "evidence.py", "gate.py")
+)
 
 BOOLEAN_SCORES = (*STAGE_OF, "contamination_free")
 LOWER_IS_BETTER = ("model_calls", "tool_calls", "latency_s")
@@ -93,11 +106,17 @@ def _dataset_fields(case: dict) -> dict:
     return {
         "input": {"id": case["id"], "turns": case["turns"]},
         "expected_output": case["expect"],
-        "metadata": {"split": case["split"], "stage": case["stage"], "kind": case["kind"]},
+        "metadata": {
+            "split": case["split"],
+            "stage": case["stage"],
+            "kind": case["kind"],
+        },
     }
 
 
-def sync_dataset(client: Langfuse, cases: Sequence[dict], name: str = DATASET_NAME) -> list[str]:
+def sync_dataset(
+    client: Langfuse, cases: Sequence[dict], name: str = DATASET_NAME
+) -> list[str]:
     """Langfuse 데이터셋을 사례와 맞춘다. 항목 ID는 사례 ID다. 반환: 새로 쓰거나 고친 사례 ID.
 
     이미 같은 내용인 항목은 다시 쓰지 않는다. 그래서 두 번 불러도 두 번째에는 아무것도 쓰지 않는다.
@@ -116,7 +135,9 @@ def sync_dataset(client: Langfuse, cases: Sequence[dict], name: str = DATASET_NA
         fields = _dataset_fields(case)
         current = existing.get(case["id"])
         if current is not None and fields == {
-            "input": current.input, "expected_output": current.expected_output, "metadata": current.metadata,
+            "input": current.input,
+            "expected_output": current.expected_output,
+            "metadata": current.metadata,
         }:
             continue
         client.create_dataset_item(dataset_name=name, id=case["id"], **fields)
@@ -150,23 +171,37 @@ async def run_case(
     run_dir = Path(workdir) / run / case["id"]
     record = RunRecord(case=case, evidence_dir=run_dir / "evidence")
     options = {
-        "variant": variant, "settings": settings, "callbacks": callbacks,
-        "model": model, "decider": decider, "server_env": server_env,
+        "variant": variant,
+        "settings": settings,
+        "callbacks": callbacks,
+        "model": model,
+        "decider": decider,
+        "server_env": server_env,
     }
     try:
         run_dir.mkdir(parents=True, exist_ok=False)
         if case.get("requires"):
             # DB는 따로 쓴다. 본 사례가 DB가 아니라 근거 파일로 이전 세션을 이어 가는지를 본다.
-            required = RunRecord(case=_case_by_id(case["requires"]), evidence_dir=record.evidence_dir)
+            required = RunRecord(
+                case=_case_by_id(case["requires"]), evidence_dir=record.evidence_dir
+            )
             try:
                 await _drive(
-                    required, db=run_dir / "prerequisite.sqlite3", thread_id=f"{run}-{case['requires']}", **options
+                    required,
+                    db=run_dir / "prerequisite.sqlite3",
+                    thread_id=f"{run}-{case['requires']}",
+                    **options,
                 )
             except Exception as error:
                 raise RuntimeError(
                     f"선행 사례 {case['requires']} 실행 오류({_describe(error)}). 본 사례를 실행하지 않았습니다."
                 ) from error
-        await _drive(record, db=run_dir / "sessions.sqlite3", thread_id=f"{run}-{case['id']}", **options)
+        await _drive(
+            record,
+            db=run_dir / "sessions.sqlite3",
+            thread_id=f"{run}-{case['id']}",
+            **options,
+        )
     except Exception as error:
         record.error = _describe(error)
     return record
@@ -193,13 +228,20 @@ async def _drive(
     server_env: dict[str, str] | None,
 ) -> None:
     """에이전트를 만들고 사례의 turns를 한 스레드에서 차례로 보낸다. 기록은 record에 쌓는다."""
-    fault = FaultPlan.model_validate(record.case["fault"]) if record.case.get("fault") else None
+    fault = (
+        FaultPlan.model_validate(record.case["fault"])
+        if record.case.get("fault")
+        else None
+    )
     earlier_events = set(record.evidence_dir.glob("*/event-*.json"))
     handle = await build_agent(
         settings,
         server_args=server_argv(
-            db, record.evidence_dir,
-            gate="h1" if variant.gate_h1 else "off", threshold=variant.threshold_h1, fault=fault,
+            db,
+            record.evidence_dir,
+            gate="h1" if variant.gate_h1 else "off",
+            threshold=variant.threshold_h1,
+            fault=fault,
             interface=variant.interface,
         ),
         skills_dir=variant.skills_dir,
@@ -219,24 +261,36 @@ async def _drive(
     finally:
         record.latency_s = time.perf_counter() - started
         if handle.goal_guard is not None:
-            record.gate_decisions += [{"gate": "h2", **asdict(d)} for d in handle.goal_guard.decisions]
+            record.gate_decisions += [
+                {"gate": "h2", **asdict(d)} for d in handle.goal_guard.decisions
+            ]
         await handle.aclose()
     # 서버는 도구 결과를 돌려주기 전에 이벤트 파일을 쓴다. 실행이 끝난 뒤 한 번 읽으면 된다.
     record.gate_decisions += _h1_gate_records(record.evidence_dir, earlier_events)
 
 
-async def _send_turn(agent: CompiledStateGraph, record: RunRecord, turn: str, config: dict) -> None:
+async def _send_turn(
+    agent: CompiledStateGraph, record: RunRecord, turn: str, config: dict
+) -> None:
     """사용자 발화 하나를 보내고, elicitation interrupt가 남지 않을 때까지 사례의 응답으로 재개한다."""
-    pending = await _stream(agent, {"messages": [{"role": "user", "content": turn}]}, config, record)
+    pending = await _stream(
+        agent, {"messages": [{"role": "user", "content": turn}]}, config, record
+    )
     resumes = 0
     while pending:
         if resumes == MAX_RESUMES_PER_TURN:
-            raise RuntimeError(f"한 턴에서 elicitation 재개가 {MAX_RESUMES_PER_TURN}번을 넘었습니다. 재개를 멈췄습니다.")
+            raise RuntimeError(
+                f"한 턴에서 elicitation 재개가 {MAX_RESUMES_PER_TURN}번을 넘었습니다. 재개를 멈췄습니다."
+            )
         resumes += 1
-        pending = await _stream(agent, Command(resume=_answer_interrupts(pending, record)), config, record)
+        pending = await _stream(
+            agent, Command(resume=_answer_interrupts(pending, record)), config, record
+        )
 
 
-async def _stream(agent: CompiledStateGraph, request: dict | Command, config: dict, record: RunRecord) -> list[Interrupt]:
+async def _stream(
+    agent: CompiledStateGraph, request: dict | Command, config: dict, record: RunRecord
+) -> list[Interrupt]:
     """updates 스트림에서 모델 호출·도구 호출·결과를 기록한다. 반환: 답해야 할 interrupt."""
     pending: list[Interrupt] = []
     async for update in agent.astream(request, config, stream_mode="updates"):
@@ -261,7 +315,13 @@ def _record_model_message(message: BaseMessage, record: RunRecord) -> None:
     record.input_tokens += usage.get("input_tokens", 0)
     record.output_tokens += usage.get("output_tokens", 0)
     record.tool_calls += [
-        {"id": call["id"], "name": call["name"], "args": call["args"], "result": None, "ok": None}
+        {
+            "id": call["id"],
+            "name": call["name"],
+            "args": call["args"],
+            "result": None,
+            "ok": None,
+        }
         for call in message.tool_calls
     ]
     if not message.tool_calls:
@@ -275,13 +335,23 @@ def _record_tool_message(message: BaseMessage, record: RunRecord) -> None:
     """
     if not isinstance(message, ToolMessage):
         return
-    call = [call for call in record.tool_calls if call["id"] == message.tool_call_id][-1]
-    structured = message.artifact.get("structured_content") if isinstance(message.artifact, dict) else None
+    call = [call for call in record.tool_calls if call["id"] == message.tool_call_id][
+        -1
+    ]
+    structured = (
+        message.artifact.get("structured_content")
+        if isinstance(message.artifact, dict)
+        else None
+    )
     call["result"] = structured if structured is not None else message.content
     business_failure = structured is not None and structured.get("success") is False
     call["ok"] = message.status != "error" and not business_failure
     path = str(call["args"].get("file_path", ""))
-    if call["name"] == "read_file" and message.status != "error" and path.endswith("SKILL.md"):
+    if (
+        call["name"] == "read_file"
+        and message.status != "error"
+        and path.endswith("SKILL.md")
+    ):
         record.skill_reads.append(path)
 
 
@@ -297,7 +367,13 @@ def _answer_interrupts(pending: list[Interrupt], record: RunRecord) -> dict[str,
         for request in payload["requests"]:
             response = _elicitation_response(request, elicitation)
             responses[request["key"]] = response
-            record.interrupts.append({"tool_name": payload["tool_name"], "message": request["message"], **response})
+            record.interrupts.append(
+                {
+                    "tool_name": payload["tool_name"],
+                    "message": request["message"],
+                    **response,
+                }
+            )
         resume[interrupt.id] = {"responses": responses}
     return resume
 
@@ -306,7 +382,10 @@ def _elicitation_response(request: dict, elicitation: dict) -> dict:
     """요청 형식의 필드를 사례의 elicitation이 모두 갖고 있으면 그 값으로 수락하고, 하나라도 없으면 거절한다."""
     fields = list((request.get("requested_schema") or {}).get("properties", {}))
     if fields and all(name in elicitation for name in fields):
-        return {"action": "accept", "content": {name: elicitation[name] for name in fields}}
+        return {
+            "action": "accept",
+            "content": {name: elicitation[name] for name in fields},
+        }
     return {"action": "decline"}
 
 
@@ -317,11 +396,25 @@ def _h1_gate_records(evidence_dir: Path, earlier_events: set[Path]) -> list[dict
         content = json.loads(path.read_text(encoding="utf-8"))["content"]
         payload = content["payload"]
         if content["event"] == "answer_recorded" and "gate" in payload:
-            found.append({"gate": "h1", "session_id": path.parent.name, "field": payload["field"], **payload["gate"]})
+            found.append(
+                {
+                    "gate": "h1",
+                    "session_id": path.parent.name,
+                    "field": payload["field"],
+                    **payload["gate"],
+                }
+            )
     return found
 
 
-def _mirror_line(record: RunRecord, scores: list[Score], *, run_name: str, variant: Variant, repeat: int) -> dict:
+def _mirror_line(
+    record: RunRecord,
+    scores: list[Score],
+    *,
+    run_name: str,
+    variant: Variant,
+    repeat: int,
+) -> dict:
     case = record.case
     return {
         "run_name": run_name,
@@ -348,7 +441,9 @@ def _score(record: RunRecord) -> list[Score]:
     try:
         return score_run(record)
     except Exception as error:
-        record.error = "; ".join(filter(None, [record.error, f"채점 오류: {_describe(error)}"]))
+        record.error = "; ".join(
+            filter(None, [record.error, f"채점 오류: {_describe(error)}"])
+        )
         return []
 
 
@@ -371,24 +466,38 @@ def _item_evaluations(*, output: dict, **_: object) -> list[Evaluation]:
     ]
 
 
-def _pass_rates(*, item_results: Sequence[ExperimentItemResult], **_: object) -> list[Evaluation]:
+def _pass_rates(
+    *, item_results: Sequence[ExperimentItemResult], **_: object
+) -> list[Evaluation]:
     """실행 단위 점수. 검사마다 통과율과 95% Wilson 구간. 확인한 항목이 없는 검사는 보내지 않는다."""
     evaluations = []
     for name in BOOLEAN_SCORES:
-        values = [s["value"] for result in item_results for s in result.output["scores"] if s["name"] == name]
+        values = [
+            s["value"]
+            for result in item_results
+            for s in result.output["scores"]
+            if s["name"] == name
+        ]
         checked = [value for value in values if value is not None]
         passed = sum(checked)
         interval = wilson_ci(passed, len(checked))
         if interval is None:
             continue
         lo, hi = interval
-        evaluations.append(Evaluation(
-            name=f"{name}_pass_rate",
-            value=passed / len(checked),
-            comment=f"{passed}/{len(checked)} 통과, 95% Wilson 구간 [{lo:.3f}, {hi:.3f}], 확인 불가 {len(values) - len(checked)}건",
-            metadata={"passed": passed, "checked": len(checked), "unchecked": len(values) - len(checked),
-                      "wilson_lo": lo, "wilson_hi": hi},
-        ))
+        evaluations.append(
+            Evaluation(
+                name=f"{name}_pass_rate",
+                value=passed / len(checked),
+                comment=f"{passed}/{len(checked)} 통과, 95% Wilson 구간 [{lo:.3f}, {hi:.3f}], 확인 불가 {len(values) - len(checked)}건",
+                metadata={
+                    "passed": passed,
+                    "checked": len(checked),
+                    "unchecked": len(values) - len(checked),
+                    "wilson_lo": lo,
+                    "wilson_hi": hi,
+                },
+            )
+        )
     return evaluations
 
 
@@ -399,7 +508,9 @@ def _sha256(paths: Iterable[Path | str]) -> str:
     return digest.hexdigest()
 
 
-def _jev_model(variant: Variant, decider: DecisionBackend | None, settings: Settings) -> str:
+def _jev_model(
+    variant: Variant, decider: DecisionBackend | None, settings: Settings
+) -> str:
     """판정기 공급자와 모델 id. 게이트를 모두 끄면 off. H1은 서버 프로세스가 같은 .env로 만든 판정기를 쓴다."""
     if decider is None or not (variant.gate_h1 or variant.gate_h2):
         return "off"
@@ -409,12 +520,19 @@ def _jev_model(variant: Variant, decider: DecisionBackend | None, settings: Sett
     return f"{decider.name}:{backend.model}" if backend else decider.name
 
 
-def run_metadata(variant: Variant, settings: Settings, model: BaseChatModel | None, decider: DecisionBackend | None) -> dict[str, str]:
+def run_metadata(
+    variant: Variant,
+    settings: Settings,
+    model: BaseChatModel | None,
+    decider: DecisionBackend | None,
+) -> dict[str, str]:
     """실행 metadata(P4). 변형의 metadata가 고정 항목을 덮어쓰지 못하게 고정 항목을 뒤에 둔다."""
     return {
         **{key: str(value) for key, value in variant.metadata.items()},
         "variant": variant.name,
-        "model": settings.model if model is None else f"injected:{type(model).__name__}",
+        "model": settings.model
+        if model is None
+        else f"injected:{type(model).__name__}",
         "effort": settings.effort,
         "skill_sha256": _sha256([variant.skills_dir / SKILL_FILE]),
         "server_sha256": _sha256([SERVER_SCRIPT, *SERVER_MODULES]),
@@ -429,7 +547,12 @@ def run_metadata(variant: Variant, settings: Settings, model: BaseChatModel | No
     }
 
 
-def cost_notice(variant: Variant, cases: Sequence[dict], repeats: int, record: Literal["langfuse", "local"] = "langfuse") -> str:
+def cost_notice(
+    variant: Variant,
+    cases: Sequence[dict],
+    repeats: int,
+    record: Literal["langfuse", "local"] = "langfuse",
+) -> str:
     """실행 직전 한 줄 비용 고지(AGENTS.md 6절). 선행 사례 실행도 Claude와 Jev를 부르므로 따로 센다. record는 기록 위치 문구만 바꾼다."""
     runs = len(cases) * repeats
     prerequisites = sum(1 for case in cases if case.get("requires")) * repeats
@@ -437,8 +560,10 @@ def cost_notice(variant: Variant, cases: Sequence[dict], repeats: int, record: L
     low, high = (calls * agent_runs for calls in CLAUDE_CALLS_PER_RUN)
     jev = JEV_CALLS_PER_GATE_RUN * (variant.gate_h1 + variant.gate_h2) * agent_runs
     extra = f"(선행 사례 실행 {prerequisites}회 별도)" if prerequisites else ""
-    return (f"이 실행은 사례 {len(cases)} x 반복 {repeats} = {runs}회{extra}, Claude 호출 약 {low}~{high}회(추정), "
-            f"Jev 호출 최대 {jev}회(추정), {'Langfuse에' if record == 'langfuse' else '로컬 사본에만'} 기록합니다.")
+    return (
+        f"이 실행은 사례 {len(cases)} x 반복 {repeats} = {runs}회{extra}, Claude 호출 약 {low}~{high}회(추정), "
+        f"Jev 호출 최대 {jev}회(추정), {'Langfuse에' if record == 'langfuse' else '로컬 사본에만'} 기록합니다."
+    )
 
 
 def _connect_langfuse(settings: Settings) -> Langfuse:
@@ -461,7 +586,9 @@ def _check_langfuse_auth(client: Langfuse) -> None:
             "LANGFUSE_HOST를 직접 확인하세요. 아무것도 실행하지 않았습니다."
         ) from error
     if not authed:
-        raise RuntimeError("Langfuse 인증 확인이 통과하지 않았습니다. 아무것도 실행하지 않았습니다.")
+        raise RuntimeError(
+            "Langfuse 인증 확인이 통과하지 않았습니다. 아무것도 실행하지 않았습니다."
+        )
 
 
 def _dataset_items(client: Langfuse, cases: Sequence[dict]) -> list[DatasetItem]:
@@ -469,7 +596,9 @@ def _dataset_items(client: Langfuse, cases: Sequence[dict]) -> list[DatasetItem]
     items = {item.id: item for item in client.get_dataset(DATASET_NAME).items}
     missing = [case["id"] for case in cases if case["id"] not in items]
     if missing:
-        raise RuntimeError(f"Langfuse 데이터셋 {DATASET_NAME}에 사례 {missing}가 없습니다.")
+        raise RuntimeError(
+            f"Langfuse 데이터셋 {DATASET_NAME}에 사례 {missing}가 없습니다."
+        )
     return [items[case["id"]] for case in cases]
 
 
@@ -499,15 +628,24 @@ async def run_experiment(
     model을 주지 않으면 실행마다 make_model로 새로 만든다(ChatAnthropic의 비동기 클라이언트는 이벤트 루프에 묶인다).
     """
     if record not in ("langfuse", "local"):
-        raise ValueError(f"record는 'langfuse' 또는 'local'이어야 합니다(받은 값: {record!r}). 아무것도 실행하지 않았습니다.")
+        raise ValueError(
+            f"record는 'langfuse' 또는 'local'이어야 합니다(받은 값: {record!r}). 아무것도 실행하지 않았습니다."
+        )
     print(cost_notice(variant, cases, repeats, record))
     needed = (["ANTHROPIC_API_KEY"] if model is None else []) + (
-        ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"] if client is None and record == "langfuse" else [])
+        ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"]
+        if client is None and record == "langfuse"
+        else []
+    )
     require(settings, *needed)
     mirror_dir = Path(mirror_dir)
     workdir = mirror_dir.parent / "work"
     run_names = [f"{variant.name}-r{k}" for k in range(1, repeats + 1)]
-    taken = [name for name in run_names if (mirror_dir / f"{name}.jsonl").exists() or (workdir / name).exists()]
+    taken = [
+        name
+        for name in run_names
+        if (mirror_dir / f"{name}.jsonl").exists() or (workdir / name).exists()
+    ]
     if taken:
         raise RuntimeError(
             f"실행 기록 {taken}이(가) 이미 있습니다. 같은 이름에 이어 쓰면 서로 다른 실행이 섞이므로 시작하지 않았습니다. "
@@ -516,8 +654,17 @@ async def run_experiment(
     if decider is None and (variant.gate_h1 or variant.gate_h2):
         decider = make_decider(settings)
     if record == "local":
-        return await _run_local(variant, cases, run_names, settings=settings, mirror_dir=mirror_dir, workdir=workdir,
-                                model=model, decider=decider, server_env=server_env)
+        return await _run_local(
+            variant,
+            cases,
+            run_names,
+            settings=settings,
+            mirror_dir=mirror_dir,
+            workdir=workdir,
+            model=model,
+            decider=decider,
+            server_env=server_env,
+        )
     trace_langchain = client is None
     client = client or _connect_langfuse(settings)
     _check_langfuse_auth(client)
@@ -531,22 +678,46 @@ async def run_experiment(
 
         async def task(*, item: DatasetItem, **_: object) -> dict:
             # 이 함수는 아래 run_experiment 호출이 끝나기 전에만 불리므로 repeat·run_name은 이번 반복의 값이다.
-            callbacks = [CallbackHandler(public_key=settings.langfuse_public_key)] if trace_langchain else None
-            run_record = await with_own_anthropic_client(run_case(
-                by_id[item.input["id"]], variant=variant, settings=settings, workdir=workdir, repeat=repeat,
-                callbacks=callbacks, model=model, decider=decider, server_env=server_env,
-            ))
-            line = _mirror_line(run_record, _score(run_record), run_name=run_name, variant=variant, repeat=repeat)
+            callbacks = (
+                [CallbackHandler(public_key=settings.langfuse_public_key)]
+                if trace_langchain
+                else None
+            )
+            run_record = await with_own_anthropic_client(
+                run_case(
+                    by_id[item.input["id"]],
+                    variant=variant,
+                    settings=settings,
+                    workdir=workdir,
+                    repeat=repeat,
+                    callbacks=callbacks,
+                    model=model,
+                    decider=decider,
+                    server_env=server_env,
+                )
+            )
+            line = _mirror_line(
+                run_record,
+                _score(run_record),
+                run_name=run_name,
+                variant=variant,
+                repeat=repeat,
+            )
             _append_line(mirror_dir / f"{run_name}.jsonl", line)
-            return {key: line[key] for key in ("final_text", "scores", "first_failure", "error")}
+            return {
+                key: line[key]
+                for key in ("final_text", "scores", "first_failure", "error")
+            }
 
         # Langfuse의 run_experiment는 동기 함수이고 안에서 새 이벤트 루프를 돈다. 이 루프를 막지 않게 스레드에서 부른다.
         await asyncio.to_thread(
             client.run_experiment,
             name=f"{DATASET_NAME}:{variant.name}",
             run_name=run_name,
-            description=(f"H1 {metadata['gate_h1']}(문턱값 {variant.threshold_h1}), "
-                         f"H2 {metadata['gate_h2']}(문턱값 {variant.threshold_h2})"),
+            description=(
+                f"H1 {metadata['gate_h1']}(문턱값 {variant.threshold_h1}), "
+                f"H2 {metadata['gate_h2']}(문턱값 {variant.threshold_h2})"
+            ),
             data=items,
             task=task,
             evaluators=[_item_evaluations],
@@ -566,12 +737,18 @@ async def with_own_anthropic_client[T](coroutine: Coroutine[None, None, T]) -> T
     다른 곳에서 열어 둔 클라이언트는 건드리지 않는다.
     """
     _get_default_async_httpx_client.cache_clear()
-    before = {id(obj) for obj in gc.get_objects() if isinstance(obj, _AsyncHttpxClientWrapper)}
+    before = {
+        id(obj) for obj in gc.get_objects() if isinstance(obj, _AsyncHttpxClientWrapper)
+    }
     try:
         return await coroutine
     finally:
         for obj in gc.get_objects():
-            if isinstance(obj, _AsyncHttpxClientWrapper) and id(obj) not in before and not obj.is_closed:
+            if (
+                isinstance(obj, _AsyncHttpxClientWrapper)
+                and id(obj) not in before
+                and not obj.is_closed
+            ):
                 await obj.aclose()
         _get_default_async_httpx_client.cache_clear()
 
@@ -604,18 +781,40 @@ async def _run_local(
     mirror_dir.mkdir(parents=True, exist_ok=True)
     for repeat, run_name in enumerate(run_names, start=1):
         meta_path = mirror_dir / f"{run_name}.meta.json"
-        meta = {**metadata, "repeat": repeat, "record": "local", "started_at": _utc_now(), "finished_at": None,
-                "case_ids": case_ids}
+        meta = {
+            **metadata,
+            "repeat": repeat,
+            "record": "local",
+            "started_at": _utc_now(),
+            "finished_at": None,
+            "case_ids": case_ids,
+        }
         _write_json(meta_path, meta)
         errors = []
         for case in cases:
-            record = await run_case(case, variant=variant, settings=settings, workdir=workdir, repeat=repeat,
-                                    model=model, decider=decider, server_env=server_env)
-            line = _mirror_line(record, _score(record), run_name=run_name, variant=variant, repeat=repeat)
+            record = await run_case(
+                case,
+                variant=variant,
+                settings=settings,
+                workdir=workdir,
+                repeat=repeat,
+                model=model,
+                decider=decider,
+                server_env=server_env,
+            )
+            line = _mirror_line(
+                record,
+                _score(record),
+                run_name=run_name,
+                variant=variant,
+                repeat=repeat,
+            )
             _append_line(mirror_dir / f"{run_name}.jsonl", line)
             errors.append(line["error"])
             if len(errors) == ABORT_AFTER_ERRORS and all(errors):
-                listed = "\n".join(f"  {n}. {error}" for n, error in enumerate(errors, start=1))
+                listed = "\n".join(
+                    f"  {n}. {error}" for n, error in enumerate(errors, start=1)
+                )
                 raise RuntimeError(
                     f"{run_name}의 처음 {ABORT_AFTER_ERRORS}개 항목이 모두 오류로 끝나 실행을 멈췄습니다. "
                     f"오류 줄은 {mirror_dir / f'{run_name}.jsonl'}에 그대로 남겼습니다.\n{listed}"
@@ -630,7 +829,9 @@ def _utc_now() -> str:
 
 
 def _write_json(path: Path, content: dict) -> None:
-    path.write_text(json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(content, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def _read_mirrors(paths: Iterable[Path | str]) -> list[dict]:
@@ -649,7 +850,9 @@ def case_values(
     None(해당 없음·확인 불가)은 값에서 빼고 확인 불가로 센다. 오류가 난 줄은 숫자 지표도 빼고 모두 확인 불가로 센다.
     중간에 멈춘 실행의 호출 수·시간이 작게 잡혀 개선처럼 보이지 않게 하기 위해서다.
     """
-    values: dict[str, dict[str, list[float]]] = {metric: defaultdict(list) for metric in metrics}
+    values: dict[str, dict[str, list[float]]] = {
+        metric: defaultdict(list) for metric in metrics
+    }
     unchecked: Counter[str] = Counter()
     for line in _read_mirrors(paths):
         if split is not None and line["split"] != split:
@@ -684,7 +887,9 @@ def compare(
     a, unchecked_a = case_values(mirror_a, metrics, split)
     a2, unchecked_a2 = case_values(mirror_a2, metrics, split)
     b, unchecked_b = case_values(mirror_b, metrics, split)
-    comparisons = {metric: paired_bootstrap_diff(a[metric], b[metric]) for metric in metrics}
+    comparisons = {
+        metric: paired_bootstrap_diff(a[metric], b[metric]) for metric in metrics
+    }
     noise = {metric: noise_band(a[metric], a2[metric]) for metric in metrics}
     verdict = decide(
         comparisons[target],
@@ -699,7 +904,9 @@ def compare(
         "reasons": verdict["reasons"],
         "comparisons": comparisons,
         "noise": noise,
-        "guards_without_data": [g for g in guards if comparisons[g] is None or noise[g] is None],
+        "guards_without_data": [
+            g for g in guards if comparisons[g] is None or noise[g] is None
+        ],
         "unchecked": {"A": unchecked_a, "A2": unchecked_a2, "B": unchecked_b},
     }
 

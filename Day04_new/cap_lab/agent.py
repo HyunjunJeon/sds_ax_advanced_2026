@@ -5,6 +5,7 @@ tool_disclosure="upfront"는 Part 5 비교용으로 MCP 도구를 처음부터 �
 에이전트의 파일 도구는 Skill 폴더만 읽고 쓰기는 거절한다. Day04_new/data/에는 닿지 않는다(오염 방지).
 MCP 도구는 비동기 전용이다. 에이전트는 ainvoke/astream으로 실행한다.
 """
+
 from __future__ import annotations
 
 import os
@@ -62,10 +63,14 @@ def server_argv(
     서버는 cwd=Day04_new로 뜨므로 상대 경로는 호출한 쪽의 현재 폴더 기준 절대 경로로 바꿔 넘긴다.
     """
     argv = [
-        "--db", str(Path(db).resolve()),
-        "--evidence-dir", str(Path(evidence_dir).resolve()),
-        "--gate", gate,
-        "--gate-threshold", str(threshold),
+        "--db",
+        str(Path(db).resolve()),
+        "--evidence-dir",
+        str(Path(evidence_dir).resolve()),
+        "--gate",
+        gate,
+        "--gate-threshold",
+        str(threshold),
     ]
     if fault is not None:
         argv += ["--fault", fault.model_dump_json()]
@@ -106,9 +111,13 @@ async def build_agent(
     """
     # 키가 없으면 자식 프로세스를 띄우기 전에 멈춘다.
     model = model or make_model(settings)
-    goal_guard = GoalGuard(decider or make_decider(settings), h2_threshold) if gate_h2 else None
+    goal_guard = (
+        GoalGuard(decider or make_decider(settings), h2_threshold) if gate_h2 else None
+    )
     adapter = MCPAdapter(
-        PythonStdioTransport(SERVER_SCRIPT, args=server_args, env=_server_env(server_env), cwd=str(ROOT))
+        PythonStdioTransport(
+            SERVER_SCRIPT, args=server_args, env=_server_env(server_env), cwd=str(ROOT)
+        )
     )
     try:
         tools = await adapter.list_tools()
@@ -134,7 +143,9 @@ async def build_agent(
                 *([goal_guard] if goal_guard else []),
             ],
             skills=["/"],
-            permissions=[FilesystemPermission(operations=["write"], paths=["/**"], mode="deny")],
+            permissions=[
+                FilesystemPermission(operations=["write"], paths=["/**"], mode="deny")
+            ],
             backend=backend,
             checkpointer=checkpointer,
             name="requirements-evidence-agent",
@@ -149,7 +160,9 @@ def _deferred(tool: BaseTool) -> BaseTool:
     """defer_loading을 켠 사본. Skill이 metadata.include_tools에 이 이름을 적었으므로
     SkillsMiddleware가 그 SKILL.md를 read_file로 읽은 뒤에 스키마를 공개한다(deepagents/middleware/skills.py:986).
     """
-    return tool.model_copy(update={"extras": {**(tool.extras or {}), "defer_loading": True}})
+    return tool.model_copy(
+        update={"extras": {**(tool.extras or {}), "defer_loading": True}}
+    )
 
 
 def _server_env(extra: dict[str, str] | None) -> dict[str, str]:
@@ -158,7 +171,11 @@ def _server_env(extra: dict[str, str] | None) -> dict[str, str]:
     mcp의 stdio 클라이언트가 PATH·HOME 등 안전한 변수만 물려준다(mcp/client/stdio.py:41).
     여기서는 .env 위치(DAY04_ENV_FILE)가 정해져 있으면 그대로 넘기고, 시험용 변수(extra)를 더한다.
     """
-    forwarded = {_ENV_FILE_VARIABLE: os.environ[_ENV_FILE_VARIABLE]} if _ENV_FILE_VARIABLE in os.environ else {}
+    forwarded = (
+        {_ENV_FILE_VARIABLE: os.environ[_ENV_FILE_VARIABLE]}
+        if _ENV_FILE_VARIABLE in os.environ
+        else {}
+    )
     return forwarded | (extra or {})
 
 
@@ -171,5 +188,7 @@ def _disable_general_purpose_subagent(model: BaseChatModel) -> None:
     provider, identifier = get_model_provider(model), get_model_identifier(model)
     register_harness_profile(
         f"{provider}:{identifier}" if identifier else provider,
-        HarnessProfile(general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False)),
+        HarnessProfile(
+            general_purpose_subagent=GeneralPurposeSubagentProfile(enabled=False)
+        ),
     )

@@ -31,7 +31,11 @@ TESTABILITY = Score(
         "주어진 완료 기준을 실행 결과(테스트 통과 여부, 명령 출력, 생성된 파일의 내용 등)를 보고 "
         "참 또는 거짓으로 판정할 수 있는지 평가하라."
     ),
-    levels=["판정할 수 없다(모호한 표현)", "일부만 판정할 수 있다", "실행 결과로 참/거짓을 판정할 수 있다"],
+    levels=[
+        "판정할 수 없다(모호한 표현)",
+        "일부만 판정할 수 있다",
+        "실행 결과로 참/거짓을 판정할 수 있다",
+    ],
 )
 
 FAKE_SWITCH = "DAY04_ALLOW_FAKE_DECIDER"
@@ -71,15 +75,23 @@ class TestabilityGate:
 
     def _judge(self, criterion: str) -> float:
         try:
-            verdict = self.decider.judge(criterion, [TESTABILITY]).verdicts[TESTABILITY.name]
+            verdict = self.decider.judge(criterion, [TESTABILITY]).verdicts[
+                TESTABILITY.name
+            ]
         except DecisionError as error:
             # DecisionError 메시지는 공급자 이름과 HTTP 상태만 담는다(cap_lab/decisions.py). 키와 state는 없다.
-            raise GateUnavailable(f"완료 기준을 판정하지 못했습니다({error}).") from error
+            raise GateUnavailable(
+                f"완료 기준을 판정하지 못했습니다({error})."
+            ) from error
         except Exception as error:
             # 그 밖의 어떤 실패도 통과로 바꾸지 않는다. 내용을 모르는 메시지라 예외 종류만 전한다.
-            raise GateUnavailable(f"완료 기준을 판정하지 못했습니다({type(error).__name__}).") from error
+            raise GateUnavailable(
+                f"완료 기준을 판정하지 못했습니다({type(error).__name__})."
+            ) from error
         if verdict.score is None:
-            raise GateUnavailable("판정기가 testability 점수를 주지 않았습니다(refused).")
+            raise GateUnavailable(
+                "판정기가 testability 점수를 주지 않았습니다(refused)."
+            )
         return verdict.score
 
 
@@ -115,7 +127,9 @@ def fake_decider_from_env(environ: Mapping[str, str]) -> FakeDecider | None:
         return None
     script = environ.get(FAKE_SCRIPT, "")
     if script.strip() == "error":
-        return FakeDecider(error=DecisionError("fake: 가짜 판정기가 판정 실패를 흉내 냈습니다."))
+        return FakeDecider(
+            error=DecisionError("fake: 가짜 판정기가 판정 실패를 흉내 냈습니다.")
+        )
     try:
         return FakeDecider(_FAKE_SCORES.validate_json(script))
     except ValidationError as error:
