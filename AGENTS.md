@@ -38,6 +38,7 @@
 - `Day04_new`: 기존 `Day04`와 나란히 놓인 노트북 버전이다(`Day04/`는 그대로 둔다). Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. 키는 이 폴더의 `.env`에 `ANTHROPIC_API_KEY`, `TYPESAFE_API_KEY`(Decision API), `LANGFUSE_*` 값이 필요하다(다른 Day의 OpenRouter 키와 다르다). 07이 Langfuse를 쓴다. 상세는 [Day04_new/AGENTS.md](Day04_new/AGENTS.md).
 - `Day05_new`: 기존 `Day05`와 나란히 놓인 노트북 버전이다(`Day05/`는 그대로 둔다). Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. 키는 이 폴더의 `.env`에 `OPENGATEWAY_API_KEY`(기본 모델은 OpenGateway의 `deepseek/deepseek-v4.1-flash-ultrafast`, `DAY05_PROVIDER=anthropic`이면 대신 `ANTHROPIC_API_KEY`), Decision API 키 하나(`TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `AZURE_OPENAI_API_KEY` 중. Azure는 `DAY05_AZURE_ENDPOINT`·`DAY05_AZURE_DEPLOYMENT`도 필요), Langfuse 셀용 `LANGFUSE_*` 값이 필요하다(다른 Day의 OpenRouter 키와 다르다). `LANGFUSE_*`가 없으면 노트북은 로컬 경로로 진행한다. 상세는 [Day05_new/AGENTS.md](Day05_new/AGENTS.md).
 - `Day07_new`: 기존 `Day07`과 나란히 놓인 이론 중심 노트북 버전이다(`Day07/`는 그대로 둔다). Day04처럼 `pyproject.toml`이 없고 루트 환경을 쓴다. GPU·API 키·RunPod 없이 실행되며 키 설정이 필요 없다. 05·06의 서버 접속 셀은 `RUN_POD = False`로 잠겨 있고 Pod 동작은 저자가 확인하지 않았다. 상세는 [Day07_new/AGENTS.md](Day07_new/AGENTS.md).
+- `Day06_new`: 기존 `Day06`과 나란히 놓인 Claude Code 실습 버전이다(`Day06/`은 그대로 둔다). 노트북이 없고 `use_cc/`의 미션 카드와 Claude Code 두 세션으로 실습한다. `pyproject.toml`이 없고 루트 환경을 쓴다. 도구는 표준 라이브러리만 쓰고 모델을 부르지 않으며 키 설정이 필요 없다. 실험 폴더는 저장소 밖에 만들고, Part 4는 `Day06/`의 하네스 스냅샷을 읽기만 한다. 실습은 수강생 자신의 Claude Code 세션 기록을 다루므로 내용이 나오는 옵션은 Claude Code 밖에서만 쓴다. 상세는 [Day06_new/AGENTS.md](Day06_new/AGENTS.md).
 
 ```bash
 uv sync --locked           # 저장소 루트에서 한 번만
@@ -99,6 +100,7 @@ cd Day02 && uv run ...     # Day01~Day05, Day07, Day08 모두 같은 방식
 - Day04: `coding_skills/verify_agent.py`는 모델 호출 약 25–45회, 2–5분(`Day04/coding_skills/README.md:154`), `build_mcp/verify_agent.py`는 모델 호출 약 20–35회, 2–5분(`Day04/build_mcp/README.md:262`) 규모다.
 - Day04_new (저자 실측, 2차 실행 `Day04_new/outputs/live/summary.json`, 캐시·루프 수정 뒤): 모든 모델 셀이 실제 호출이고 각 셀이 `announce`로 직전에 규모를 고지한다. 기본 실행(`RUN_EXERCISE`·`RUN_OPTIONAL` 모두 `False`)의 노트북 00~06 실측 합계는 Claude 123회(예고 약 290회), 입력 811,755·출력 33,703 토큰, 노트북 안 Jev 4회(서버 쪽 1회 별도, 예고 약 9회), 벽시계 약 466초이고 예고를 넘은 셀은 없다. 07의 수업 측정(예고 Claude 324회·Jev 72회)은 Langfuse를 건너뛰어 셀 48의 인증 확인에서 설계대로 멈췄으므로 측정하지 않았다(`Day04_new/AGENTS.md` 6장). 07 전체와 `tests/live_smoke.py`, 저자 측정 `tests/run_measurement.py`는 먼저 고지한다.
 - Day05_new (예고 값이며 저자 실측이 아니다): 모든 모델 셀이 `announce`로 직전에 규모를 고지한다. 기본 실행(`RUN_EXERCISE`·`RUN_OPTIONAL` 모두 `False`)의 노트북 00~06 예고 합계는 에이전트 모델 217회, Jev 57회, Judge 133회, improver 1회이고, 두 스위치를 모두 켜면 에이전트 모델 409회, Jev 73회, Judge 193회, improver 2회다. 06의 holdout은 3건 상한으로 예고하므로 현재 승인 카드 2장 기준으로는 기본 합계가 그보다 24회 적다. 저자 측정 `Day05_new/tests/run_measurement.py --live`는 예고 최대 에이전트 모델 1,080회·improver 6회·Jev 36회·Judge 108회 규모이며 먼저 고지한다(옵션 없이 실행하면 계획만 출력하고 모델을 부르지 않는다).
+- Day06_new (실험 대상 세션은 저자 실측 1회, 조교 세션은 예고 값): 도구는 모델을 부르지 않는다. 과금은 수강생의 Claude Code 계정뿐이고, 각 미션 카드의 "이 미션의 비용" 표가 행동별 규모를 적는다. 저자 실측(2026-11-05, Sonnet 5.5, 비대화형)은 Part 3 "이어서 작업해 줘" 모델 호출 8회·0.13달러, 깨뜨리기 3회·0.18달러, Part 5 계획 A 3회·0.11달러, 계획 B 3회·0.16달러다. 실습의 `/insights`는 선택이고 최근 세션을 모델이 읽어 토큰을 쓴다. 먼저 고지한다.
 - Day07: GLM-5.3-Flash 엔드포인트는 RunPod GPU Pod이며 떠 있는 동안 시간 단위로 강사에게 과금된다. `Day07/task.md`의 EXA 호출은 수강생 본인의 EXA 크레딧을 쓴다.
 
 ## 7. 키와 보안
@@ -123,6 +125,7 @@ cd Day02 && uv run ...     # Day01~Day05, Day07, Day08 모두 같은 방식
 | `Day05/` | 주문 취소·결제·재고 업무로 Agent Evaluation을 설계하고 DeepEval·Langfuse로 개선과 회귀를 검증한다 | [Day05/AGENTS.md](Day05/AGENTS.md) |
 | `Day05_new/` | Day05의 새 노트북 버전(`Day05/`는 그대로 둔다). Agent를 왜 평가하는가부터 오프라인 Golden Dataset, 온라인 평가와 Trace 선정, Trajectory 평가, Monitoring, 지속 운영, 하네스 정책을 기록 재생으로 고치는 Self-Improving Agent 실습(Langfuse)까지 노트북 00~06(03a, 03b 포함)으로 배운다 | [Day05_new/AGENTS.md](Day05_new/AGENTS.md) |
 | `Day06/` | AI Agent Harness 4종(pi·gajae-code·deepseek-harness·ouroboros)의 소스를 여섯 책임(지침·도구·실행 제어·상태·검증·기록)으로 분석한다 | [Day06/AGENTS.md](Day06/AGENTS.md) |
+| `Day06_new/` | Day06의 새 Claude Code 실습 버전(`Day06/`은 그대로 둔다). AI SDLC의 단계와 산출물, Agent Harness의 여섯 책임, Evidence·Checkpoint·Plan, 오픈소스 하네스 주장 검증, 계획과 실행 구조를 Part 1~5 미션 카드로 배우고, 자기 세션 기록을 진단해 개인 AI SDLC를 설계한다 | [Day06_new/AGENTS.md](Day06_new/AGENTS.md) |
 | `Day07/` | vLLM 기초·추론 속도 최적화, RunPod에 띄운 GLM-5.3-Flash 호출, dcode 설치·활용 | [Day07/AGENTS.md](Day07/AGENTS.md) |
 | `Day07_new/` | Day07의 새 노트북 버전(`Day07/`는 그대로 둔다). vLLM v0.32.0 소스를 근거로 서빙 기초·KV Cache·최근 모델의 KV 통제(02c 사례)·파라미터와 측정·Quantization·KV 운영과 LMCache(04b 운영)(앞 330분 이론)와 Agent 연결·Tool Calling 오류를 노트북 00~06(02a, 02b, 02c, 04b 포함)으로 배운다 | [Day07_new/AGENTS.md](Day07_new/AGENTS.md) |
 | `Day08/` | 같은 보고 Agent에 같은 공격을 넣고 Guardrail 배치(Input·Action·Output·권한·메모리·HITL)만 바꿔 방어 효과를 비교한다 | [Day08/AGENTS.md](Day08/AGENTS.md) |

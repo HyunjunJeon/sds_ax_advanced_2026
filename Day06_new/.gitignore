@@ -1,0 +1,9 @@
+# 수강생 각자의 기록: 올리지 않는다
+use_cc/notes/
+__pycache__/
+
+# 강사·저자용 자료: 수강생에게 배포하지 않는다
+use_cc/**/instructor_notes.md
+use_cc/tests/
+docs/sources/part4_claims.md
+use_cc/**/recordings/
