@@ -1,0 +1,46 @@
+{
+  "fx-ops-resume": {
+    "actor_id": "customer-c",
+    "subject_id": "order-r",
+    "fault": "none",
+    "orders": [
+      {
+        "id": "order-r",
+        "customer_id": "customer-c",
+        "status": "cancelling",
+        "amount_cents": 9900,
+        "currency": "USD",
+        "sku": "sku-r",
+        "quantity": 3,
+        "version": 2
+      },
+      {
+        "id": "order-s",
+        "customer_id": "customer-d",
+        "status": "paid",
+        "amount_cents": 4400,
+        "currency": "USD",
+        "sku": "sku-s",
+        "quantity": 1,
+        "version": 1
+      }
+    ],
+    "payments": [
+      {
+        "order_id": "order-r",
+        "captured_cents": 9900,
+        "refunded_cents": 9900
+      },
+      {
+        "order_id": "order-s",
+        "captured_cents": 4400,
+        "refunded_cents": 0
+      }
+    ],
+    "inventory": {
+      "sku-r": 4,
+      "sku-s": 8
+    },
+    "releases": []
+  }
+}

@@ -25,7 +25,7 @@ from langfuse import propagate_attributes
 
 from eval_lab.agent import Gate, make_live_session, run_scripted
 from eval_lab.contracts import Artifact, Followup, Request, Response, TurnRecord
-from eval_lab.environment import OrderEnvironment
+from eval_lab.environment import OBSERVATION_GATE, OrderEnvironment
 
 # scripted 드라이버의 모양: driver(request, env, release) -> (Response, usage dict)
 ScriptedDriver = Callable[[Request, OrderEnvironment, str], tuple[Response, dict]]
@@ -75,9 +75,12 @@ def execute_episode(request: Request, fixture: dict, *, followups: list[Followup
         return run_turns()
 
     # 2단계: Episode 전체를 root observation 하나로 감싼다. 입력은 첫 요청이다.
+    # Langfuse는 시작 시각을 밀리초로 정렬하므로 앞 observation과 같은 밀리초에 열지 않는다(OBSERVATION_GATE).
+    OBSERVATION_GATE.wait()
     root_scope = langfuse.start_as_current_observation(name="episode", as_type="agent",
                                                        input=request.model_dump(mode="json"))
     with root_scope as root:
+        OBSERVATION_GATE.mark()
         # 3단계: root 안에서 Episode 단위 속성을 건다. root와 그 아래 모든 observation에 붙는다.
         attribute_scope = propagate_attributes(
             session_id=episode_id,
@@ -137,10 +140,14 @@ def _run_turns(request: Request, fixture: dict, *, followups: list[Followup], ma
             before = env.snapshot()
             event_offset = len(env.events)
             response = None
+            if langfuse:
+                OBSERVATION_GATE.wait()
             scope = (langfuse.start_as_current_observation(name=f"turn-{index + 1}", as_type="agent",
                        input=current.model_dump(), metadata={"episode_id": episode_id, "turn_index": index + 1})
                      if langfuse else nullcontext())
             with scope as span:
+                if langfuse:
+                    OBSERVATION_GATE.mark()
                 try:
                     response = invoke(current)
                 finally:

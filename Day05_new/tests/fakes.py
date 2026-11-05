@@ -53,6 +53,9 @@ from langfuse.api import (
     PaginatedDatasetItems,
     Project,
     Projects,
+    ScoreConfig,
+    ScoreConfigDataType,
+    ScoreConfigs,
     Usage,
 )
 from langfuse.api.commons.types.observation_v2 import ObservationV2
@@ -520,13 +523,27 @@ class _DatasetRunItems(_OfflineResource):
 class _Observations(_OfflineResource):
     def get_many(self, *, trace_id: str | None = None, limit: int | None = None, cursor: str | None = None,
                  from_start_time: datetime | None = None, to_start_time: datetime | None = None,
-                 fields: str | None = None, request_options: RequestOptions | None = None) -> ObservationsV2Response:
-        """관측 목록 v2. 조건에 맞는 observation을 한 쪽에 모두 담고 cursor는 None이다."""
+                 fields: str | None = None, filter: str | None = None, environment: str | None = None,
+                 name: str | None = None, parse_io_as_json: bool | None = None,
+                 request_options: RequestOptions | None = None) -> ObservationsV2Response:
+        """관측 목록 v2. filter는 v1과 같은 조건 배열이다. limit을 주면 쪽을 나누고 cursor(다음 시작 위치)를 준다.
+
+        실제 서버와 같게 parse_io_as_json=True를 거절한다(2026-11-05 jp.cloud.langfuse.com이 400으로 거절).
+        """
+        if parse_io_as_json:
+            raise OfflineLangfuseError("FakeLangfuse: parseIoAsJson=true는 v2 관측 API에서 지원하지 않습니다.")
+        conditions = json.loads(filter) if filter else []
         found = [o.as_v2() for o in self._client.captured_observations()
                  if (trace_id is None or o.trace_id == trace_id)
+                 and (environment is None or o.environment == environment)
+                 and (name is None or o.name == name)
                  and (from_start_time is None or o.start_time >= _as_datetime(from_start_time))
-                 and (to_start_time is None or o.start_time <= _as_datetime(to_start_time))]
-        return ObservationsV2Response(data=found, meta=ObservationsV2Meta(cursor=None))
+                 and (to_start_time is None or o.start_time <= _as_datetime(to_start_time))
+                 and _matches(o, conditions)]
+        start = int(cursor) if cursor else 0
+        end = len(found) if limit is None else start + limit
+        next_cursor = str(end) if end < len(found) else None
+        return ObservationsV2Response(data=found[start:end], meta=ObservationsV2Meta(cursor=next_cursor))
 
 
 class _ObservationsV1(_OfflineResource):
@@ -546,6 +563,10 @@ class _Metrics(_OfflineResource):
         if request["view"] != "observations":
             raise OfflineLangfuseError(f"FakeLangfuse Metrics: view {request['view']!r}는 지원하지 않습니다(observations만).")
         start, end = _as_datetime(request["fromTimestamp"]), _as_datetime(request["toTimestamp"])
+        if not start < end:
+            # 실제 서버와 같게 거절한다: jp.cloud.langfuse.com(v4.75.0)이 2026-11-05에 시작=끝 질의를
+            # 400 'fromTimestamp must be before toTimestamp'로 돌려줬다.
+            raise OfflineLangfuseError("FakeLangfuse Metrics: fromTimestamp must be before toTimestamp")
         dimensions = [dimension["field"] for dimension in request.get("dimensions", [])]
         groups: dict[tuple, list[CapturedObservation]] = defaultdict(list)
         if not dimensions:
@@ -571,6 +592,14 @@ class _AnnotationQueues(_OfflineResource):
 
     def create_queue(self, *, name: str, score_config_ids: list[str], description: str | None = None,
                      request_options: RequestOptions | None = None) -> AnnotationQueue:
+        if not score_config_ids:
+            # 실제 서버와 같게 거절한다: jp.cloud.langfuse.com(v4.75.0)이 2026-11-05에 빈 scoreConfigIds를
+            # 400 'Too small: expected array to have >=1 items'로 돌려줬다.
+            raise OfflineLangfuseError("FakeLangfuse: scoreConfigIds는 1개 이상이어야 합니다.")
+        known = {config.id for config in self._client.score_configs}
+        unknown = sorted(set(score_config_ids) - known)
+        if unknown:
+            raise LookupError(f"FakeLangfuse: score config {unknown}가 없습니다.")
         now = _now()
         queue = AnnotationQueue(id=f"offline-queue-{len(self._client.annotation_queues) + 1}", name=name,
                                 description=description, score_config_ids=score_config_ids, created_at=now, updated_at=now)
@@ -588,6 +617,23 @@ class _AnnotationQueues(_OfflineResource):
         return item
 
 
+class _ScoreConfigs(_OfflineResource):
+    def get(self, *, page: int = 1, limit: int = 50, request_options: RequestOptions | None = None) -> ScoreConfigs:
+        configs = self._client.score_configs
+        return ScoreConfigs(data=configs[(page - 1) * limit: page * limit], meta=_page_meta(page, limit, len(configs)))
+
+    def create(self, *, name: str, data_type: ScoreConfigDataType, categories: list | None = None,
+               min_value: float | None = None, max_value: float | None = None, description: str | None = None,
+               request_options: RequestOptions | None = None) -> ScoreConfig:
+        now = _now()
+        config = ScoreConfig(id=f"offline-score-config-{len(self._client.score_configs) + 1}", name=name,
+                             created_at=now, updated_at=now, project_id="offline-project", data_type=data_type,
+                             is_archived=False, min_value=min_value, max_value=max_value, categories=categories,
+                             description=description)
+        self._client.score_configs.append(config)
+        return config
+
+
 class _EvaluationRules(_OfflineResource):
     def create(self, *, name: str, enabled: bool, evaluator_assignments: list, sampling: float | None = None,
                filter: list | None = None, request_options: RequestOptions | None = None) -> SimpleNamespace:
@@ -603,7 +649,7 @@ class OfflineLangfuseAPI(_OfflineResource):
 
     projects.get, datasets.create/get, dataset_items.create/list, dataset_run_items.create,
     observations.get_many(v2), legacy.observations_v1.get_many, metrics.metrics,
-    annotation_queues.list_queues/create_queue/create_queue_item, evaluation_rules.create.
+    annotation_queues.list_queues/create_queue/create_queue_item, score_configs.get/create, evaluation_rules.create.
     """
 
     def __init__(self, client: FakeLangfuse) -> None:
@@ -617,6 +663,7 @@ class OfflineLangfuseAPI(_OfflineResource):
         self.legacy.observations_v1 = _ObservationsV1(client, "api.legacy.observations_v1")
         self.metrics = _Metrics(client, "api.metrics")
         self.annotation_queues = _AnnotationQueues(client, "api.annotation_queues")
+        self.score_configs = _ScoreConfigs(client, "api.score_configs")
         self.evaluation_rules = _EvaluationRules(client, "api.evaluation_rules")
 
 
@@ -641,6 +688,7 @@ class FakeLangfuse(Langfuse):
         self.dataset_items: dict[str, dict[str, DatasetItem]] = {}
         self.dataset_run_items: list[DatasetRunItem] = []
         self.annotation_queues: list[AnnotationQueue] = []
+        self.score_configs: list[ScoreConfig] = []
         self.annotation_queue_items: list[AnnotationQueueItem] = []
         self.evaluation_rules: list[SimpleNamespace] = []
         self.metrics_queries: list[dict[str, JsonValue]] = []

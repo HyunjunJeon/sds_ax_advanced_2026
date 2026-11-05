@@ -32,7 +32,7 @@ def announce(
     """유료 호출 직전에 규모를 한 줄로 알린다. 알리기만 하고 멈추지 않는다. 0인 항목은 적지 않는다."""
     parts = [
         text for count, text in (
-            (model_calls, f"Claude 에이전트 약 {model_calls}회"),
+            (model_calls, f"에이전트 모델 약 {model_calls}회"),
             (jev_calls, f"Jev 최대 {jev_calls}회"),
             (judge_calls, f"Judge(xhigh) 최대 {judge_calls}회"),
             (improver_calls, f"개선기 약 {improver_calls}회"),

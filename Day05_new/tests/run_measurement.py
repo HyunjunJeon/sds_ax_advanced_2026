@@ -78,6 +78,7 @@ from eval_lab.settings import (
     make_improver_model,
     make_judge_model,
     make_langfuse,
+    provider_of,
 )
 from eval_lab.traffic import (
     MistakeDriver,
@@ -507,6 +508,8 @@ class Measurement:
             "holdout_ids": self.holdout_ids,
             "key_check": "eval_lab factory(설정됨/미설정)" if self.mode == "live" else "생략: --offline은 가짜 모델이라 키를 쓰지 않습니다",
             "models": {
+                # 공급자와 주소. 2026-11-05부터 기본은 OpenGateway의 DeepSeek이다(eval_lab/settings.py PROVIDERS).
+                "provider": {"name": config.provider, "api_url": provider_of(config).api_url},
                 "agent": {"model": config.model, "effort": config.effort, "class": type(deps.agent_model).__name__},
                 "judge": {"model": config.judge_model, "effort": config.judge_effort,
                           "class": type(deps.judge_model).__name__},

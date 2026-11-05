@@ -30,14 +30,16 @@
   - `Day05/오전.md`·`오후.md`의 자유 실습(문서로 Golden 만들기)은 02의 "문서 기반 합성 후보 → 검수" 절로 흡수한다.
   - 총 약 6.5시간.
   - Langfuse는 2026-11-16 전환 **이후의 구조만** 가르친다.
-  - 온라인 평가의 주 경로는 SDK `run_batched_evaluation`이다. Langfuse 서버에서 도는 LLM-as-a-Judge(수강생이 자기 키를 Langfuse LLM Connection에 등록해야 함)는 선택 경로다.
+  - 온라인 평가의 주 경로는 SDK `run_batched_evaluation`이다. (2026-11-05: 같은 계약을 v2 관측 API 위에서 직접 도는 `batch_evaluate`로 바꿨다. 19절) Langfuse 서버에서 도는 LLM-as-a-Judge(수강생이 자기 키를 Langfuse LLM Connection에 등록해야 함)는 선택 경로다.
 - 다른 `_new` Day와 같은 원칙을 따른다: 채점 없음, 모든 코드 제공, 직접 해보기와 확인 질문만 둔다. 새 패키지를 더하지 않는다(uv `exclude-newer` 2026-10-31).
 
 ## 2. 가정 (바꿀 수 있음)
 
-- 에이전트: `claude-sonnet-5-5`, effort `medium`(Day04_new와 같은 기본값). `.env`의 `DAY05_MODEL`, `DAY05_EFFORT`로 바꾼다.
-- Judge: `claude-sonnet-5-5`, effort `xhigh`. `DAY05_JUDGE_EFFORT`로 바꿀 수 있지만 기본값은 저자 결정값이다. 에이전트와 Judge가 같은 모델이고 effort만 다르다. 이 선택이 만드는 자기 선호 위험은 사람 라벨 보정(6.4절)의 false pass로 드러낸다.
-- 개선기(06의 정책 후보 생성): `claude-sonnet-5-5`, effort `high`. 저자 지정값이 아니므로 바꿀 수 있다.
+- **모델 공급자(2026-11-05 저자 결정으로 바꿈, 개정 1).** 기본은 OpenGateway(`https://apis.opengateway.ai`)의 Anthropic Messages 호환 엔드포인트이고, 세 역할 모두 `deepseek/deepseek-v4.1-flash-ultrafast`다. 키는 `OPENGATEWAY_API_KEY`다. 클라이언트는 그대로 `ChatAnthropic`이고 주소·키·모델 이름만 바뀐다(`eval_lab/settings.py`의 `PROVIDERS`). `.env`의 `DAY05_PROVIDER=anthropic`이면 이전 설정(`https://api.anthropic.com`, `claude-sonnet-5-5`, `ANTHROPIC_API_KEY`)으로 돌아간다. 바꾼 이유: 저자의 Anthropic 키가 크레딧 부족으로 400을 돌려줬다(2026-11-05).
+- 에이전트: 공급자 기본 모델, effort `medium`. `.env`의 `DAY05_MODEL`, `DAY05_EFFORT`로 바꾼다.
+- Judge: 공급자 기본 모델, effort `xhigh`. `DAY05_JUDGE_MODEL`, `DAY05_JUDGE_EFFORT`로 바꿀 수 있지만 effort 기본값은 저자 결정값이다. 에이전트와 Judge가 같은 모델이고 effort만 다르다. 이 선택이 만드는 자기 선호 위험은 사람 라벨 보정(6.4절)의 false pass로 드러낸다.
+- 개선기(06의 정책 후보 생성): 공급자 기본 모델, effort `high`. 저자 지정값이 아니므로 바꿀 수 있다.
+- OpenGateway가 `reasoning_effort`(ChatAnthropic이 보내는 `output_config.effort`)를 DeepSeek의 어떤 설정으로 바꾸는지는 확인하지 않았다. 2026-11-05 1회 관찰에서 xhigh가 medium보다 생각 토큰을 적게 썼다(39 대 138). effort 차이에 효과를 붙여 말하지 않는다.
 - 시간: 00 10분, 01 40분, 02 60분, 03a 45분, 03b 55분, 04 45분, 05 45분, 06 90분 = 390분.
 - Langfuse 키는 12절 5번 항목으로 결정했다. 저자가 `Day05/.env`에서 복사해 `Day05_new/.env`에 넣고(값은 출력하지 않는다), 수강생용 안내는 `.env.example`이다.
 
@@ -49,20 +51,20 @@
 |---|---|---|---|---|
 | U1 | Langfuse 평가기 구조 | PDF p47이 trace 단위 Judge 매핑 | Evaluator와 Rule 분리, observation-level, `isRootObservation`. Cloud의 trace-level evaluator는 2026-11-16에 멈춘다 | 2.2 |
 | U2 | Trace I/O | 해당 호출 없음 | 평가기 매핑은 root observation 기준. `set_trace_io` 계열을 쓰지 않는다 | 2.2, 2.3 |
-| U3 | 기록된 trace 일괄 채점 | 로컬 원자료 재채점만 | `run_batched_evaluation`으로 운영 trace 채점, 새 평가기 backtest | 2.1 |
+| U3 | 기록된 trace 일괄 채점 | 로컬 원자료 재채점만 | `run_batched_evaluation`과 같은 계약의 `batch_evaluate`(v2 관측 API)로 운영 trace 채점, 새 평가기 backtest | 2.1 |
 | U4 | 사람 검수 | CSV 수작업 | annotation queue에 선정 trace를 넣는다. CSV 경로는 키 없는 대체 경로로 유지 | 2.1, 2.2 |
 | U5 | DeepEval 에이전트 지표 | `GEval`, `FaithfulnessMetric` | `ToolCorrectness`, `ArgumentCorrectness`, `ToolPermission`, `TaskCompletion`, `StepEfficiency`, `PlanAdherence`, `AgentLoopDetection`을 규칙 검사와 나란히 비교 | 3.1 |
 | U6 | 궤적 판정 | PASS/FAIL/`INSUFFICIENT_EVIDENCE` | 판정 5종, 치명·경고 등급, 복구 창, 평가기 평가(Wilson 구간), 반사실 재생 | `trajectory-eval.md` |
 | U7 | 모니터링 | 없음 | Metrics API v2(observations view), 사전 고정 경보 기준, OTel GenAI 이름(안정화 미확인) | 2.1, 6 |
 | U8 | 자기 개선 | 사람이 Prompt 한 조건 변경 | 하네스 정책을 재생으로 고르고 holdout에서 재확인 | `dream-rsi.md` |
-| U9 | 모델 | OpenRouter `gemini-3.8-flash`, Judge `claude-haiku-4.5` | `ChatAnthropic` `claude-sonnet-5-5`, Judge 같은 모델 `xhigh`, 그 앞에 Jev | 4, 5 |
+| U9 | 모델 | OpenRouter `gemini-3.8-flash`, Judge `claude-haiku-4.5` | `ChatAnthropic` `claude-sonnet-5-5`, Judge 같은 모델 `xhigh`, 그 앞에 Jev. **개정 1(2026-11-05)로 OpenGateway `deepseek/deepseek-v4.1-flash-ultrafast`** | 4, 5 |
 | U10 | 형식 | 스크립트 00~09와 PDF | 노트북 00~06, 실습 패키지 `eval_lab/`, 검사기 | — |
 
 ## 4. 노트북 지도
 
 | 노트북 | Part | 분 | 핵심 질문 | 기존 Day05에서 가져올 것 | 새로 만들 것 |
 |---|---|---|---|---|---|
-| `00-Setup.ipynb` | 준비 | 10 | 키·연결·버전이 준비되었는가 | `Day05/00_check_env.py` | 키 설정됨/미설정, Langfuse 인증, SDK ≥ 4.7.0 확인, Claude·Jev·Judge 각 1회 |
+| `00-Setup.ipynb` | 준비 | 10 | 키·연결·버전이 준비되었는가 | `Day05/00_check_env.py` | 키 설정됨/미설정, Langfuse 인증, SDK ≥ 4.7.0 확인, 에이전트 모델·Jev·Judge 각 1회 |
 | `01-Why-Evaluate.ipynb` | 1 | 40 | 그럴듯한 답이 왜 업무 성공의 증거가 못 되는가 | PDF p2~5, scripted 두 경로 | 답변·결과·과정 3분리, 같은 응답 다른 궤적, 비결정성(pass@k, pass^k), "낮은 점수"와 "평가 불능" 구분 |
 | `02-Offline-Golden-Dataset.ipynb` | 2 | 60 | 무엇을 성공으로 볼지 어떻게 고정하는가 | PDF p6~21, `authoring.py`, `01`~`02`, `05`~`07` | Scenario 계약, 세 확보 경로(인터뷰·문서·운영 trace), 최소쌍, 커버리지, 검수·동결 해시, dev/holdout, Langfuse Dataset 버전과 `run_experiment`, Code·Jev·Judge·Human 역할, **문서 기반 합성 후보 → 검수**(DeepEval Synthesizer 대신 정책 문서로 후보를 만들고 사람이 승인) |
 | `03a-Online-Eval-Trace-Selection.ipynb` | 3 | 45 | 정답이 없는 운영 trace를 무엇으로, 어떤 것부터 채점하는가 | — | 모의 운영 트래픽, 정답 필요 지표와 정답 불필요 지표의 구분, 표본 선정 전략 4종, Rule(무엇)과 Evaluator(어떻게), observation-level, `run_batched_evaluation`, 점수를 observation에 연결, 7일 매칭량과 비용 예측 개념 |
@@ -84,7 +86,7 @@
 | `trajectory_rules.py` | 새로 | 7절 규칙, 판정 5종, 읽기 예산 |
 | `meta_eval.py` | 새로 | 결함 주입·정상 변형 생성, 재현율·오탐률·정밀도, Wilson 95% 구간 |
 | `traffic.py` | 새로 | 모의 운영 트래픽(요청 문형 × fixture × 날짜별 분포 변화) |
-| `online.py` | 새로 | 표본 선정 전략, `run_batched_evaluation` 감싸기, Rule·Evaluator API(선택), annotation queue |
+| `online.py` | 새로 | 표본 선정 전략, 일괄 채점 `batch_evaluate`(v2 관측 API, `run_batched_evaluation`과 같은 계약), Rule·Evaluator API(선택), annotation queue |
 | `monitoring.py` | 새로 | Metrics API v2 질의, 로컬 원자료에서 같은 지표 계산(키 없는 대체), 경보 판정 |
 | `replay.py`, `rsi.py` | 새로 | 재생 풀, 정책 명세 해석기, 재생 점수, 개선기 루프, holdout 게이트 |
 | `notebook.py` | 새로 | 노트북 도우미(`announce` 비용 고지, 표 출력) |
@@ -152,7 +154,7 @@
 - **모의 운영 트래픽**(`traffic.py`): 요청 문형(정중함, 번호 유무, 오타, 다른 고객 번호) × fixture 9종(dev) × 날짜 2개. 1일차는 정상 위주, 2일차는 TIMEOUT·결제 장애·다른 고객 주문이 늘어난 분포다. 기본은 scripted 드라이버(모델 0회, 실수를 일부러 섞음)로 Langfuse에 trace를 남기고, 선택 셀에서 실제 모델 소량을 섞는다. scripted 결과는 "모의 트래픽"으로만 부르고 LLM 성능으로 보고하지 않는다.
 - **정답 필요 지표와 정답 불필요 지표**: 기대 최종 상태 비교는 Golden이 있는 오프라인에서만 한다. 운영에서는 궤적 규칙, 응답과 기록의 일치, Jev·Judge 의미 판단처럼 정답 없이 되는 것만 쓴다.
 - **표본 선정 전략**: (1) 무작위(seed 고정) (2) 층화(요청 유형·fixture 계열별 할당) (3) 신호 기반(도구 오류, 모델 오류, `escalated` 응답, 지연 상위, 비용 상위, 경고 규칙) (4) 새로움(Golden에 없는 요청 모양). 전략마다 "무엇을 놓치는가"를 함께 적는다.
-- **채점 경로**: 주 경로는 `run_batched_evaluation(scope="observations", filter=root, ...)`로 선정된 trace를 가져와 Code → Jev → Judge로 채점하고 점수를 observation에 붙인다. 선택 경로는 Rule(필터·샘플링)과 Evaluator를 API로 만드는 서버 쪽 평가다. 서버 쪽 LLM Judge는 수강생 키를 LLM Connection에 등록해야 하므로 실행 셀은 잠근다.
+- **채점 경로**: 주 경로는 `batch_evaluate`(SDK `run_batched_evaluation(scope="observations", filter=root, ...)`과 같은 계약, v2 관측 API)로 선정된 trace를 가져와 Code → Jev → Judge로 채점하고 점수를 observation에 붙인다. 선택 경로는 Rule(필터·샘플링)과 Evaluator를 API로 만드는 서버 쪽 평가다. 서버 쪽 LLM Judge는 수강생 키를 LLM Connection에 등록해야 하므로 실행 셀은 잠근다.
 
 ## 9. 모니터링 지표와 경보
 
@@ -183,7 +185,7 @@
 ```
 
 - 승격 초안은 기대 상태를 비워 두고 사람이 검수한 뒤 새 데이터 버전에서만 쓴다(`Day05/business_lab/evidence.py:157`의 규칙 유지).
-- 평가기를 바꾸면 두 Agent 버전의 원자료를 같은 새 평가기로 다시 채점한다. 새 평가기는 과거 운영 trace에 먼저 backtest해 판정이 얼마나 바뀌는지 본다(`run_batched_evaluation`).
+- 평가기를 바꾸면 두 Agent 버전의 원자료를 같은 새 평가기로 다시 채점한다. 새 평가기는 과거 운영 trace에 먼저 backtest해 판정이 얼마나 바뀌는지 본다(`batch_evaluate`).
 
 ## 11. 실습 설계: Self-Improving Agent (06)
 
@@ -270,6 +272,14 @@
 - 재생 풀과 holdout의 Episode ID가 겹치면 실행 전에 멈춘다.
 <!-- PREREG:END -->
 
+## 개정 1 (2026-11-05, 유료 측정 전, 저자 결정)
+
+블록은 그대로 두고 여기서 고친다(블록 해시는 바뀌지 않는다). **P1의 Judge `claude-sonnet-5-5`는 "설정의 Judge 모델"로 읽는다.** 2026-11-05부터 기본은 OpenGateway의 `deepseek/deepseek-v4.1-flash-ultrafast`, effort `xhigh`다. 에이전트와 개선기도 같은 모델이다(2절). 저자의 지시는 "Anthropic 모델 말고, OpenGateway에서 DeepSeek 모델을 사용하도록 구성해줘", "deepseek-v4.1-flash-ultrafast 모델을 사용했으면 좋겠어"였다.
+
+- 바뀌지 않는 것: 판정 단계(Code → Jev → Judge), 문턱값 `t_lo = 0.2`, `t_hi = 0.8`(미조정), P2~P7의 가설·프로토콜·재생 점수·판정 규칙·가드·오염 방지, 예산, 사례, 분할, 반복.
+- 이 개정 전에 측정한 결과는 없다. 그래서 이전 모델과 섞인 측정도 없다.
+- `tests/run_measurement.py`의 `run_manifest.json`은 `models.provider`(이름과 주소)를 남긴다. 측정 결과를 읽을 때 이 칸으로 어느 공급자로 쟀는지 확인한다.
+
 ## 12. 저자 검토 게이트 결정 (2026-11-02)
 
 저자가 "추천대로"라고 답했다. 각 항목의 결정은 다음과 같다.
@@ -303,7 +313,7 @@
 
 ## 14. 외부 전송
 
-- Anthropic: 요청, 도구 결과, 응답. Judge에는 Episode 기록 요약도 간다.
+- OpenGateway(기본 공급자, `https://apis.opengateway.ai`): 요청, 도구 결과, 응답. Judge에는 Episode 기록 요약도 간다. OpenGateway가 실제 추론을 맡기는 업스트림은 모델 목록의 `providers`(2026-11-05 기준 이 모델은 `sionic-ai`)이며 바뀔 수 있다. `DAY05_PROVIDER=anthropic`이면 같은 내용이 Anthropic으로 간다.
 - Decision API(Jev): 질문 문장과 state(요청·사건 요약·최종 상태·응답)가 공급자에게 그대로 간다.
 - Langfuse: 프롬프트, 도구 입출력, 점수, Dataset. 서버 쪽 Judge를 켜면 수강생 키가 Langfuse LLM Connection에 저장된다.
 - DeepEval 텔레메트리: 이 목록에 없는 전송이므로 끈다. `eval_lab/__init__.py:7`이 `DEEPEVAL_TELEMETRY_OPT_OUT`을 `setdefault`로 `1`로 둔다(deepeval을 import하는 `judges.py`보다 먼저 실행된다). 사용자가 이미 정한 값은 덮어쓰지 않는다.
@@ -319,8 +329,9 @@
 
 ## 16. 미확인
 
-- 실제 Claude, Jev, Judge 응답. Langfuse 서버 쪽 동작(Rule·Evaluator 실행, Metrics API 응답, 집계 지연, 2026-11-16 이후 Cloud 동작).
-- `ToolStrategy(Response)`가 `claude-sonnet-5-5`(프로필 `tool_choice = False`)에서 구조화 응답을 안정적으로 내는지. 첫 유료 smoke에서 확인한다.
+- 실제 에이전트 모델, Jev, Judge 응답(2026-11-05에 OpenGateway DeepSeek으로 Episode 1개만 1회 관찰). Langfuse 서버 쪽 동작(Rule·Evaluator 실행, Metrics API 응답, 집계 지연, 2026-11-16 이후 Cloud 동작).
+- `ToolStrategy(Response)`가 `deepseek/deepseek-v4.1-flash-ultrafast`(`langchain-anthropic` 모델 프로필 없음)에서 구조화 응답을 반복해서 안정적으로 내는지. 2026-11-05 1회 관찰에서는 냈다.
+- OpenGateway가 effort를 어떻게 옮기는지, 응답에 비용 필드를 주는지(Messages 응답 usage에는 토큰만 있었다).
 - DeepEval trace 필요 지표에 우리 원자료를 `_trace_dict`(비공개 필드)로 넣는 경로. 구현 단계에서 fake 모델로 확인하고, 안 되면 해당 지표는 03b에서 개념 비교로만 다룬다.
 - Judge(`xhigh`)의 `max_tokens`. Day04_new는 `_MAX_TOKENS = 16000`(`Day04_new/cap_lab/settings.py`)이고 adaptive thinking은 이 한도를 응답과 나눠 쓴다. Judge에는 더 큰 별도 값이 필요할 수 있고, 첫 smoke에서 잘림 여부를 확인한다.
 - scripted Episode가 Langfuse에서 trace 하나로 묶이는지(5절 기록 요구 사항). fake Langfuse 테스트로 먼저 확인하고, 실제 서버는 첫 smoke에서 확인한다.
@@ -347,7 +358,7 @@ PREREG 블록은 그대로 두고, 구현 중 설계가 말하지 않은 곳을 
 
 - **게이트가 막은 호출은 서비스 사건이 아니다.** 막힌 호출은 `GateEvent`로 `Artifact.gate_events`에 남고(`eval_lab/contracts.py:116`, `:154`) 궤적 규칙은 위반으로 세지 않으며 `blocked_attempts`로 개수만 센다(`eval_lab/trajectory_rules.py:10`, `:86`).
 - **holdout 초안은 새 family_id를 쓴다.** `incident-hv-*`를 쓴다(`Day05_new/data/scenarios.json:383`). `load_dataset`이 한 family가 dev와 holdout에 걸치면 거부하기 때문이다(`eval_lab/dataset.py:41`).
-- **PROVISIONAL은 끝나지 않은 Episode만이다.** 끝난 Episode가 후속 질문으로 끝나도 판정한다(7절, `eval_lab/trajectory_rules.py:486`). `awaiting_user`는 요약에 키로 실리며, 이 키가 없는 옛 요약은 `False`로 읽는다(`eval_lab/episodes.py:237`). 요약 스키마 이름은 v1 그대로다(기본값 있는 키 추가는 변경이 아니다, `eval_lab/episodes.py:34`).
+- **PROVISIONAL은 끝나지 않은 Episode만이다.** 끝난 Episode가 후속 질문으로 끝나도 판정한다(7절, `eval_lab/trajectory_rules.py:486`). `awaiting_user`는 요약에 키로 실리며, 이 키가 없는 옛 요약은 `False`로 읽는다(`eval_lab/episodes.py:244`). 요약 스키마 이름은 v1 그대로다(기본값 있는 키 추가는 변경이 아니다, `eval_lab/episodes.py:34`).
 - **P5 완료율은 계획한 격자 기준이다.** 받은 행 수가 아니라 `len(expected_cases) x reps`로 나누고(`eval_lab/rsi.py:949`), 빠진 Episode는 이름으로 이유 목록에 남긴다(`eval_lab/rsi.py:939`). `holdout_check`는 항상 계획한 사례 ID를 넘기고 `payload["missing"]`에 누락을 기록한다(`eval_lab/rsi.py:1232`).
 - **치명 Episode는 상태와 상관없다.** 치명 위반 hit가 있는 행은 모두 치명 Episode다(`eval_lab/rsi.py:875`). 재생 풀의 라벨과 같은 정의다(`eval_lab/replay.py:130`).
 - **claim-without-record의 위치는 `len(events)`다.** 응답 주장은 모든 호출 뒤에 있으므로(`eval_lab/replay.py:96`), 그보다 앞선 어떤 block도 재생에서는 이 위반을 잡은 것으로 센다.
@@ -357,8 +368,8 @@ PREREG 블록은 그대로 두고, 구현 중 설계가 말하지 않은 곳을 
 - **`require_check_after_timeout`은 자기 도구에 매인다.** 그 규칙의 `tool`이 낸 마지막 TIMEOUT만 기준으로 삼고, 그 뒤에 확인 도구 호출이 있는지 본다(`eval_lab/policy.py:216`, `:219`).
 - **`jev_only`의 중간대 답은 미결(None)이다.** Judge를 부르지 않으므로 `t_lo`~`t_hi` 사이와 거절은 `passed=None`이고 통과로 세지 않는다(`eval_lab/judges.py:249`).
 - **성공 건당 비용은 trajectory PASS 건수로 나눈다.** 비용을 모르는 기록이 있거나 PASS가 0이면 None이다(`eval_lab/monitoring.py:162`). 같은 정의를 `eval_lab/rsi.py:999`에서 쓴다.
-- **서버 쪽 Rule은 비활성으로 만든다.** `create_root_rule`의 기본값이 `enabled=False`다(`eval_lab/online.py:495`). 서버 Judge는 수강생 키를 LLM Connection에 저장하므로 비용을 이해한 뒤 켠다.
-- **Langfuse version 라벨.** `execute_episode`와 `run_traffic`이 `version`을 받아 Langfuse에 넘기고 없으면 release를 쓴다(`eval_lab/episodes.py:84`). 정책이 바뀌는 라운드를 trace에서 가를 수 있다.
+- **서버 쪽 Rule은 비활성으로 만든다.** `create_root_rule`의 기본값이 `enabled=False`다(`eval_lab/online.py:637`). 서버 Judge는 수강생 키를 LLM Connection에 저장하므로 비용을 이해한 뒤 켠다.
+- **Langfuse version 라벨.** `execute_episode`와 `run_traffic`이 `version`을 받아 Langfuse에 넘기고 없으면 release를 쓴다(`eval_lab/episodes.py:87`). 정책이 바뀌는 라운드를 trace에서 가를 수 있다.
 - **holdout 불러오기는 두 길이다.** 수업은 `load_dataset(split="holdout", approved_only=True)`로 승인된 카드만 읽고(`eval_lab/dataset.py:45`), 저자 측정(P3)은 엄격한 기본값을 쓴다. 검수 전 카드가 하나라도 있으면 측정 스크립트가 멈춘다(`tests/run_measurement.py` 사전 점검).
 - **DeepEval 텔레메트리를 끈다.** 14절 목록에 없는 전송이라서 `eval_lab/__init__.py:7`이 막는다.
 - **측정 스크립트의 선택.** release는 `baseline`(`tests/run_measurement.py:112`), 라운드 버전 라벨은 r0·r1(`:115`)이다. 실수 확률과 seed는 03a·04의 운전자 값을 그대로 쓴다(`:121`, `:128`, 11.2a). `outcome_passed`는 `check_outcome(artifact, expected).passed`이고 expected는 라운드에서는 `family_id`가 같은 dev 카드, holdout에서는 holdout 카드다. 의미 판정(cascade)은 holdout 36 Episode에만 붙인다(`:431`).
@@ -366,3 +377,9 @@ PREREG 블록은 그대로 두고, 구현 중 설계가 말하지 않은 곳을 
 - **열린 저자 결정: 이어서 처리하는 경로와 `step-out-of-order` (2026-11-03 추가, 측정 전).** `check_step_out_of_order`(`eval_lab/trajectory_rules.py:180`)는 같은 Episode에 `begin_cancellation`이 없는 `refund_payment`를 치명으로 본다. 그런데 `Day05_new/data/order_policy.md:16`의 P2는 `cancelling` 주문을 부분 완료 상태를 조회한 뒤 이어서 처리한다고 한다. 두 문장이 환불이 남은 `cancelling` 주문에서 부딪힐 수 있다. `Day05_new/data/fixtures.json`에서 `"status": "cancelling"`은 412줄 하나뿐이고 그 결제는 환불이 끝나 있으므로, 환불이 남은 `cancelling` 카드는 dev에도 holdout에도 없다. 그래서 P3 측정은 영향받지 않는다. 저자가 정할 때까지 평가기는 바꾸지 않는다.
 - **P5 holdout 행은 치명이 아니거나 모르는 규칙 ID를 거부한다 (2026-11-03 추가, 측정 전).** 치명 등급 ID는 규칙 표에서 읽고(`eval_lab/rsi.py:764`), `holdout_row`(`eval_lab/rsi.py:788`)와 `holdout_decision`이 받는 원시 행(`eval_lab/rsi.py:843`)이 경고 ID나 모르는 ID를 `ValueError`로 거부한다. 손으로 만든 행이 치명이 아닌 ID로 치명 Episode 수를 부풀리는 길을 막는다.
 - **06은 승인된 holdout 카드를 끝에서 한 번만 연다 (2026-11-03 추가, 측정 전).** 보여 주는 것은 `scenario_id`, `family_id`, 최대 턴, 검수자뿐이다. 사전 등록 P3가 holdout을 끝에서 한 번만 연다고 정했고, 요청 문장과 기대 상태는 보이지 않는다.
+- **Langfuse 기록은 observation마다 다른 밀리초에 연다 (2026-11-05 추가, 측정 전).** 실제 서버(jp.cloud.langfuse.com, v4.75.0)는 observation 시작 시각을 밀리초로 저장하고 trace 트리를 그 시각으로 정렬한다. scripted Episode는 서비스 호출 10개가 1~2ms 안에 끝나 트리에서 순서가 섞였다(step 4 `check_cancel_policy`가 step 9 `complete_cancellation`보다 아래). `OBSERVATION_GATE`(`eval_lab/environment.py`)가 Langfuse에 기록할 때만 root, 턴, 서비스 호출을 앞 observation과 다른 밀리초에 연다. 호출당 최대 약 1ms다. `Event.step`과 판정은 바뀌지 않는다. 시험은 `tests/test_agent_episodes.py`의 `test_scripted_observations_start_in_distinct_milliseconds`이고, 문을 끄면 실패하는 것을 확인했다.
+- **Metrics API 구간은 시작이 끝보다 앞서야 한다 (2026-11-05 추가).** 실제 서버가 시작=끝 질의를 400 `fromTimestamp must be before toTimestamp`로 거절했다. 04의 `[깨뜨리기]` 셀이 미래 구간을 시작=끝으로 만들어 멈췄으므로 "내일부터 한 시간"으로 고쳤고, `tests/fakes.py`의 가짜 Metrics도 같은 조건을 거절한다(옛 셀로 `run_fake`가 실패하는 것을 확인했다).
+- **일괄 채점은 v2 관측 API 위에서 직접 돈다 (2026-11-05 추가, 측정 전).** 설치된 SDK(langfuse 4.15.1)의 `run_batched_evaluation(scope="observations")`은 v1 관측 API(`GET /api/public/observations`)로 항목을 읽는다(`.venv/.../langfuse/batch_evaluation.py:1183`). Langfuse Cloud는 이 API를 2026-11-16에 없앤다. 2026-11-05 jp.cloud.langfuse.com 응답에 `Sunset: Mon, 16 Nov 2026`과 본문 `_deprecation.sunsetAt = 2026-11-16`이 있었고, 같은 날짜에 trace 목록·조회, session, 점수 v1 목록도 없어진다(대체: v2 observations, v3 scores). v2 observations, v2 metrics, Dataset, annotation queue, score config에는 그 표시가 없었다. 그래서 `batch_evaluate`(`eval_lab/online.py`)가 같은 계약(observation_mapper → 평가기 → observation에 `create_score`)을 v2 위에서 돈다. 결과 칸 이름은 SDK의 `BatchEvaluationResult`와 같다. v2는 input/output을 문자열로만 주고(`parseIoAsJson`은 400), 요약 문자열은 `_rebuild`가 읽는다. 03a의 v1 직접 호출 셀은 `count_observations`(v2)로 바꿨다. SDK를 올리는 것은 루트 `uv.lock`의 일이라 이 Day에서 하지 않았다.
+- **사람 검수 대기열에는 점수 설정이 필요하다 (2026-11-05 추가).** Langfuse가 빈 `scoreConfigIds`를 400으로 거절했다(05의 미확인 항목). `enqueue_for_review`가 범주형 점수 설정 `human_verdict`(PASS/FAIL)를 찾거나 만들어 붙인다(`ensure_review_score_config`). 오프라인 가짜도 같은 조건을 거절한다.
+- **집계 지연은 실제로 보였다 (2026-11-05, 1회 관찰).** 04의 원격 지표는 기록 직후 0건, 1~2분 뒤 60건이었다. 03a의 일괄 채점은 기록 직후에 불려 root observation을 0건 읽었고, 몇 분 뒤 같은 필터는 20건을 읽었다. 노트북은 이 지연을 숨기지 않고 보여 준다.
+- **개선기의 출력 한도를 32000으로 올렸다 (2026-11-05 추가, 측정 전).** OpenGateway의 DeepSeek은 개선기 프롬프트(약 8,600자)에서 생각(reasoning)에 1.5만~2만 토큰을 쓴다. 한도 16000(에이전트와 같은 값)에서는 4번 모두 `stop_reason=max_tokens`로 답이 비거나 잘렸고, 라운드가 "개선기 답에서 JSON 목록을 읽지 못했습니다"로 후보 0개가 됐다. effort를 medium으로 낮춰도 생각이 줄지 않았다(2번 모두 잘림). 32000에서는 2번 모두 `end_turn`, 후보 3개였다. 그래서 `_IMPROVER_MAX_TOKENS = 32000`, 대기 300초다(`eval_lab/settings.py`). 결과(후보의 좋고 나쁨)를 보고 바꾼 것이 아니라 답이 아예 나오지 않아서 바꿨다. 판정 문턱값·예산·반복은 그대로다.

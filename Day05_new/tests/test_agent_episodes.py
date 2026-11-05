@@ -7,6 +7,7 @@
 import json
 import sys
 from contextlib import contextmanager
+from itertools import pairwise
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -442,6 +443,30 @@ def test_version_label_reaches_langfuse_instead_of_release(langfuse_memory):
     assert versions(labelled) == {"policy-r2"}
     assert versions(default) == {"baseline"}
     assert labelled.release == "baseline"
+
+
+def test_scripted_observations_start_in_distinct_milliseconds(langfuse_memory):
+    """Langfuse는 시작 시각을 밀리초로 정렬한다. scripted Episode의 root, 턴, 서비스 호출이 실제 순서대로 서로 다른 밀리초에 시작한다.
+
+    고치기 전(2026-11-05)에는 서비스 호출 10개가 1~2ms 안에 몰려 Langfuse 트리에서 순서가 섞였다.
+    """
+    client, exporter = langfuse_memory
+    card = dev_card("normal")
+    artifact = run_card(card, langfuse=client)
+    client.flush()
+    spans = [s for s in exporter.get_finished_spans() if s.attributes.get("session.id") == artifact.episode_id]
+    by_hex = {format(s.context.span_id, "016x"): s for s in spans}
+
+    # 1단계: 서비스 Event를 step 순서로 놓고, 각 Event가 가리키는 span의 시작 밀리초를 읽는다.
+    events = sorted(artifact.events, key=lambda event: event.step)
+    service_ms = [by_hex[event.observation_id].start_time // 1_000_000 for event in events]
+    assert len(service_ms) == len(events) >= 5
+
+    # 2단계: root → turn-1 → 첫 서비스 호출 → … 순서로 밀리초가 엄격하게 커진다.
+    root_ms = next(s for s in spans if s.parent is None).start_time // 1_000_000
+    turn_ms = next(s for s in spans if s.name == "turn-1").start_time // 1_000_000
+    sequence = [root_ms, turn_ms, *service_ms]
+    assert all(earlier < later for earlier, later in pairwise(sequence)), sequence
 
 
 def test_summary_round_trip_keeps_awaiting_user():

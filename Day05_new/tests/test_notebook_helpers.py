@@ -6,13 +6,13 @@ from pydantic import BaseModel
 def test_announce_names_each_nonzero_part_and_minutes(capsys):
     notebook.announce("시험", model_calls=30, jev_calls=5, judge_calls=4, improver_calls=2, minutes=3)
     assert capsys.readouterr().out.strip() == (
-        "[시험] 이 실행은 Claude 에이전트 약 30회, Jev 최대 5회, Judge(xhigh) 최대 4회, "
+        "[시험] 이 실행은 에이전트 모델 약 30회, Jev 최대 5회, Judge(xhigh) 최대 4회, "
         "개선기 약 2회, 3분 예상입니다. 진행합니다.")
 
 
 def test_announce_omits_zero_parts(capsys):
     notebook.announce("시험", model_calls=7)
-    assert capsys.readouterr().out.strip() == "[시험] 이 실행은 Claude 에이전트 약 7회 예상입니다. 진행합니다."
+    assert capsys.readouterr().out.strip() == "[시험] 이 실행은 에이전트 모델 약 7회 예상입니다. 진행합니다."
 
 
 def test_announce_all_zero_says_no_paid_calls(capsys):

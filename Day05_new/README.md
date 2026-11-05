@@ -1,6 +1,6 @@
 # Day05_new — Agent 평가 및 모니터링
 
-주문 취소·결제 환불·예약 재고 복원 업무를 하는 Agent를 하나 두고, 그 Agent를 **어떻게 평가하고, 운영 중에 어떻게 지켜보고, 그 기록으로 어떻게 개선하는가**를 노트북 00~06으로 배웁니다. 모델은 `ChatAnthropic`(`claude-sonnet-5-5`)이고, 평가는 Code → Jev → Judge 순서로 진행합니다(Judge는 effort `xhigh`).
+주문 취소·결제 환불·예약 재고 복원 업무를 하는 Agent를 하나 두고, 그 Agent를 **어떻게 평가하고, 운영 중에 어떻게 지켜보고, 그 기록으로 어떻게 개선하는가**를 노트북 00~06으로 배웁니다. 모델은 OpenGateway의 `deepseek/deepseek-v4.1-flash-ultrafast`이고(Anthropic Messages 호환 엔드포인트라 클라이언트는 `ChatAnthropic`), 평가는 Code → Jev → Judge 순서로 진행합니다(Judge는 같은 모델의 effort `xhigh`).
 
 채점은 없습니다. 모든 코드가 제공되고, 각 노트북 끝의 **직접 해보기**와 **확인 질문**으로 자기 말로 설명할 수 있는지 확인합니다.
 
@@ -19,6 +19,8 @@
 
 번호 순서대로 진행합니다. 뒤 노트북은 앞 노트북의 개념과 `eval_lab` 함수를 이어서 씁니다.
 
+같은 내용을 **Claude Code와 Langfuse로 실습하는 미션 카드**는 [`use_cc/README.md`](use_cc/README.md)에 있습니다. 노트북은 그때 강의 본문과 Claude Code의 참고본으로 씁니다.
+
 ## 준비
 
 1. 저장소 루트에서 한 번 `uv sync --locked`를 실행합니다. 이 폴더에서는 `uv sync`를 하지 않습니다.
@@ -27,30 +29,30 @@
 
 필요한 키(자세한 변수 목록과 기본값은 `.env.example`):
 
-- 필수: `ANTHROPIC_API_KEY`
-- Decision API(Jev)용 키 하나: `TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `AZURE_OPENAI_API_KEY` 중. `DAY05_DECISION_BACKEND`를 비워 두면 이 순서에서 값이 있는 첫 번째를 씁니다. Claude가 Jev를 대신하지는 않습니다.
+- 필수: `OPENGATEWAY_API_KEY`(에이전트·Judge·개선기). `DAY05_PROVIDER=anthropic`으로 바꾸면 대신 `ANTHROPIC_API_KEY`와 `claude-sonnet-5-5`를 씁니다.
+- Decision API(Jev)용 키 하나: `TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `AZURE_OPENAI_API_KEY` 중. `DAY05_DECISION_BACKEND`를 비워 두면 이 순서에서 값이 있는 첫 번째를 씁니다. 에이전트 모델이 Jev를 대신하지는 않습니다.
 - Langfuse(`LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY`, `LANGFUSE_HOST`): Langfuse 셀에만 필요합니다. 없으면 노트북은 로컬 경로로 계속 진행합니다.
 
 두 스위치 `RUN_EXERCISE`, `RUN_OPTIONAL`은 노트북 안에서 기본 `False`입니다. 직접 해보기와 선택 실습 중 호출이 더 드는 셀이 이 스위치 뒤에 있습니다.
 
 ## 비용
 
-유료 셀(Claude 에이전트, Jev, Judge, 개선기)은 실행 직전에 `announce`로 호출 규모를 한 줄로 알립니다. 아래는 노트북이 예고하는 **상한 추정**이며 측정값이 아닙니다. 본인 크레딧이 쓰입니다.
+유료 셀(에이전트 모델, Jev, Judge, 개선기)은 실행 직전에 `announce`로 호출 규모를 한 줄로 알립니다. 아래는 노트북이 예고하는 **상한 추정**이며 측정값이 아닙니다. 본인 크레딧이 쓰입니다.
 
 | 노트북 | 기본 실행 | 스위치를 켠 실행 |
 |---|---|---|
-| 00 | Claude 1, Jev 1, Judge 1 | Jev 2, Judge 4 |
-| 01 | 호출 없음 | Claude 12 |
-| 02 | Claude 72, Jev 12, Judge 36 | 같음 |
-| 03a | Jev 20, Judge 60 | Claude 96, Jev 30, Judge 90 |
+| 00 | 에이전트 1, Jev 1, Judge 1 | Jev 2, Judge 4 |
+| 01 | 호출 없음 | 에이전트 12 |
+| 02 | 에이전트 72, Jev 12, Judge 36 | 같음 |
+| 03a | Jev 20, Judge 60 | 에이전트 96, Jev 30, Judge 90 |
 | 03b | Jev 4, Judge 36 | Jev 4, Judge 48 |
 | 04 | 호출 없음 | 호출 없음 |
 | 05 | 각 셀의 `announce` 줄을 확인 | 각 셀의 `announce` 줄을 확인 |
-| 06 | Claude 144 이하, 개선기 1 | Claude 228 이하, 개선기 2 |
+| 06 | 에이전트 144 이하, 개선기 1 | 에이전트 228 이하, 개선기 2 |
 
 06의 holdout 구간은 사례 3개 상한으로 예고하므로 현재 승인된 카드 수에서는 실제가 더 적습니다. 합계는 노트북을 고치면 달라지므로, 최종 규모는 각 셀의 `announce` 출력을 따릅니다.
 
-외부로 나가는 데이터: Anthropic에는 요청·도구 결과·응답과 Judge용 Episode 기록 요약, Decision API 공급자에는 질문 문장과 state, Langfuse에는 프롬프트·도구 입출력·점수·Dataset이 갑니다. 모든 데이터는 교육용 가상 데이터입니다.
+외부로 나가는 데이터: OpenGateway(와 OpenGateway가 고른 업스트림 추론 공급자)에는 요청·도구 결과·응답과 Judge용 Episode 기록 요약, Decision API 공급자에는 질문 문장과 state, Langfuse에는 프롬프트·도구 입출력·점수·Dataset이 갑니다. 모든 데이터는 교육용 가상 데이터입니다.
 
 ## 폴더 구성
 
@@ -65,9 +67,9 @@
 
 ## 이 과정이 주장하지 않는 것
 
-- **실제 모델 응답은 저자가 아직 측정하지 않았습니다.** 노트북은 가짜 모델로 끝까지 도는 것만 확인되었고, 실제 Claude·Jev·Judge 응답과 그 점수는 수업에서 처음 나옵니다.
+- **실제 모델 응답은 저자가 아직 측정하지 않았습니다.** 노트북은 가짜 모델로 끝까지 도는 것만 확인되었고, 실제 에이전트 모델·Jev·Judge 응답과 그 점수는 수업에서 처음 나옵니다(저자는 2026-11-05에 OpenGateway DeepSeek으로 Episode 1개만 1회 관찰했습니다).
 - Langfuse 서버 쪽 동작(Rule·Evaluator 실행, Metrics API 응답, 집계 지연, 2026-11-16 전환 이후 Cloud 동작)은 확인되지 않았습니다.
-- `ToolStrategy(Response)`가 `claude-sonnet-5-5`에서 구조화 응답을 안정적으로 내는지, Judge의 `max_tokens`가 충분한지는 첫 유료 실행에서 확인할 항목입니다.
+- `ToolStrategy(Response)`가 `deepseek/deepseek-v4.1-flash-ultrafast`에서 구조화 응답을 반복해서 안정적으로 내는지, Judge의 `max_tokens`가 충분한지, OpenGateway가 effort를 어떻게 옮기는지는 아직 확인하지 않았습니다.
 - OTel GenAI 규약의 안정화 여부와 Dream-RSI 공식 코드의 위치·라이선스도 확인되지 않았습니다. Dream-RSI는 재현하지 않고 개념만 인용합니다.
 - 작은 표본(수 건~수십 건)의 비율에는 통계적 의미가 없습니다.
 

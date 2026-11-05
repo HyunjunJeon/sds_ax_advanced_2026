@@ -81,24 +81,53 @@ def test_load_settings_ignores_the_real_dotenv_under_the_conftest_fixture():
     assert all(value == "미설정" for value in key_status(settings).values())
 
 
+DEEPSEEK = "deepseek/deepseek-v4.1-flash-ultrafast"
+
+
 def test_settings_defaults():
     settings = Settings()
-    assert (settings.model, settings.effort) == ("claude-sonnet-5-5", "medium")
-    assert (settings.judge_model, settings.judge_effort) == ("claude-sonnet-5-5", "xhigh")
+    assert settings.provider == "opengateway"
+    assert (settings.model, settings.effort) == (DEEPSEEK, "medium")
+    assert (settings.judge_model, settings.judge_effort) == (DEEPSEEK, "xhigh")
     assert (settings.improver_effort, settings.langfuse_environment) == ("high", "day05_new")
+
+
+def test_default_provider_is_opengateway_messages_endpoint():
+    """기본 공급자는 OpenGateway다. ChatAnthropic이 base_url 뒤에 /v1/messages를 붙이므로 주소에 /v1이 없다."""
+    model = make_agent_model(Settings(opengateway_api_key="og-test"))
+    assert (model.model, model.anthropic_api_url) == (DEEPSEEK, "https://apis.opengateway.ai")
+    assert model.anthropic_api_key.get_secret_value() == "og-test"
+
+
+def test_anthropic_provider_switch_uses_its_own_url_key_and_default_model(tmp_path):
+    env = tmp_path / "anthropic.env"
+    env.write_text("DAY05_PROVIDER= Anthropic \nANTHROPIC_API_KEY=sk-a\nOPENGATEWAY_API_KEY=og-ignored\n", encoding="utf-8")
+    settings = load_settings(env)
+    assert (settings.provider, settings.model, settings.judge_model) == ("anthropic", "claude-sonnet-5-5", "claude-sonnet-5-5")
+    model = make_judge_model(settings)
+    assert (model.anthropic_api_url, model.anthropic_api_key.get_secret_value()) == ("https://api.anthropic.com", "sk-a")
+
+
+def test_unknown_provider_is_rejected_before_any_call(tmp_path):
+    env = tmp_path / "bad.env"
+    env.write_text("DAY05_PROVIDER=openrouter\n", encoding="utf-8")
+    with pytest.raises(ValueError, match="DAY05_PROVIDER"):
+        load_settings(env)
+    with pytest.raises(ValueError, match="DAY05_PROVIDER"):
+        make_agent_model(Settings(provider="nope", opengateway_api_key="og"))
 
 
 def test_load_settings_reads_an_explicit_file_with_defaults_and_overrides(tmp_path):
     env = tmp_path / "custom.env"
-    env.write_text("ANTHROPIC_API_KEY=abc\nDAY05_EFFORT=high\nDAY05_DECISION_BACKEND= OpenAI \nLANGFUSE_HOST=https://lf.example\n", encoding="utf-8")
+    env.write_text("OPENGATEWAY_API_KEY=abc\nDAY05_EFFORT=high\nDAY05_DECISION_BACKEND= OpenAI \nLANGFUSE_HOST=https://lf.example\n", encoding="utf-8")
     settings = load_settings(env)
-    assert (settings.anthropic_api_key, settings.effort, settings.model) == ("abc", "high", "claude-sonnet-5-5")
+    assert (settings.opengateway_api_key, settings.effort, settings.model) == ("abc", "high", DEEPSEEK)
     assert (settings.decision_backend, settings.langfuse_host, settings.langfuse_environment) == ("openai", "https://lf.example", "day05_new")
 
 
 def test_judge_effort_override_through_day05_env_file(tmp_path, monkeypatch):
     env = tmp_path / "judge.env"
-    env.write_text("ANTHROPIC_API_KEY=k\nDAY05_JUDGE_EFFORT=max\nDAY05_IMPROVER_EFFORT=low\n", encoding="utf-8")
+    env.write_text("OPENGATEWAY_API_KEY=k\nDAY05_JUDGE_EFFORT=max\nDAY05_IMPROVER_EFFORT=low\n", encoding="utf-8")
     monkeypatch.setenv("DAY05_ENV_FILE", str(env))
     settings = load_settings()
     assert (settings.judge_effort, settings.improver_effort) == ("max", "low")
@@ -107,28 +136,33 @@ def test_judge_effort_override_through_day05_env_file(tmp_path, monkeypatch):
 
 def test_load_settings_ignores_shell_environment_keys(monkeypatch):
     monkeypatch.setenv("ANTHROPIC_API_KEY", "from-shell")
-    assert load_settings().anthropic_api_key == ""
+    monkeypatch.setenv("OPENGATEWAY_API_KEY", "from-shell")
+    monkeypatch.setenv("DAY05_PROVIDER", "anthropic")
+    settings = load_settings()
+    assert (settings.anthropic_api_key, settings.opengateway_api_key, settings.provider) == ("", "", "opengateway")
 
 
 def test_judge_model_uses_xhigh_and_large_token_budget():
-    model = make_judge_model(Settings(anthropic_api_key="sk-test"))
-    assert (model.model, model.effort, model.max_tokens) == ("claude-sonnet-5-5", "xhigh", 32000)
+    model = make_judge_model(Settings(opengateway_api_key="og-test"))
+    assert (model.model, model.effort, model.max_tokens) == (DEEPSEEK, "xhigh", 32000)
     assert (model.temperature, model.thinking, model.max_retries) == (None, None, 0)
 
 
 def test_agent_and_improver_models_use_their_own_effort():
-    settings = Settings(anthropic_api_key="sk-test")
+    settings = Settings(opengateway_api_key="og-test")
     agent = make_agent_model(settings)
     improver = make_improver_model(settings)
     assert (agent.effort, agent.max_tokens) == ("medium", 16000)
-    assert (improver.effort, improver.max_tokens) == ("high", 16000)
+    assert (improver.effort, improver.max_tokens, improver.default_request_timeout) == ("high", 32000, 300.0)
     assert (agent.temperature, agent.thinking, agent.max_retries) == (None, None, 0)
 
 
 @pytest.mark.parametrize("factory", [make_agent_model, make_judge_model, make_improver_model])
-def test_model_factories_require_the_anthropic_key(factory):
-    with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY"):
+def test_model_factories_require_the_provider_key(factory):
+    with pytest.raises(RuntimeError, match="OPENGATEWAY_API_KEY"):
         factory(Settings())
+    with pytest.raises(RuntimeError, match="ANTHROPIC_API_KEY"):
+        factory(Settings(provider="anthropic", opengateway_api_key="og-set-but-not-used"))
 
 
 def test_make_langfuse_requires_both_keys_and_uses_host():
@@ -263,3 +297,15 @@ def test_unix_socket_and_subprocess_pipes_still_work():
     left.close(), right.close()
     out = subprocess.run([sys.executable, "-c", "print('pipe')"], capture_output=True, text=True, check=True)
     assert out.stdout.strip() == "pipe"
+
+
+def test_langfuse_base_url_from_the_langfuse_env_snippet_is_accepted(tmp_path):
+    """Langfuse 화면의 .env 예시(LANGFUSE_BASE_URL)를 그대로 붙여도 주소가 쓰이고, LANGFUSE_HOST가 있으면 그쪽이 우선이다."""
+    snippet = tmp_path / "snippet.env"
+    snippet.write_text('LANGFUSE_SECRET_KEY="sk-lf-x"\nLANGFUSE_PUBLIC_KEY="pk-lf-x"\nLANGFUSE_BASE_URL="https://jp.cloud.langfuse.com"\n',
+                       encoding="utf-8")
+    assert load_settings(snippet).langfuse_host == "https://jp.cloud.langfuse.com"
+    both = tmp_path / "both.env"
+    both.write_text("LANGFUSE_HOST=https://us.cloud.langfuse.com\nLANGFUSE_BASE_URL=https://jp.cloud.langfuse.com\n", encoding="utf-8")
+    assert load_settings(both).langfuse_host == "https://us.cloud.langfuse.com"
+

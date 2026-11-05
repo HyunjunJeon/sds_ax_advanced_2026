@@ -3,8 +3,8 @@
 `Day05/business_lab/agents.py`를 이식했다. 바뀐 점은 세 가지다.
 
 1. 모델은 호출한 쪽이 넘긴다. 노트북은 `eval_lab.settings.make_agent_model(settings)`가 만든
-   `ChatAnthropic`을 넘긴다. 이 모듈은 키를 읽거나 모델을 직접 만들지 않는다.
-2. 비용(cost_usd)은 집계하지 않고 None으로 둔다. Anthropic 응답에는 비용 필드가 없다.
+   `ChatAnthropic`(기본 공급자 OpenGateway의 DeepSeek, Anthropic Messages 방식)을 넘긴다. 이 모듈은 키를 읽거나 모델을 직접 만들지 않는다.
+2. 비용(cost_usd)은 집계하지 않고 None으로 둔다. Anthropic Messages 응답에는 비용 필드가 없다.
    모르는 비용을 0으로 적으면 "공짜였다"는 거짓 주장이 되므로 None(미확인)으로 남긴다.
 3. 하네스 게이트 훅(DESIGN 11.1절). 도구 호출이 업무 환경에 닿기 전에 게이트가
    allow / block / ask를 정한다. 막힌 호출은 서비스에 닿지 않고, 모델에는 막혔다는 결과만 돌아간다.
@@ -186,7 +186,7 @@ def make_live_session(env: OrderEnvironment, release: str, model, *, usage: dict
     - 다음 턴에는 이전 messages 전체와 새 사용자 입력을 전달한다. 새 Episode는 이 함수를 다시 호출한다.
     - 모델 호출이 MAX_MODEL_CALLS를 넘으려 하면 RuntimeError("ModelBudgetExceeded")로 멈춘다.
     - usage는 이 함수가 0으로 초기화한다. 토큰은 응답의 usage_metadata로 더하고, 한 번이라도
-      빠지면 None(미확인)이 된다. cost_usd는 항상 None이다(Anthropic 응답에 비용 필드가 없다).
+      빠지면 None(미확인)이 된다. cost_usd는 항상 None이다(Anthropic Messages 응답에 비용 필드가 없다).
     - env.langfuse가 있으면 LangChain CallbackHandler로 모델·도구 호출도 기록한다.
     공식 계약: https://docs.langchain.com/oss/python/langchain/agents
     """
@@ -221,7 +221,7 @@ def make_live_session(env: OrderEnvironment, release: str, model, *, usage: dict
                     usage[field] = None
                 else:
                     usage[field] += measured[field]
-            # 비용은 더하지 않는다. Anthropic 응답에는 비용 필드가 없어 cost_usd는 None으로 남는다.
+            # 비용은 더하지 않는다. Anthropic Messages 응답에는 비용 필드가 없어 cost_usd는 None으로 남는다.
 
         def on_llm_error(self, *args, **kwargs):
             usage["input_tokens"] = usage["output_tokens"] = None
@@ -229,8 +229,8 @@ def make_live_session(env: OrderEnvironment, release: str, model, *, usage: dict
                                           "error_type": type(args[0]).__name__ if args else "Unknown"})
 
     # 2단계: 에이전트를 만든다. 구조화 응답은 Response 스키마를 도구로 노출하는 ToolStrategy를 쓴다.
-    # 미확인: claude-sonnet-5-5의 모델 프로필은 tool_choice=False다. 이 설정에서 ToolStrategy의
-    # 구조화 응답이 그대로 동작하는지는 실제 호출 없이 확인할 수 없다. 첫 유료 smoke에서 확인한다.
+    # 기본 모델 deepseek/deepseek-v4.1-flash-ultrafast(OpenGateway)에서 ToolStrategy 구조화 응답과
+    # 도구 호출이 동작하는 것을 저자가 2026-11-05에 1회 관찰했다(normal Episode PASS). 반복 안정성은 미확인이다.
     system_prompt = prompt if prompt is not None else PROMPTS[release]
     agent = create_agent(model=model, tools=build_tools(env, gate), system_prompt=system_prompt,
                          response_format=ToolStrategy(Response))
