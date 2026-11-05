@@ -58,7 +58,7 @@ Ko-StrategyQA `train`에서 CPU float32로 후보 50개를 재순위하면 문�
 | 항목 | Ko-StrategyQA | 올거나이즈 | 결정 |
 |---|---|---|---|
 | BM25 단독 대 dense 단독 | dense 우세 | BM25 우세 | 융합 유지, dense .7 |
-| 질문별 최고 점수 재순위 | 우세 | 1위 적중 하락 | 원 질문 기준(AutoRAG와 같음) |
+| 질문별 최고 점수 재순위 | 우세 | 1위 적중 하락 | 원 질문 기준 |
 | 가장 큰 개선 | 재순위 | 페이지 판독 | 실제 문서 쪽을 따른다 |
 
 ## rag_lab 구현 재측정
@@ -139,7 +139,7 @@ r@3가 1 미만인 행은 세 구성 모두 범위 밖 4문항(`multi-which-cont
 
 ## Jev 관문 측정
 
-`rag_lab/gates.py`의 게이트 세 개를 실제 Jev(`jev-1.14.0`, TypeSafe API)로 돌려 쟀다. 원본은 `outputs/benchmarks/results/measure_jev.json`과 `measure_answers_3.jsonl`이고 도구는 `benchmarks/measure.py jev`와 `answers --out`이다. 올거나이즈는 `tune`만 쟀고 `hold`는 읽지 않았으며 `decomposed_allganize_hold.json`도 열지 않았다. 정답표, 예산, 게이트 문턱값은 바꾸지 않았다. 한 번 실행, 장비 한 대의 값이다. 이 문서의 확률은 모두 보정되지 않은 값이다.
+`rag_lab/gates.py`의 게이트 세 개를 실제 Jev(`jev-1.14.0`, TypeSafe API)로 돌려 쟀다. 원본은 `outputs/benchmarks/results/measure_jev.json`과 `measure_answers_3.jsonl`이고 도구는 `benchmarks/measure.py jev`와 `answers --out`이다. 올거나이즈는 `tune`만 쟀고 `hold`는 읽지 않았으며 `decomposed_allganize_hold.json`도 열지 않았다. 정답표, 예산, 게이트 문턱값은 바꾸지 않았다. 한 번 실행, 장비 한 대의 값이다. 이 문서의 확률은 모두 보정되지 않은 값이다. **게이트 문장은 2026-11-05에 저자가 새로 작성한 문장으로 교체했고, 이 절의 모든 수치는 교체 이전 문장으로 잰 값이다. 새 문장으로는 다시 재지 않았다.**
 
 실제 규모: Jev 227회(분해 게이트 훑기 153, 답변 74), Claude 61회, Claude 비용 **$1.4665**(`tests/cost_report.py`, 상한 $1.50에 걸리지 않고 24행을 모두 돌았다). 실행 전에 고지한 Jev 약 150회는 게이트 훑기만 센 값이라 실제가 더 많았다. **Jev 비용은 확인할 수 없었다.** 응답의 `usage`에 입력·출력 토큰만 있고 `cost`가 없으며(입력 129,550, 출력 6,878 토큰), 저장소에 Jev 단가가 없다. 게이트 판단 실패로 기본값을 쓴 행은 전체 227회 중 0건이다.
 
@@ -321,7 +321,7 @@ Claude를 부르지 않았다. 문턱값 .5.
 
 ### 출처 보강: 파일 기준
 
-위 측정은 쪽 하나를 출처 하나로 셌다(`page_documents`가 쪽마다 문서를 만들고 `Retriever.rank`가 `doc_id`를 출처로 넘긴다). AutoRAG `merger.ts`는 출처 문서 하나에 속한 조각 수를 센다. 그래서 파일을 출처로 삼아 다시 쟀다. `rag_lab`은 바꾸지 않았다. `benchmarks/measure.py`의 `file_source_view`가 조각의 `doc_id`만 파일 이름으로 바꾼 검색기를 만들고, 순위 계산은 같은 `Retriever.rank`와 `corroborate`가 한다. 조각 ID와 본문은 그대로라 색인과 재순위 점수도 같다. 원본은 `outputs/benchmarks/results/measure_corroboration_file.json`의 `file_source`이고 실행은 `benchmarks/measure.py corroboration-file`이다.
+위 측정은 쪽 하나를 출처 하나로 셌다(`page_documents`가 쪽마다 문서를 만들고 `Retriever.rank`가 `doc_id`를 출처로 넘긴다). 출처를 문서(파일) 하나로 묶어 그 조각 수를 세는 방식과 결과가 다를 수 있어 파일을 출처로 삼아 다시 쟀다. `rag_lab`은 바꾸지 않았다. `benchmarks/measure.py`의 `file_source_view`가 조각의 `doc_id`만 파일 이름으로 바꾼 검색기를 만들고, 순위 계산은 같은 `Retriever.rank`와 `corroborate`가 한다. 조각 ID와 본문은 그대로라 색인과 재순위 점수도 같다. 원본은 `outputs/benchmarks/results/measure_corroboration_file.json`의 `file_source`이고 실행은 `benchmarks/measure.py corroboration-file`이다.
 
 조건은 위 `tune` 측정과 같다. 105문항, 조각 1992개, 쪽 판독 글자, 후보 50개, 점수 융합, 원 질문 기준 재순위(로컬), 분해 없음, mps. 모델 API는 부르지 않았다. 재순위 실패는 `FailingReranker`로 만들었다. 한 번 실행, 장비 한 대의 값이다. 쪽 출처 구성의 값은 위 표의 `no_decompose` 행과 같게 재현됐다(재순위 정상 MRR .919, 실패 .772).
 

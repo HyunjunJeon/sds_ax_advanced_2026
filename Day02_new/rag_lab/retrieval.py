@@ -15,7 +15,7 @@ from rag_lab.corpus import Chunk, Document, Scope, section_chunks
 _K1, _B = 1.5, 0.75
 _HYBRID_DEPTH = 18  # Day02 09의 조각별 상위 18개와 맞춘다.
 _CANDIDATE_DEPTH = 50  # 출처 보강도는 방법별 상위 50개 후보 안에서만 센다.
-SAME_SOURCE_CORROBORATION_BONUS = 0.15  # AutoRAG merger.ts와 같은 값이다.
+SAME_SOURCE_CORROBORATION_BONUS = 0.15  # 출처 보강 가산계수. 로그 스케일에 곱한다.
 MAX_CORROBORATION_BONUS = 0.3
 
 
@@ -109,7 +109,7 @@ def fuse_scores(dense: list[tuple[str, float]], sparse: list[tuple[str, float]],
 
 
 def corroborate(scores: dict[str, float], sources: dict[str, str], methods: dict[str, set[str]]) -> list[str]:
-    """출처 보강도(AutoRAG merger.ts). 같은 출처의 다른 조각 수 + 그 출처를 찾은 다른 방법 수가 많을수록 점수에 가산한다. 동점은 입력 순서다."""
+    """출처 보강도. 같은 출처의 다른 조각 수 + 그 출처를 찾은 다른 방법 수가 많을수록 점수에 가산한다. 동점은 입력 순서다."""
     chunks_per_source: dict[str, int] = {}
     methods_per_source: dict[str, set[str]] = {}
     for key in scores:

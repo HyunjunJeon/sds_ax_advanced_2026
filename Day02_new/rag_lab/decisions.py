@@ -13,7 +13,7 @@ import httpx
 
 from rag_lab.settings import Settings, append_usage, load_settings
 
-_TIMEOUT = 15.0  # AutoRAG와 같은 값. 재시도는 없다.
+_TIMEOUT = 15.0  # 재시도는 없다.
 
 
 @dataclass(frozen=True)

@@ -538,7 +538,7 @@ def plan_queries(decomposition: str, case_id: str, gates: dict[str, dict], saved
 
 
 class FailingReranker:
-    """재순위 실패를 만든다. retrieve가 합친 순서를 유지하므로 AutoRAG 병합 순서만 남은 상태를 잴 수 있다."""
+    """재순위 실패를 만든다. retrieve가 합친 순서를 유지하므로 합친 순서만 남은 상태를 잴 수 있다."""
     def score(self, query: str, texts: list[str]) -> list[float]:
         raise RuntimeError("측정용 재순위 실패")
 

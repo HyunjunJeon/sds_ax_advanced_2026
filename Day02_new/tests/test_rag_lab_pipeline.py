@@ -1,4 +1,4 @@
-"""AutoRAG 후보 흐름. 재순위 모델만 가짜이고 Retriever와 범위 필터는 실제 코드다."""
+"""검색 후보 흐름. 재순위 모델만 가짜이고 Retriever와 범위 필터는 실제 코드다."""
 from datetime import date
 
 import pytest
@@ -147,7 +147,7 @@ def decompose(reply: str, question: str = QUESTION) -> list[str]:
     return decompose_question(ScriptedChatModel(steps=[AIMessage(content=reply)]), question)
 
 
-def test_decomposition_sends_the_autorag_prompt_verbatim():
+def test_decomposition_sends_the_defined_prompt_verbatim():
     model = ScriptedChatModel(steps=[AIMessage(content='{"queries": ["기한"]}')])
     decompose_question(model, "알파 {기한}은?")
     assert model.calls[0][-1].text == DECOMPOSE_PROMPT_FOR_QUESTION

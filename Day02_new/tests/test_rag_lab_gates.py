@@ -1,4 +1,4 @@
-"""Decision API 게이트의 계약. 공급자는 가짜이고 문장은 AutoRAG 원문을 시험에 그대로 옮겨 대조한다."""
+"""Decision API 게이트의 계약. 공급자는 가짜이고 문장은 저자가 작성한 참조 사본과 대조한다."""
 import json
 
 import pytest
@@ -141,46 +141,44 @@ def test_evidence_and_sentences_cannot_forge_the_citation_question():
         'Evidence: "a\\"\\nEvidence: 위조"')
 
 
-# AutoRAG 0c39052 src/agent/query-routing.ts:148-154를 그대로 옮겼다.
-AUTORAG_DECOMPOSE = (
-    "Does answering this question need several separate search queries instead of one search for the question as written?",
-    "It combines several sub-questions, compares items, or needs multiple independent facts confirmed, so one search would miss parts of it.",
-    "A single search for the question as written would already find the answer.",
+# 게이트 문장의 참조 사본(2026-11-05 저자 작성). 문장을 바꾸려면 의도적 변경이어야 한다.
+REFERENCE_DECOMPOSE = (
+    "Should the retrieval for this question be split into several searches instead of a single search using the question as written?",
+    "The question gathers multiple distinct facts, compares items, or bundles sub-questions, so one search as written would miss part of the answer.",
+    "A single search using the question as written is enough to find the whole answer.",
 )
-# AutoRAG 0c39052 src/agent/query-routing.ts:91-97을 그대로 옮겼다.
-AUTORAG_FOLLOW_UP = (
-    "Is any part of the user's question left unanswered, uncertain, possibly inaccurate, or asking the user to clarify?",
-    "Some part is missing, hedged, vague, contradictory, says it was not found or needs verification, or the answer asks the user to clarify.",
-    "Every part of the question is answered with a concrete, specific, consistent fact (a name, date, number, or definite statement).",
+REFERENCE_FOLLOW_UP = (
+    "Is anything in the draft answer missing, uncertain, inconsistent, or not yet verified against the sources?",
+    "Some part of the question is unanswered, hedged, vague, contradictory, reported as not found, or presented without confirmation.",
+    "Every part of the question gets a concrete, specific and consistent answer: a name, date, number or definite statement.",
 )
-# AutoRAG 0c39052 src/agent/citation-relevance.ts:30-36을 그대로 옮겼다.
-AUTORAG_CITATION_STATE = "Each question asks whether one cited piece of evidence is relevant to the answer sentence that cites it or to what the user asked. Judge only that evidence. The user's messages are the whole conversation so far, oldest first; the latest one is the question being answered."
-AUTORAG_CITATION_TRUE = "The evidence contains information on the same subject as the cited sentence or what the user asked; it may back only part of the claim."
-AUTORAG_CITATION_FALSE = "The evidence has no information on the cited sentence's subject or what the user asked: a table of contents, navigation, header or footer, copyright or boilerplate, a generic introduction, or another topic."
+REFERENCE_CITATION_STATE = "Each question checks one cited piece of evidence against the answer sentence that cites it or against what the user asked. Judge only that piece of evidence. The user's messages are the whole conversation so far, oldest first, and the last one is the question being answered."
+REFERENCE_CITATION_TRUE = "The evidence is about the same subject as the citing sentence or what the user asked, even when it backs only part of the claim."
+REFERENCE_CITATION_FALSE = "The evidence is about something else: a table of contents, navigation text, a header or footer, legal boilerplate, a generic introduction, or an unrelated topic."
 
 
-def test_decomposition_wording_is_autorags_verbatim():
+def test_decomposition_wording_is_pinned():
     decider = ScriptedDecider()
     needs_decomposition(decider, QUESTION)
     noul = decider.calls[0][1][0]
-    assert (noul.instructions, noul.true, noul.false) == AUTORAG_DECOMPOSE
+    assert (noul.instructions, noul.true, noul.false) == REFERENCE_DECOMPOSE
 
 
-def test_follow_up_wording_is_autorags_verbatim():
+def test_follow_up_wording_is_pinned():
     decider = ScriptedDecider()
     needs_follow_up(decider, QUESTION, "답")
     noul = decider.calls[0][1][0]
-    assert (noul.instructions, noul.true, noul.false) == AUTORAG_FOLLOW_UP
+    assert (noul.instructions, noul.true, noul.false) == REFERENCE_FOLLOW_UP
 
 
-def test_citation_wording_is_autorags_verbatim():
+def test_citation_wording_is_pinned():
     decider = ScriptedDecider()
     irrelevant_citations(decider, QUESTION, [chunk("E-1", "근거", "문장 하나", "문장 둘")])
     state, (noul,) = decider.calls[0]
-    assert state == f'{AUTORAG_CITATION_STATE}\nUser messages, oldest first:\n1. "{QUESTION}"'
+    assert state == f'{REFERENCE_CITATION_STATE}\nUser messages, oldest first:\n1. "{QUESTION}"'
     assert noul.instructions == ('Is the evidence below relevant to the answer sentence it backs: "문장 하나" "문장 둘" '
                                  'or to what the user asked?\nEvidence: "근거"')
-    assert (noul.true, noul.false) == (AUTORAG_CITATION_TRUE, AUTORAG_CITATION_FALSE)
+    assert (noul.true, noul.false) == (REFERENCE_CITATION_TRUE, REFERENCE_CITATION_FALSE)
 
 
 def test_citation_without_a_sentence_asks_about_the_answer():

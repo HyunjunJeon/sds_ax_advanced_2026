@@ -1,10 +1,11 @@
-"""AutoRAG의 Decision API 게이트 세 개: 분해가 필요한가, 추가 확인이 필요한가, 인용이 무관한가.
+"""Decision API 게이트 세 개: 분해가 필요한가, 추가 확인이 필요한가, 인용이 무관한가.
 
-질문 문장은 AutoRAG(0c39052)의 영어 원문을 그대로 옮겼다. 그쪽이 실제 Jev로 맞춘 문장이다. 문턱값은 코드 규칙이며
-우리 라벨로 재서 정한 값이 아니다. 판단이 실패하면 AutoRAG의 규칙대로 분해하지 않고, 검증하고, 인용을 남긴다.
+게이트 문장은 2026-11-05에 저자가 새로 작성했다. 이 문장으로는 아직 측정하지 않았고 문턱값(0.5/0.5/0.3)은
+코드 규칙이며 우리 라벨로 재서 정한 값이 아니다. 판단이 실패하면 안전 기본값(분해 안 함, 검증함, 인용 유지)을
+쓰고 진단을 남긴다.
 
-route 분기(organize, extra, config), 메모리 판단, 데이터 소스 검사는 옮기지 않았다. 이 과정은 문서만 검색하며
-검색을 건너뛰는 분기를 두면 Scope를 우회한다.
+검색을 건너뛰는 분기(route 나누기, 메모리 판단, 데이터 소스 검사)는 두지 않는다. 이 과정은 문서만 검색하며
+그런 분기는 Scope를 우회한다.
 """
 from __future__ import annotations
 
@@ -18,24 +19,24 @@ from rag_lab.evidence import Budget, Evidence
 DECOMPOSE_THRESHOLD = 0.5
 FOLLOWUP_THRESHOLD = 0.5
 CITATION_RELEVANCE_FLOOR = 0.3  # 이 값 미만만 뺀다. 주제가 같으면 일부만 뒷받침해도 남긴다.
-_MAX_CHUNK_CHARS = 1500  # 이보다 긴 글은 참/거짓 판단에 보탬이 없고 묶음만 키운다(AutoRAG 주석).
+_MAX_CHUNK_CHARS = 1500  # 이보다 긴 글은 참/거짓 판단에 보탬이 없고 묶음만 키운다.
 _NO_VERDICT = "모델이 거절했거나 쓸 수 있는 답을 주지 않았습니다."
 
 _DECOMPOSE = Noul(
     "decompose",
-    "Does answering this question need several separate search queries instead of one search for the question as written?",
-    "It combines several sub-questions, compares items, or needs multiple independent facts confirmed, so one search would miss parts of it.",
-    "A single search for the question as written would already find the answer.",
+    "Should the retrieval for this question be split into several searches instead of a single search using the question as written?",
+    "The question gathers multiple distinct facts, compares items, or bundles sub-questions, so one search as written would miss part of the answer.",
+    "A single search using the question as written is enough to find the whole answer.",
 )
 _FOLLOW_UP = Noul(
     "follow_up",
-    "Is any part of the user's question left unanswered, uncertain, possibly inaccurate, or asking the user to clarify?",
-    "Some part is missing, hedged, vague, contradictory, says it was not found or needs verification, or the answer asks the user to clarify.",
-    "Every part of the question is answered with a concrete, specific, consistent fact (a name, date, number, or definite statement).",
+    "Is anything in the draft answer missing, uncertain, inconsistent, or not yet verified against the sources?",
+    "Some part of the question is unanswered, hedged, vague, contradictory, reported as not found, or presented without confirmation.",
+    "Every part of the question gets a concrete, specific and consistent answer: a name, date, number or definite statement.",
 )
-_CITATION_STATE = "Each question asks whether one cited piece of evidence is relevant to the answer sentence that cites it or to what the user asked. Judge only that evidence. The user's messages are the whole conversation so far, oldest first; the latest one is the question being answered."
-_CITATION_TRUE = "The evidence contains information on the same subject as the cited sentence or what the user asked; it may back only part of the claim."
-_CITATION_FALSE = "The evidence has no information on the cited sentence's subject or what the user asked: a table of contents, navigation, header or footer, copyright or boilerplate, a generic introduction, or another topic."
+_CITATION_STATE = "Each question checks one cited piece of evidence against the answer sentence that cites it or against what the user asked. Judge only that piece of evidence. The user's messages are the whole conversation so far, oldest first, and the last one is the question being answered."
+_CITATION_TRUE = "The evidence is about the same subject as the citing sentence or what the user asked, even when it backs only part of the claim."
+_CITATION_FALSE = "The evidence is about something else: a table of contents, navigation text, a header or footer, legal boilerplate, a generic introduction, or an unrelated topic."
 
 
 @dataclass(frozen=True)

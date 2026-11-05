@@ -1,6 +1,6 @@
 {"id": "simple-deadline-current", "expected_docs": ["sla-a-v2", "sla-a-amendment"], "facts": ["신청 기한은 다음 달 20일이다(2026-08 개별 추가 약정 기준)."], "abstain": false}
 {"id": "versioned-deadline-july", "expected_docs": ["sla-a-v2"], "facts": ["추가 약정 적용 전 기준 기한은 매월 15일이다(20일이 아니어야 한다)."], "abstain": false}
-{"id": "versioned-deadline-june", "expected_docs": ["sla-a-v1"], "facts": ["v1 기준 기한은 매월 15일이다."], "abstain": false}
+{"id": "versioned-deadline-june", "expected_docs": ["sla-a-v1"], "facts": ["v1 기준 기한은 장애 발생 다음 달 말일이다."], "abstain": false}
 {"id": "table-interval-comparison", "expected_docs": ["sla-a-v2"], "facts": ["가용률 구간별 크레딧 비율의 최댓값은 20%이다."], "abstain": false}
 {"id": "table-ratio-max", "expected_docs": ["sla-a-v2"], "facts": ["최댓값은 20%(단위 %)다."], "abstain": false}
 {"id": "procedure-credit-application", "expected_docs": ["sla-a-v2", "sla-a-amendment"], "facts": [], "abstain": false}

@@ -38,13 +38,30 @@ LangGraph 루프를 손으로 짜지 않고 곧바로 `create_deep_agent`로 간
 
 ---
 
-## 1. 명령행 플래그가 없다
+## 1. 실행은 노트북이 기본, 실행기는 보조
 
-이 폴더에는 실행 스크립트가 없고 `argparse`도 없다. 실행 조건은 **노트북 안의 변수와 셀**이다
+노트북 00~06이 수업 경로다. 실행 조건은 **노트북 안의 변수와 셀**이다
 (`CONFIG`, `Budget(...)`, `Scope(...)` 등). 조건을 바꾸려면 셀을 편집해 다시 실행한다.
-`--flag`를 지어내 안내하지 않는다.
+노트북에 없는 `--flag`를 지어내 안내하지 않는다.
 
-예외는 저자용 도구뿐이며, 수강생 실습에 필요하지 않다. 수강생이 쓰지 않으니 안내하지도 않는다.
+`run_pipeline.py`는 노트북 대신 전체 파이프라인을 Python 코드로 한 번에 돌리는 보조 실행기다(2026-11-05 추가).
+기본 모델은 OpenGateway의 `deepseek/deepseek-v4.1-flash-ultrafast`고 `.env`의 `OPENGATEWAY_API_KEY`가 필요하다.
+`--provider anthropic`이면 노트북과 같은 Anthropic Claude를 쓴다. 게이트 판정은 노트북과 같은 Decision API다.
+검색 구성도 `.env` 파일로 정한다: `DAY02_RETRIEVAL_MODE`(`fusion` 기본, `bm25`면 로컬 임베딩을 적재하지 않음)와
+`DAY02_RERANKER`(`on` 로컬 교차 인코더 기본, `off`, `jev`는 Decision API가 후보별 관련 확률로 재순위, 판단 호출 유료).
+실행 인자 `--retrieval`, `--rerank`가 `.env`보다 우선한다. `--mode fs`는 검색 도구 없이 내장 파일 도구
+(`ls`·`glob`·`grep`·`read_file`)로 `outputs/fs_corpus/`(고객/도메인 폴더 + INDEX.md + frontmatter)를
+뒤지는 경로다. `--mode fs_jev`는 파일 선택을 Jev가 발췌별 관련 확률로 하고 커버리지 판정으로 모은 발췌의
+적절함을 검증하며(불충분하면 fs 에이전트로 폴백), 답 뒤 추가 확인 게이트로 재검증한다. 기록은 `outputs/runs/`.
+`--dataset`(`--cases-file`·`--gold-file`로 hard 세트 지정, `--corpus allganize`·`--split tune|hold`로 올거나이즈
+실측 PDF 지정)은 사례 전체를 돌려 품질을 잰다. 정답표는 실행이 끝난 뒤에만 읽고(`load_gold`), 기대 문서가
+범위 밖인 행은 따로 세며 실패 행을 지우지 않는다. 올거나이즈처럼 클 때는 `--stage1-files N`(문서 요약으로 먼저
+좁히는 2단계 선택, 커버리지 실패 시 전체 발췌 재시도 → 에이전트 폴백 사다리)로 판단 호출을 줄인다.
+유료 호출 직전에 `announce`로 규모를 고지한다. 저장소 루트에서
+`uv run --no-sync python Day02_new/run_pipeline.py`로 돌리며 `--question`, `--entity`, `--as-of`,
+`--mode ask|two_phase|fs|fs_jev|both`, `--provider opengateway|anthropic`을 받는다.
+
+그 밖의 예외는 저자용 도구뿐이며, 수강생 실습에 필요하지 않다. 수강생이 쓰지 않으니 안내하지도 않는다.
 - `tests/check_notebook.py`: 노트북 검사기 (3장 참고).
 - `benchmarks/measure.py`: `rag_lab`을 부품별로 재는 도구. `retrieval`은 API를 부르지 않고, `answers`는 실제 Claude를 부르는 유료다 (`--out`, 반복 `--pair 구성:문항ID`, `--cap` 예산 상한 지원).
 - `benchmarks/check_decider.py`: 고른 Decision API가 지금 응답하는지 `Noul` 하나로 확인한다. **실제 Decision API를 한 번 부르는 유료 호출**이고 키 값은 출력하지 않는다 (저장소 루트에서 `uv run --no-sync python Day02_new/benchmarks/check_decider.py`). 상태 코드 401·403이면 키, 404면 주소나 모델 id를 확인하라고 안내한다.
@@ -63,10 +80,11 @@ LangGraph 루프를 손으로 짜지 않고 곧바로 `create_deep_agent`로 간
 | `01-Agentic-AI-Basics.ipynb` | 제공 | Agent가 일반 LLM 호출과 다른 점(단일 호출, 고정 workflow, Agent), 같은 질문 세 번(도구 없이, 도구 하나, 직접 실행), 메시지가 곧 상태라는 점, 존재하지 않는 도구와 반복 한도. 2절 제목 셀이 따로 있다. `기본 경로의 announce` 합은 약 30회(추정). 2026-11-02 실제 호출은 Claude 29회, 51.9초 |
 | `02-Function-Calling-and-Tools.ipynb` | 제공 | 도구 왕복 4단계, 도구 설명·스키마, `Pydantic` 입력 범위, 도구 선택·병렬 호출, 도구 실패 세 유형, 오류 정보를 돌려주는 도구 vs 예외를 던지는 도구(8절), `tool_choice`·`strict`. 예산과 허용 목록은 여기서 가르치지 않고 05(결정 2)에서 다룬다. `announce` 합은 약 25회(추정). 2026-11-02 실제 호출은 Claude 23회, 42.2초 |
 | `03-Agent-Skills.ipynb` | 제공 | `SKILL.md` 구조, 트리거 측정, 설명 수정 전후. **Skill 트리거 테스트(양성과 near-miss)는 6절-7절**이다. `RUN_OPTIONAL = False` 기본 경로의 `announce` 합은 약 132회, 선택 측정 두 셀은 약 100회(모두 추정). 2026-11-02 실제 호출은 기본 경로 Claude 87회(126.3초), `RUN_OPTIONAL = True` 복사본은 184회(422.0초) |
-| `04-Retrieval-Design.ipynb` | 제공 | 청킹, BM25·dense·RRF, recall·MRR 측정, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해와 출처 보강), AutoRAG와 다른 점, PDF 쪽 판독. 1절에 `[깨뜨리기]` 셀 세 개(전체 문서를 한 프롬프트에 넣었을 때의 크기, 같은 이름의 여러 버전, 기준일을 넣은 전체 문서 질문)가 있다. 기본 경로의 Claude 호출은 최대 4회, Decision API는 5회(추정). 2026-11-02 실제 호출은 Claude 3회, Decision API 5회, 112.0초 |
+| `04-Retrieval-Design.ipynb` | 제공 | 청킹, BM25·dense·RRF, recall·MRR 측정, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해와 출처 보강), 아키텍처 선택 비교, PDF 쪽 판독. 1절에 `[깨뜨리기]` 셀 세 개(전체 문서를 한 프롬프트에 넣었을 때의 크기, 같은 이름의 여러 버전, 기준일을 넣은 전체 문서 질문)가 있다. 기본 경로의 Claude 호출은 최대 4회, Decision API는 5회(추정). 2026-11-02 실제 호출은 Claude 3회, Decision API 5회, 112.0초 |
 | `05-Production-Agentic-RAG.ipynb` | 제공 | 설계 결정 아홉 가지(근거 검증, 지지 검토, 실행 기록)와 선택 결정(빠른 답변과 Jev 게이트 세 개의 비용 측정, 게이트 실패 [깨뜨리기]). 예산은 3절(`MAX_SEARCHES`의 `[바꿔보기]` 셀), 허용 목록은 결정 2(적용 전 `[따라하기]`, `MENU_ALLOWED`의 `[바꿔보기]`, `ALLOWED_TOOLS`의 `[깨뜨리기]`)에서 가르친다. 근거 상태별 행동 표(충분·일부·모호·부재·충돌·timeout)가 있다. `announce` 합은 Claude 약 58회(`[내 것 만들기]` 11회 제외 약 47회, 추정). 2026-11-02 실제 호출은 Claude 42회와 Decision API 4회, 132.1초 |
 | `06-Lab-DeepAgents-RAG.ipynb` | 제공 | 융합 검색+재순위 도구로 조립, 6단계 `ask_two_phase`(Jev 게이트, 분해 기본 켬), 한 설정을 측정하고 한 가지만 바꿔 전후 비교. 1~3단계가 Tool + Skill + RAG 기본 통합(최소 Agentic RAG 루프, 검색 도구와 Skill 연결, 도구 호출과 `loaded_skills` 관찰)이고 4~6단계는 확장이다. Skill 트리거 테스트 자체는 03의 6절-7절에 있다. `announce` 합은 약 77회(추정). 2026-11-02 실제 호출은 Claude 54회와 Decision API 54회, 259.8초(`MAX_CASES = 3`) |
 | `rag_lab/` | 제공 | 노트북이 import하는 지원 모듈 (4장 참고) |
+| `run_pipeline.py` | 제공 | 보조 실행기. 노트북 없이 단일 단계 `ask`와 2단계 `ask_two_phase`를 Python 코드로 한 번씩 돌린다. 기본 모델은 OpenGateway DeepSeek(키 `OPENGATEWAY_API_KEY`), `--provider anthropic`이면 Claude. Decision API 키도 필요하다(2단계 게이트) |
 | `docs/gold_review_sheet.md` | 제공 | `data/gold_hard*.jsonl`과 `gold.jsonl:3`(`versioned-deadline-june`) 검수 시트. AI 교차 확인 초안이고 모든 판정이 `미검수`다. 사람 검수 전에는 gold를 확정이라 말하지 않는다 |
 | `docs/rehearsal_sheet.md` | 제공 | 60분 리허설 시트. `실제 분`이 비어 있고 리허설은 아직 하지 않았다 |
 | `data/cases_hard2.jsonl`, `data/gold_hard2.jsonl` | 제공 | 04의 두 번째 어려운 질문 22개와 정답표(평가 전용, 동결). 04가 recall과 MRR을 잰다 |
@@ -106,7 +124,8 @@ uv run jupyter lab          # 실행은 이 폴더에서 (00-Setup.ipynb 안내�
 - **키가 둘 필수다.** `ANTHROPIC_API_KEY`와 Decision API 키 하나(`TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`,
   `OPENAI_API_KEY` 중, 또는 Azure의 `AZURE_OPENAI_API_KEY`)다. Anthropic 키가 없으면 `require_key`(`rag_lab/settings.py:86`)가, Decision API 키가
   없으면 `make_decider`(`rag_lab/decisions.py:175`)가 한국어 안내와 함께 `RuntimeError`로 멈춘다. 키 없이 도는
-  경로, 건너뛰기, 대체 경로, Claude로 판정을 대신하는 경로는 없다.
+  경로, 건너뛰기, 대체 경로, Claude로 판정을 대신하는 경로는 없다. 보조 실행기 `run_pipeline.py`의 기본 경로는
+  `ANTHROPIC_API_KEY` 대신 `OPENGATEWAY_API_KEY`다(노트북에는 필요 없고 `--provider anthropic`이면 Anthropic 키를 쓴다).
 - **질문 문장과 근거 텍스트가 선택한 Decision API 공급자에게 전송된다.** 04~06의 게이트 셀이 그렇다.
   외부에 보내면 안 되는 내용은 넣지 않게 안내한다. 여러 키가 있으면 `DAY02_DECISION_BACKEND`로 고르고,
   비어 있으면 TYPESAFE, OPENROUTER, OPENAI, AZURE 순서의 첫 키를 쓴다 (`rag_lab/decisions.py:175`). Azure는 키에 더해 `DAY02_AZURE_ENDPOINT`와 `DAY02_AZURE_DEPLOYMENT`가 모두 있어야 하고 하나라도 비면 `make_decider`가 `RuntimeError`로 멈춘다 (`rag_lab/decisions.py:190`). `DAY02_OPENROUTER_MODEL`은 OpenRouter가 보낼 모델 id를 바꾸고 비우면 코드의 고정값을 쓴다. **Azure와 OpenRouter 경로는 실제 호출로 확인되지 않았다.** 모의 전송 단위 시험만 있으니 수강생에게 "동작 확인됨"이라 말하지 않는다. `benchmarks/check_decider.py`(1장)로 고른 공급자를 한 번 불러 볼 수 있다.

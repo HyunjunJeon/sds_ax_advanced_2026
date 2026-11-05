@@ -22,6 +22,23 @@ uv run jupyter lab
 - 이 폴더 안에서 `uv sync`를 실행하지 않습니다. 환경은 루트에 하나만 있습니다.
 - 이 폴더에는 `pyproject.toml`이 없습니다. `uv run`이 루트 환경을 찾아 씁니다.
 
+## 보조 실행기: 노트북 없이 Python 코드로 돌리기
+
+수업 경로는 노트북이지만, 전체 파이프라인을 한 번에 돌리는 Python 실행기도 있습니다(저장소 루트에서).
+
+```bash
+uv run --no-sync python Day02_new/run_pipeline.py            # 단일 단계 ask + 2단계 ask_two_phase
+uv run --no-sync python Day02_new/run_pipeline.py --mode two_phase --question "서비스 크레딧 신청 기한은?"
+```
+
+- 기본 모델은 **OpenGateway의 `deepseek/deepseek-v4.1-flash-ultrafast`**이고 `.env`의 `OPENGATEWAY_API_KEY`가 필요합니다. `--provider anthropic`이면 노트북과 같은 Anthropic Claude를 씁니다.
+- 게이트 판정은 노트북과 같은 Decision API 키로 돌아가고, 유료 호출 직전에 `announce`로 규모를 고지합니다.
+- 검색 구성은 `.env` 파일로 바꿉니다: `DAY02_RETRIEVAL_MODE`(`fusion` 기본, `bm25`·`dense`·`hybrid` 중 선택)와 `DAY02_RERANKER`(`on` 기본). **`bm25`로 두면 로컬 임베딩 모델(e5, 약 470MB)을 내려받지 않고 형태소 검색만 쓰고**, `DAY02_RERANKER=off`면 재순위 모델(약 2.1GB)도 적재하지 않습니다. **`DAY02_RERANKER=jev`는 재순위를 로컬 교차 인코더 대신 Decision API(Jev)가 후보별 관련 확률로 합니다** — 로컬 모델 없이 시작이 빠르고 판단 호출이 유료로 늘어납니다. 한 번의 실행만 바꿀 때는 `--retrieval bm25 --rerank off` 실행 인자가 `.env`보다 우선합니다. 노트북 00~06은 이 설정을 읽지 않고 검색 설계 수업을 위해 fusion을 계속 가르칩니다. 수업 문서에서 bm25 단독의 recall은 재지 않았습니다(`docs/retrieval_benchmarks.md`의 fusion+재순위 r@1 .844와 직접 비교하지 않습니다).
+- `--mode fs`는 임베딩·검색 도구 없이 **에이전트의 내장 파일 도구(`ls`·`glob`·`grep`·`read_file`)로 문서를 찾는 경로**입니다. 실행할 때마다 `outputs/fs_corpus/` 트리를 다시 만드는데, Agent Memory 프로젝트처럼 뿌리에 색인 `INDEX.md`, 아래에 `고객/도메인` 폴더, 파일 이름은 문서 ID, 파일마다 고객·버전·상태·적용 기간·담당자 frontmatter를 둡니다. 답은 일반 텍스트로 받습니다.
+- `--mode fs_jev`는 **파일 선택 자체를 Decision API(Jev)가** 합니다. 범위 안 문서의 발췌(절)마다 관련 확률을 batched judge로 매겨 상위 발췌만 모으고(에이전트 왕복 없음), **커버리지 판정**으로 모은 발췌가 답에 필요한 정보를 담고 있는지 검증한 뒤(불충분하면 `fs` 에이전트로 폴백) 모델 한 번으로 답을 쓰고 **추가 확인 게이트**로 재검증합니다. 실행 기록은 `outputs/runs/`에 남습니다.
+- `--dataset`(옵션: `--cases-file`·`--gold-file`·`--repeats`·`--limit`·`--top-k`·`--per-file-cap`)은 사례 파일 전체를 돌려 품질을 잽니다. 실행이 모두 끝난 뒤에만 정답표(`load_gold`)를 읽고, 기대 문서가 사례 범위 밖인 행은 `범위 밖 기대`로 따로 세며 실패 행도 모두 결과 JSONL에 남습니다. 2026-11-05 측정(OpenGateway DeepSeek, 각 1~2회 관찰): 기본 12사례×2 hit_all 20/20·보류 4/4 정답 거절, `cases_hard` 14×2 범위 안 26/26, `cases_hard2` 22×1 범위 안 18/18(범위 밖 함정 4문항은 구조적으로 못 찾음, 답은 범위 밖임을 밝힘). 결과 파일은 `outputs/runs/dataset_fs_jev_*.jsonl`.
+- `--corpus allganize`(옵션: `--split tune|hold`)는 **올거나이즈 실측 PDF**(48문서 1,008쪽, 쪽=파일 트리 `outputs/fs_corpus_allganize/`)로 같은 평가를 돌립니다. 대규모 코퍼스에서 판단 호출을 줄이는 **2단계 선택** `--stage1-files N`: 문서(폴더) 단위 요약 점수로 먼저 좁힌 뒤(에이전트가 INDEX.md를 먼저 읽는 것과 같은 순서) 그 문서들의 발췌만 점수 매기고, 커버리지가 못 미치면 **전체 발췌로 재시도**(문서 좁힘 → 전체 → 에이전트 폴백 사다리)합니다. 2026-11-05 측정(tune 앞 10사례×2): 전체 발췌 단일 선택 대비 **판단 호출 66→11회/실행(5.9×), 30.3→13.5초, 페이지 적중 20/20 동일**. 2026-11-06 전체 측정(1회, OpenGateway DeepSeek): `tune` 105문항 **1위 적중 .857, 상위 5위 .952** — 같은 문항의 임베딩+로컬 재순위 파이프라인(`.876`/`.943`, `docs/retrieval_benchmarks.md`) 대비 임베딩·로컬 모델 0적재로 재현율@5는 앞서고 1위 적중은 근접. `hold` 101문항(한 번만 읽음): 1위 .792, 상위 5위 .931. 놓친 문항은 image 유형(판독 글자)이 대부분이고, 폴백 에이전트 실패는 `status=error` 행으로 기록에 남습니다. 결과 파일은 `outputs/runs/dataset_fs_jev_allganize_*.jsonl`.
+
 ## API 키 설정 (필수)
 
 이 과정은 실제 모델만 씁니다. **키가 둘 필요합니다: `ANTHROPIC_API_KEY` 하나와 Decision API 키 하나(`TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY` 중 하나, 또는 Azure OpenAI).** 둘 다 `Day02_new/.env`에 **본인이 직접** 채웁니다. 키가 없으면 노트북은 해당 셀에서 한국어 안내와 함께 멈춥니다. 키 없이 도는 경로, 건너뛰기, 대체 경로는 없습니다. Anthropic 키만 있어서는 00의 판정 API 셀부터 멈춥니다. 수업 전에 보낼 안내문 초안은 [docs/draft_student_notice.md](docs/draft_student_notice.md)에 있습니다(저자가 `[저자 확인]` 자리를 채우기 전에는 보내지 않습니다).
@@ -80,7 +97,7 @@ cp .env.example .env
 | `01-Agentic-AI-Basics.ipynb` | 60 | LLM 호출, workflow, Agent의 차이와 `create_deep_agent` 첫 실행. 2절에서 같은 질문을 도구 없이, 도구 하나 묶기, 직접 실행으로 세 번 물어봅니다 |
 | `02-Function-Calling-and-Tools.ipynb` | 60 | 모델은 요청하고 코드가 실행한다: `@tool`, 스키마, 실패(8절: 오류 정보를 돌려주는 도구와 예외를 던지는 도구). 호출 예산과 허용 목록은 02에서 다루지 않고 05의 결정 1과 결정 2에서 다룹니다 |
 | `03-Agent-Skills.ipynb` | 60 | `SKILL.md` 형식, 점진적 공개, 트리거 테스트(6절 near-miss, 7절 읽으면 안 되는 질문) |
-| `04-Retrieval-Design.ipynb` | 60 | 1절 왜 여전히 RAG인가(전체 문서를 프롬프트에 넣는 시도를 [깨뜨리기]로 확인), 청킹, 범위 필터, BM25·dense·RRF, 어려운 질문 recall·MRR, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해, 출처 보강), AutoRAG와 다른 점, PDF 쪽 판독 |
+| `04-Retrieval-Design.ipynb` | 60 | 1절 왜 여전히 RAG인가(전체 문서를 프롬프트에 넣는 시도를 [깨뜨리기]로 확인), 청킹, 범위 필터, BM25·dense·RRF, 어려운 질문 recall·MRR, 넓은 후보와 원 질문 재순위, Jev 관문(질문 분해, 출처 보강), 아키텍처 선택 비교, PDF 쪽 판독 |
 | `05-Production-Agentic-RAG.ipynb` | 60 | 운영형 설계 결정 아홉 가지(인용 검증, 후속 턴, 실행 기록)와 선택 결정: 빠른 답변과 Jev 게이트 세 개(분해, 인용 관련성, 추가 확인)의 비용 측정, 게이트가 실패하면 검증으로 기우는 [깨뜨리기] |
 | `06-Lab-DeepAgents-RAG.ipynb` | 60 | 실습: 1~3단계가 기본 통합(융합 검색+재순위 도구, Agent, Skill 연결, 도구 호출 확인), 4~6단계가 확장(검증, 기록 읽기, `ask_two_phase`의 Jev 게이트와 질문 분해). 한 조건만 바꿔 다시 재기. 05 11절의 완성된 조립을 여기서는 직접 조립합니다 |
 

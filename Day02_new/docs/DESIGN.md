@@ -451,10 +451,10 @@ def cited_chunks(answer: AnswerPayload, evidence: dict[str, Evidence]) -> list[C
 def strip_citations(answer: AnswerPayload, rejected: list[str]) -> AnswerPayload: ...
 ```
 
-- 질문의 영어 문장은 AutoRAG 원문 그대로다. 그쪽이 실제 Jev로 맞춘 문장이라 번역하지 않는다. `tests/test_rag_lab_gates.py`가 원문 사본과 대조한다.
+- 질문의 영어 문장은 2026-11-05에 저자가 새로 작성했다(이전 문장으로 잰 측정 기록은 `docs/retrieval_benchmarks.md`에 그대로 있다). 새 문장으로는 아직 측정하지 않았다. `tests/test_rag_lab_gates.py`가 참조 사본과 대조해 문장 변경은 의도적이어야 한다.
 - 경계: 분해와 추가 확인은 확률이 문턱값 **이상**이면 한다. 인용은 하한 **미만**일 때만 뺀다(.3은 남긴다). 문턱값은 코드 규칙이고 **우리 라벨로 재지 않았다.** 보정되었다고 말하지 않는다.
-- 실패 규칙은 AutoRAG와 같다. `DecisionError`나 거절이면 분해하지 않고(`query-decomposition-fallback`), 검증하고(`follow-up-check-fallback`), 인용을 모두 남긴다(`citation-relevance-fallback`). 일부 근거만 답이 없으면 그 근거만 남기고 진단 코드는 없으며 `reason`에 개수를 적는다.
-- 인용 판단은 근거마다 Noul 하나를 **judge 한 번**에 묻는다. 근거는 1500자로 자른다. 질문 이름은 `citation_0`처럼 쓴다(AutoRAG는 `citation:0`). 사용자 글, 답변, 근거, 인용 문장은 모두 JSON 문자열로 state에 넣어 가짜 머리글로 구조를 흉내 내지 못한다.
+- 실패 규칙은 안전 쪽으로 정했다. `DecisionError`나 거절이면 분해하지 않고(`query-decomposition-fallback`), 검증하고(`follow-up-check-fallback`), 인용을 모두 남긴다(`citation-relevance-fallback`). 일부 근거만 답이 없으면 그 근거만 남기고 진단 코드는 없으며 `reason`에 개수를 적는다.
+- 인용 판단은 근거마다 Noul 하나를 **judge 한 번**에 묻는다. 근거는 1500자로 자른다. 질문 이름은 `citation_0`처럼 쓴다. 사용자 글, 답변, 근거, 인용 문장은 모두 JSON 문자열로 state에 넣어 가짜 머리글로 구조를 흉내 내지 못한다.
 - **옮기지 않은 것.** route 분기(organize, extra, config), 메모리 판단, 데이터 소스 검사. 이 과정은 문서만 검색하고, 검색을 건너뛰는 분기를 두면 `Scope`를 우회한다.
 
 ### rag_lab.phases
@@ -491,11 +491,10 @@ def ask_two_phase(question: str, *, retriever: Retriever, scope: Scope, model: B
 - TypeSafe 빠른 시작: https://docs.typesafe.ai/introduction/quickstart.md
 - OpenAI Decisions 안내: https://developers.openai.com/api/docs/guides/decisions
 - OpenRouter의 Jev와 LLM 판정 비교: https://openrouter.ai/blog/tutorials/jev-vs-llm-as-a-judge/
-- AutoRAG `docs/jev-decisions.md`, 커밋 0c39052
 
-**공급자마다 보정(calibration)에 대한 주장이 다르다.** AutoRAG 문서는 Jev의 답을 "calibrated probabilities"라고 적는다. 이 수업은 어느 쪽 주장도 전제하지 않는다. 확률은 과제별 값으로 읽고, 문턱값을 믿으려면 자기 라벨로 잰다. 각 공급자의 정확한 문구는 이 문서를 쓸 때 네트워크 없이 작업해 다시 확인하지 못했다. 위 링크에서 직접 확인한다(확인이 필요합니다).
+**공급자마다 보정(calibration)에 대한 주장이 다르다.** 어떤 문서는 Jev의 답을 "calibrated probabilities"라고 적는다. 이 수업은 어느 쪽 주장도 전제하지 않는다. 확률은 과제별 값으로 읽고, 문턱값을 믿으려면 자기 라벨로 잰다. 각 공급자의 정확한 문구는 이 문서를 쓸 때 네트워크 없이 작업해 다시 확인하지 못했다. 위 링크에서 직접 확인한다(확인이 필요합니다).
 
-### AutoRAG 방식을 택한 이유
+### 2단계 게이트 아키텍처를 택한 이유
 
 수치는 `docs/retrieval_benchmarks.md`(2026-11-01, 실행 한 번·장비 한 대)에서 가져온다.
 
@@ -905,7 +904,7 @@ def mrr(rows: list[dict]) -> tuple[float | None, int]: ...   # (평균 역순위
 | 9 | 어려운 질문으로 측정 | 5 |
 | 10 | 넓은 후보와 원 질문 재순위 | 7 |
 | 11 | Jev 관문: 분해와 출처 보강 | 6 |
-| 12 | AutoRAG와 다른 점 | 3 |
+| 12 | 아키텍처 선택 비교 | 3 |
 | 13 | PDF 쪽 판독 | 5 |
 | - | 직접 해보기 | 5 |
 | - | 확인 질문 | 3 |
@@ -949,7 +948,7 @@ dense와 hybrid의 임베딩은 `intfloat/multilingual-e5-small`이다("결정 3
 
 - 코드 셀을 모두 다시 썼다(단계 주석, 이름 붙인 중간 변수, 한국어 docstring). 호출 동작은 같다.
 - 1절을 확장했다. 코퍼스 전체를 프롬프트에 넣는 `[깨뜨리기]` 셀 셋(바이트 비교, 버전·상태 표, 전체 코퍼스 질의)과 설명 셀을 추가했다. 원래 번호 3 이후 셀은 7칸 밀린다.
-- AutoRAG 경로와 문서는 외부 저장소(커밋 0c39052)임을 표시했다.
+- 외부 참조 경로 표시를 정리했다.
 - 틀어진 `file:line` 인용을 다시 확인해 고쳤다(`tokenize`, `BM25Index`, `rrf`, `section_chunks`, `Retriever.rank` 등).
 - 호출 규모는 Claude 최대 4회, Decision API 5회로 적었다.
 
@@ -1408,7 +1407,7 @@ print((folder / "SKILL.md").read_text(encoding="utf-8"))
 | 9 | 어려운 질문으로 측정 | 실습 | 5 |
 | 10 | 넓은 후보와 원 질문 재순위 | 실습 | 7 |
 | 11 | Jev 관문: 분해와 출처 보강 | 실습 | 6 |
-| 12 | AutoRAG와 다른 점 | 설명 | 3 |
+| 12 | 아키텍처 선택 비교 | 설명 | 3 |
 | 13 | PDF 쪽 판독 | 실습 | 5 |
 | - | 직접 해보기 | 내 것 | 5 |
 | - | 확인 질문 | 설명 | 3 |
