@@ -29,7 +29,11 @@
 | `cost-report-b1.txt` | B1 재실행 직후 노트북별 비용 표 (`tests/cost_report.py` 출력) |
 | `cost-report-c2.txt` | C2 재실행 직후 노트북별 비용 표. 이 폴더를 만들 때 현재 `tests/cost_report.py` 출력과 한 글자도 다르지 않음을 확인. 2026-11-02 전체 재실행 뒤에는 현재 출력과 다르다(지금 출력은 아래 `cost-report-rerun-20261102.txt`) |
 | `live-rerun-20261102-notes.md` | 2026-11-02 Supervisor 용어 수정 뒤 13개 기록을 모두 다시 돌린 기록. 다시 돌린 이유, 순서와 시각, 실행 당시 코드 해시 27개, 기록별 전후 호출 수·초·비용, 감사 결과, 지출, 이전 기록을 남긴 곳 |
-| `cost-report-rerun-20261102.txt` | 전체 재실행 직후 노트북별 비용 표 (`tests/cost_report.py` 출력). 합계 996회, 3419.6초, 6.9435 USD |
+| `cost-report-rerun-20261102.txt` | 전체 재실행 직후 노트북별 비용 표 (`tests/cost_report.py` 출력). 합계 996회, 3419.6초, 6.9435 USD 2026-11-03 재실행 뒤에는 **현재 출력이 아니다**(지금 출력은 `cost-report-rerun-20261102b.txt`). |
+| `live-rerun-20261102b-notes.md` | 2026-11-03 자동 `general-purpose`를 끈 뒤 13개 기록을 모두 다시 돌린 기록. 다시 돌린 이유, 명령과 순서와 창(00:05:29~01:03:38 KST), 이전 기록 보존 위치, 코드 해시 재확인, 기록별 전후 호출 수·초·비용, 감사, 새 행의 `general-purpose` 0개, 지출, 한계 |
+| `rerun-20261102b-facts.md` | 위 재실행의 기록 직접 집계: 합계, 시각, 감사 셀, 켜는 칸, 같은 셀 변동, EXA, `general-purpose` 행 대조, 저장본·실행본 비교, 노트북 크기 |
+| `rerun-20261102b-code-hashes.txt` | 위 재실행 시작 때 코드 28개 파일(`mas_lab`, `rag_lab`, 노트북)의 sha256 앞 12자리 |
+| `cost-report-rerun-20261102b.txt` | 위 재실행 직후 노트북별 비용 표(`tests/cost_report.py` 출력). 합계 1022회, 3357.1초, 7.1327 USD. 현재 출력 |
 | `stale-records-notes.md` | 00~03과 06의 저장된 실행 기록이 `gate.py`, `workers.py`, `exa.py` 수정 앞의 기록이어도 기록이 달라지지 않는 이유 |
 
 ### 실제 모델 행과 반복 관찰

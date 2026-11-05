@@ -1,0 +1,23 @@
+| 노트북 | 모델 | 모델 호출 | 초 | 입력 토큰 | 출력 토큰 | 비용(USD) |
+|---|---|---:|---:|---:|---:|---:|
+| 00-Setup | claude-sonnet-5-5 | 3 | 12.6 | 7582 | 388 | 0.0128 |
+| 01-Workflow-vs-Agent.exercises | claude-sonnet-5-5 | 51 | 153.2 | 208926 | 14008 | 0.2489 |
+| 01-Workflow-vs-Agent | claude-sonnet-5-5 | 45 | 131.2 | 186251 | 12153 | 0.2198 |
+| 02-Agent-Architecture.exercises | claude-sonnet-5-5 | 53 | 165.4 | 166118 | 20325 | 0.3215 |
+| 02-Agent-Architecture | claude-sonnet-5-5 | 33 | 114.2 | 113267 | 13640 | 0.2312 |
+| 03-Four-Flows.exercises | claude-sonnet-5-5 | 44 | 138.4 | 110580 | 18015 | 0.2538 |
+| 03-Four-Flows | claude-sonnet-5-5 | 38 | 131.7 | 86025 | 16247 | 0.2543 |
+| 04-Graph-Engineering.exercises | claude-sonnet-5-5 | 36 | 115.0 | 90778 | 16866 | 0.2394 |
+| 04-Graph-Engineering | claude-sonnet-5-5 | 35 | 107.8 | 94303 | 15855 | 0.2334 |
+| 05-Choosing-Multi-Agent.exercises | claude-sonnet-5-5 | 451 | 1237.5 | 1713172 | 145338 | 2.6182 |
+| 05-Choosing-Multi-Agent | claude-sonnet-5-5 | 142 | 402.8 | 549206 | 53185 | 0.9222 |
+| 06-Lab-Research-Agents.exercises | claude-sonnet-5-5 | 63 | 433.4 | 295148 | 73650 | 1.0886 |
+| 06-Lab-Research-Agents | claude-sonnet-5-5 | 28 | 214.0 | 147993 | 32660 | 0.4886 |
+| **합계** | | 1022 | 3357.1 | 3769349 | 432330 | **7.1327** |
+
+단가(100만 토큰당, 출처: Anthropic first-party API rates as of 2026-10)
+- claude-sonnet-5-5: 입력 $2, 출력 $10, 캐시 읽기 $0.2
+- claude-opus-5-5: 입력 $4, 출력 $20, 캐시 읽기 $0.2
+- claude-haiku-5-5: 입력 $0.1, 출력 $0.5, 캐시 읽기 단가 미확인
+
+주: 기록된 입력 토큰은 캐시 읽기를 포함하므로 캐시 읽기분은 캐시 단가로, 나머지는 입력 단가로 계산했다. 캐시 쓰기 단가는 모델링하지 않았다(기록에 캐시 쓰기 토큰이 없다).
