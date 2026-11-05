@@ -114,17 +114,17 @@ def install_offline_kernel(*, langfuse: str) -> None:
 
     def make_agent_model(config: settings.Settings) -> fakes.NotebookAgentModel:
         """가짜 에이전트(NotebookAgentModel)."""
-        settings.require(config, "ANTHROPIC_API_KEY")
+        settings.require(config, settings.provider_of(config).key_env)
         return fakes.NotebookAgentModel()
 
     def make_judge_model(config: settings.Settings) -> fakes.NotebookJudgeModel:
         """가짜 Judge(NotebookJudgeModel). DeepEvalAnthropic에 감싸도 된다."""
-        settings.require(config, "ANTHROPIC_API_KEY")
+        settings.require(config, settings.provider_of(config).key_env)
         return fakes.NotebookJudgeModel()
 
     def make_improver_model(config: settings.Settings):
         """키 없는 scripted 개선기(rsi.scripted_improver('sensible'))."""
-        settings.require(config, "ANTHROPIC_API_KEY")
+        settings.require(config, settings.provider_of(config).key_env)
         return rsi.scripted_improver("sensible")
 
     def make_decider(config: settings.Settings | None = None, *,
@@ -190,7 +190,7 @@ def kernel_environment(work: Path, langfuse: str) -> dict[str, str]:
     DEEPEVAL_DISABLE_DOTENV: deepeval은 import할 때 작업 폴더(Day05_new)의 .env를 os.environ에 올린다.
     끄지 않으면 저자의 실제 키가 kernel에 들어온다.
     """
-    keys = ["ANTHROPIC_API_KEY", "TYPESAFE_API_KEY"]
+    keys = ["OPENGATEWAY_API_KEY", "TYPESAFE_API_KEY"]
     if langfuse == "fake":
         keys += ["LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY"]
     env_file = work / "offline.env"

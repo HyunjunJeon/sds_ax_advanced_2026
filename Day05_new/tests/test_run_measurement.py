@@ -152,8 +152,8 @@ def test_live_preflight_stops_on_missing_keys_before_any_call(tmp_path, capsys):
     code = run_measurement.main(["--live", "--scenarios", str(scenarios), "--out", str(tmp_path / "out")])
     printed = capsys.readouterr().out
     assert code == run_measurement.EXIT_PREFLIGHT
-    assert "ANTHROPIC_API_KEY 미설정" in printed
-    assert "ANTHROPIC_API_KEY가 미설정입니다" in printed
+    assert "OPENGATEWAY_API_KEY 미설정" in printed
+    assert "OPENGATEWAY_API_KEY가 미설정입니다" in printed
     assert not (tmp_path / "out" / "measurement").exists()
 
 
@@ -234,8 +234,9 @@ def test_manifest_records_settings_thresholds_versions_and_calls(tmp_path):
     assert (manifest["status"], manifest["mode"], manifest["langfuse"]) == ("completed", "offline", False)
     assert manifest["prereg_sha256"] == recorded_hash
     assert manifest["thresholds"] == {"t_lo": 0.2, "t_hi": 0.8, "status": "미조정"}
-    assert manifest["models"]["judge"] == {"model": "claude-sonnet-5-5", "effort": "xhigh",
+    assert manifest["models"]["judge"] == {"model": "deepseek/deepseek-v4.1-flash-ultrafast", "effort": "xhigh",
                                            "class": "NotebookJudgeModel"}
+    assert manifest["models"]["provider"] == {"name": "opengateway", "api_url": "https://apis.opengateway.ai"}
     assert (manifest["release"], manifest["version_labels"]["round-1"], manifest["version_labels"]["round-2"]) == (
         "baseline", "r0", "r1")
     assert manifest["planned_calls_max"] == {"agent": 1080, "jev": 36, "judge": 108, "improver": 6}

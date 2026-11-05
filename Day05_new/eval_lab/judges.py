@@ -352,17 +352,21 @@ def _parse_into(text: str, schema: Any) -> Any:
 
 
 class DeepEvalAnthropic(DeepEvalBaseLLM):
-    """LangChain 채팅 모델(claude-sonnet-5-5 effort xhigh)을 DeepEval 지표의 평가 모델로 쓰게 한다.
+    """LangChain 채팅 모델(make_judge_model이 만든 Judge, effort xhigh)을 DeepEval 지표의 평가 모델로 쓰게 한다.
+
+    이름의 Anthropic은 공급자가 아니라 통신 방식(Anthropic Messages)이다. 기본 공급자는 OpenGateway의 DeepSeek이다.
 
     커스텀 모델이라 DeepEval은 generate(prompt, schema=...)를 부르고 schema 인스턴스를 그대로 기대한다.
     schema가 있으면 JSON 텍스트를 받아 schema로 검증해 돌려주고, schema가 없으면 문자열을 돌려준다.
     """
 
-    def __init__(self, chat_model: BaseChatModel, model_name: str = "claude-sonnet-5-5") -> None:
+    def __init__(self, chat_model: BaseChatModel, model_name: str | None = None) -> None:
         # load_model()이 부모 __init__ 안에서 불리므로 그 전에 채워 둔다.
+        # 이름을 주지 않으면 감싼 모델의 이름(ChatAnthropic.model)을 쓴다.
+        name = model_name or getattr(chat_model, "model", None) or type(chat_model).__name__
         self._chat_model = chat_model
-        self.model_name = model_name
-        super().__init__(model_name)
+        self.model_name = name
+        super().__init__(name)
 
     def load_model(self) -> BaseChatModel:
         """감싼 LangChain 채팅 모델을 돌려준다."""

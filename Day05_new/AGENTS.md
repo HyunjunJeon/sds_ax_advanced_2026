@@ -6,7 +6,7 @@
 성공의 기준을 Golden Dataset으로 어떻게 고정하는지(02), 정답이 없는 운영 trace를 무엇으로 어떤 것부터 채점하는지와 궤적을 어떻게 판정하는지(03a, 03b),
 평가와 무엇이 다르고 무엇을 언제 경보하는지(04), 평가와 모니터링을 하나의 운영 루프로 묶는 법(05),
 에이전트가 자기 trace로 나아지게 하려면 무엇을 고정하고 무엇을 열어야 하는지(06)를 배운다.
-평가 순서는 **Code → Jev → Judge**다. Code가 못 보는 자유 문장만 Jev(Decision API)가 보고, 확신이 낮을 때만 Judge(`claude-sonnet-5-5`, effort `xhigh`)가 본다 (`docs/DESIGN.md` 1절, 6절).
+평가 순서는 **Code → Jev → Judge**다. Code가 못 보는 자유 문장만 Jev(Decision API)가 보고, 확신이 낮을 때만 Judge(에이전트와 같은 OpenGateway `deepseek/deepseek-v4.1-flash-ultrafast`, effort `xhigh`)가 본다 (`docs/DESIGN.md` 2절, 6절, 개정 1).
 설계 근거와 사전 등록은 [docs/DESIGN.md](docs/DESIGN.md)에 있지만 수강생용 문서가 아니다.
 
 **`Day05/`는 이 폴더와 별개이고 그대로 둔다.** 이 폴더의 작업은 `Day05/`를 바꾸지 않는다.
@@ -35,7 +35,7 @@ Golden, Episode, Trace, Rule, Evaluator, Jev, Judge, holdout, dev, release는 �
 
 | 노트북 | Part | 분 | 핵심 질문 |
 |---|---|---|---|
-| `00-Setup.ipynb` | 준비 | 10 | 키·연결·버전이 준비되었는가. Claude·Jev·Judge 각 1회 |
+| `00-Setup.ipynb` | 준비 | 10 | 키·연결·버전이 준비되었는가. 에이전트 모델·Jev·Judge 각 1회 |
 | `01-Why-Evaluate.ipynb` | 1 | 40 | 그럴듯한 답이 왜 업무 성공의 증거가 못 되는가 |
 | `02-Offline-Golden-Dataset.ipynb` | 2 | 60 | 무엇을 성공으로 볼지 어떻게 고정하는가 |
 | `03a-Online-Eval-Trace-Selection.ipynb` | 3 | 45 | 정답이 없는 운영 trace를 무엇으로, 어떤 것부터 채점하는가 |
@@ -45,6 +45,8 @@ Golden, Episode, Trace, Rule, Evaluator, Jev, Judge, holdout, dev, release는 �
 | `06-Lab-Self-Improving-Agent.ipynb` | 실습 | 90 | 자기 trace로 나아지게 하려면 무엇을 고정하고 무엇을 열어야 하는가 |
 
 노트북은 00부터 번호 순서로 푼다. 건너뛰게 유도하지 않는다. 폴더에는 이 밖에 `eval_lab/`(지원 라이브러리), `data/`(시나리오·fixture·정책 문서), `docs/`, `tests/`(저자용)가 있다.
+
+**Claude Code 실습 구성(`use_cc/`, 2026-11-05).** 같은 Part 1~5 + 실습을 Claude Code와 Langfuse 두 화면으로 하는 미션 카드(`use_cc/missions/m0`~`m6`)다. 수강생은 `use_cc/setup_sandbox.py`로 **저장소 밖**에 실습 폴더를 만들고 그 폴더에서 Claude Code를 연다. 실습 폴더의 규칙은 그 폴더의 `CLAUDE.md`(원본 `use_cc/sandbox/CLAUDE.md`)가 맡는다. 실습 폴더에는 holdout 내용이 없고(ID만), holdout은 `use_cc/tools/holdout_check.py`로만 연다. 이 저장소 안에서 수강생이 use_cc를 묻으면 `use_cc/README.md`를 가리킨다.
 
 ---
 
@@ -70,26 +72,27 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 ## 3. 키
 
-`.env.example`을 `.env`로 복사해 **수강생이 직접** 채운다. 키는 `Day05_new/.env`에서 읽는다 (`eval_lab/settings.py:62`). 셸에 export한 키나 다른 Day의 키에 기대지 않는다. `.env`를 고친 뒤에는 kernel을 재시작한다.
-`.env` 내용을 출력하지 않는다. 설정됨/미설정만 본다 (`key_status`, `eval_lab/settings.py:94`; `show_keys`, `eval_lab/notebook.py:78`). 키가 없어 실패하면 대신 넣어주지 않고 `.env.example`을 가리킨다 (`require`, `eval_lab/settings.py:104`).
+`.env.example`을 `.env`로 복사해 **수강생이 직접** 채운다. 키는 `Day05_new/.env`에서 읽는다 (`eval_lab/settings.py:89`). 셸에 export한 키나 다른 Day의 키에 기대지 않는다. `.env`를 고친 뒤에는 kernel을 재시작한다.
+`.env` 내용을 출력하지 않는다. 설정됨/미설정만 본다 (`key_status`, `eval_lab/settings.py:129`; `show_keys`, `eval_lab/notebook.py:78`). 키가 없어 실패하면 대신 넣어주지 않고 `.env.example`을 가리킨다 (`require`, `eval_lab/settings.py:139`).
 
 | 키 | 필요한 곳 |
 |---|---|
-| `ANTHROPIC_API_KEY` | 에이전트, Judge, 개선기 호출 전부. 모든 유료 셀 |
+| `OPENGATEWAY_API_KEY` | 에이전트, Judge, 개선기 호출 전부. 모든 유료 셀. `DAY05_PROVIDER=anthropic`이면 대신 `ANTHROPIC_API_KEY` |
 | Decision API 키 하나 (`TYPESAFE_API_KEY`, `OPENROUTER_API_KEY`, `OPENAI_API_KEY`, `AZURE_OPENAI_API_KEY` 중) | Jev 호출: 00, 02, 03a, 03b, 05. 01·04·06은 Jev를 부르지 않는다 |
-| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (필요하면 `LANGFUSE_HOST`) | Langfuse 셀에서만. 비어 있으면 노트북은 로컬 경로로 진행한다 (`langfuse_or_none`, `eval_lab/notebook.py:84`) |
+| `LANGFUSE_PUBLIC_KEY`, `LANGFUSE_SECRET_KEY` (필요하면 `LANGFUSE_HOST`, 또는 Langfuse 화면의 `.env` 예시가 주는 `LANGFUSE_BASE_URL`. `LANGFUSE_HOST`가 우선) | Langfuse 셀에서만. 비어 있으면 노트북은 로컬 경로로 진행한다 (`langfuse_or_none`, `eval_lab/notebook.py:84`) |
 
-- `DAY05_DECISION_BACKEND`가 비면 TYPESAFE, OPENROUTER, OPENAI, AZURE 순서로 키가 있는 첫 번째를 쓴다. 값을 정하면 그 백엔드만 본다. Claude가 Jev를 대신하지 않는다 (`.env.example`).
+- `DAY05_DECISION_BACKEND`가 비면 TYPESAFE, OPENROUTER, OPENAI, AZURE 순서로 키가 있는 첫 번째를 쓴다. 값을 정하면 그 백엔드만 본다. 에이전트 모델이 Jev를 대신하지 않는다 (`.env.example`).
 - Azure는 키와 함께 `DAY05_AZURE_ENDPOINT`, `DAY05_AZURE_DEPLOYMENT`가 필요하다.
-- 기본값: 에이전트 `claude-sonnet-5-5` effort `medium`, Judge `claude-sonnet-5-5` effort `xhigh`, 개선기 effort `high`. `DAY05_MODEL`, `DAY05_EFFORT`, `DAY05_JUDGE_MODEL`, `DAY05_JUDGE_EFFORT`, `DAY05_IMPROVER_EFFORT`로 바꾼다 (`.env.example`).
-- 다른 Day의 OpenRouter 키와 다른 키다. 모델 호출은 `max_retries=0`이라 429 같은 일시 오류가 숨지 않고 드러난다 (`eval_lab/settings.py:121`).
+- 공급자: 기본 `opengateway`(`https://apis.opengateway.ai`, Anthropic Messages 호환). `DAY05_PROVIDER=anthropic`이면 `https://api.anthropic.com`과 `claude-sonnet-5-5`. 주소는 코드에 고정되어 있다 (`PROVIDERS`, `eval_lab/settings.py`).
+- 기본값: 에이전트 `deepseek/deepseek-v4.1-flash-ultrafast` effort `medium`, Judge 같은 모델 effort `xhigh`, 개선기 effort `high`. `DAY05_MODEL`, `DAY05_EFFORT`, `DAY05_JUDGE_MODEL`, `DAY05_JUDGE_EFFORT`, `DAY05_IMPROVER_EFFORT`로 바꾼다 (`.env.example`).
+- 다른 Day의 OpenRouter 키와 다른 키다. 모델 호출은 `max_retries=0`이라 429 같은 일시 오류가 숨지 않고 드러난다 (`eval_lab/settings.py:166`).
 - 키를 로그·출력·결과 파일에 남기지 않는다. 저자용 `tests/check_secrets.py`가 `.env` 값이 폴더 안 파일에 들어갔는지 본다.
 
 ---
 
 ## 4. 비용
 
-모든 모델 셀이 실제 호출이다. 유료 셀은 같은 셀 안에서 `announce`(`eval_lab/notebook.py:23`)가 실행 **직전에 규모를 한 줄로 고지**한다. 막지 않는다. 수강생이 자기 Anthropic·Decision API 크레딧을 쓴다는 점을 상기시키고, 도우미가 대신 셀을 돌릴 때도 직전에 한 줄로 알린다.
+모든 모델 셀이 실제 호출이다. 유료 셀은 같은 셀 안에서 `announce`(`eval_lab/notebook.py:23`)가 실행 **직전에 규모를 한 줄로 고지**한다. 막지 않는다. 수강생이 자기 OpenGateway·Decision API 크레딧을 쓴다는 점을 상기시키고, 도우미가 대신 셀을 돌릴 때도 직전에 한 줄로 알린다.
 
 **아래는 모두 예고 값이다. 저자 실측이 아니다.** 노트북 `announce` 인자를 읽은 상한 쪽 추정이며 아직 실제 키로 노트북을 끝까지 돌려 잰 적이 없다. "기본"은 `RUN_EXERCISE`, `RUN_OPTIONAL`이 모두 `False`인 실행이다. 칸은 에이전트 / Jev / Judge / 개선기 호출 수다.
 
@@ -115,8 +118,8 @@ uv run jupyter lab          # 실행은 이 폴더에서
 ## 5. 확인되지 않은 것 (`docs/DESIGN.md` 16절)
 
 실제 키로 돌린 노트북 결과는 아직 없다. 아래는 사실처럼 말하지 않는다.
-- **00이 첫 실제 확인이다.** `ToolStrategy(Response)`가 `claude-sonnet-5-5`(프로필 `tool_choice = False`)에서 구조화 응답을 안정적으로 내는지, Judge `max_tokens`가 충분한지(`_JUDGE_MAX_TOKENS = 32000`, `eval_lab/settings.py:22`; xhigh의 thinking이 한도를 답변과 나눠 쓴다)는 00의 한 번 호출로 처음 본다. 잘림이나 `StructuredOutputError`는 버그가 아니라 관찰 결과다.
-- 실제 Claude·Jev·Judge 응답, Langfuse 서버 쪽 동작(Rule·Evaluator 실행, Metrics API 응답, 집계 지연, 2026-11-16 이후 Cloud).
+- **00이 첫 실제 확인이다.** `ToolStrategy(Response)`가 `deepseek/deepseek-v4.1-flash-ultrafast`(`langchain-anthropic` 모델 프로필 없음)에서 구조화 응답을 반복해서 안정적으로 내는지(2026-11-05 1회 관찰에서는 냈다), Judge `max_tokens`가 충분한지(`_JUDGE_MAX_TOKENS = 32000`, `eval_lab/settings.py:43`; xhigh의 thinking이 한도를 답변과 나눠 쓴다)는 00의 한 번 호출로 처음 본다. 잘림이나 `StructuredOutputError`는 버그가 아니라 관찰 결과다.
+- 실제 에이전트 모델·Jev·Judge 응답(Episode 1개 1회 관찰뿐), OpenGateway가 effort를 옮기는 방식, Langfuse 서버 쪽 동작(Rule·Evaluator 실행, Metrics API 응답, 집계 지연, 2026-11-16 이후 Cloud).
 - DeepEval trace 필요 지표에 우리 원자료를 비공개 필드로 넣는 경로.
 - scripted Episode가 실제 Langfuse에서 trace 하나로 묶이는지. OTel GenAI 규약의 안정화 여부. Dream-RSI 공식 코드 위치와 라이선스.
 - 노트북 안에서 오프라인 가짜 모델로 돈 결과는 "구조가 끝까지 도는지"만 보여 준다. 가짜 출력으로 모델·정책의 우열을 말하지 않는다.
@@ -145,7 +148,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 - `run_measurement.py` — **P3 저자 측정(유료)**. 인자 없이 실행하면 계획과 `announce` 줄, 검수 전 holdout 초안 목록만 출력하고 종료한다. 모델·키를 쓰지 않는다. `--live`는 실제 측정, `--offline`은 같은 코드를 `tests/fakes.py`의 가짜로 돌린다. `--no-langfuse`, `--scenarios`, `--out` 옵션이 있다 (`tests/run_measurement.py:564`).
   - 규모(예고 상한): 에이전트 (54 + 36) × 12 = 1,080회, 개선기 6회, Jev 36회, Judge(xhigh) 108회. **`--live` 직전에 이 한 줄을 먼저 고지한다.** 수업 노트북이 아니라 저자가 한 번 돌린다.
   - 단계: 사전 점검(PREREG 해시, holdout 엄격 로드로 6사례 확인, dev 기대 상태, 키, Langfuse 인증, 새 출력 폴더) → pilot → 1라운드 → 2라운드 → holdout → `run_manifest.json`. 출력은 `<out>/measurement/<UTC 시각>-<16진수>/`에 새로 만든다.
-  - `--live` 전에 저자가 할 일: holdout 초안 4건 승인(6장), `Day05_new/.env`에 `ANTHROPIC_API_KEY`·Decision API 키·`LANGFUSE_*` 확보(또는 `--no-langfuse`).
+  - `--live` 전에 저자가 할 일: holdout 초안 4건 승인(6장), `Day05_new/.env`에 `OPENGATEWAY_API_KEY`·Decision API 키·`LANGFUSE_*` 확보(또는 `--no-langfuse`).
   - 종료 코드: 0 정상, 1 실행 실패(기록은 남음), 2 사용법 오류, 3 사전 점검 거부.
 
 ---
@@ -171,7 +174,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 
 - **Langfuse가 미설정이다.** `Langfuse 키가 미설정이라 로컬 경로로 진행합니다.`가 나오고 노트북은 끝까지 간다 (`eval_lab/notebook.py:84`). 오류가 아니다. 서버가 필요한 부분(Dataset 버전, Metrics API, annotation queue)은 로컬 대체 경로나 건너뜀으로 나온다. 키를 대신 넣어주지 않는다.
 - **Langfuse가 401이다.** 00의 인증 확인 셀이 먼저 보여 준다. 키가 틀렸거나 `LANGFUSE_HOST`가 안 맞는 경우다. 모델 호출 전에 보이는 실패라 비용이 나가지 않는다. 키를 대신 고치지 않는다. 00은 Langfuse SDK가 4.7.0 미만이면 `RuntimeError`로 멈춘다.
-- **키 미설정 `RuntimeError`.** 메시지가 키 이름만 대고 `.env.example`을 가리킨다 (`eval_lab/settings.py:104`). Decision API 키가 하나도 없으면 Jev 셀에서 멈춘다. Claude로 대신하지 않는다.
+- **키 미설정 `RuntimeError`.** 메시지가 키 이름만 대고 `.env.example`을 가리킨다 (`eval_lab/settings.py:139`). Decision API 키가 하나도 없으면 Jev 셀에서 멈춘다. 에이전트 모델로 대신하지 않는다.
 - **holdout 로드 오류.** `검수가 끝나지 않은 시나리오: hv-...`는 엄격 로드가 검수 전 카드를 만난 것이다 (`eval_lab/dataset.py:54`). 버그가 아니다. 수업 경로는 `approved_only=True`, 승인은 저자 몫이다 (6장).
 - **판정이 `NOT_DETERMINABLE`이다.** "개선이 없다"가 아니라 **재지 못했다**는 뜻이다. 두 정책 중 하나라도 평가 완료율(PASS+FAIL / 전체)이 90% 미만이거나, π0의 치명 위반 Episode가 0이라 개선 여지를 잴 수 없을 때 나온다 (`eval_lab/rsi.py:904`). 보류(HOLD)·채택(ADOPT)과 구분해서 읽게 하고, 이유 목록을 먼저 본다. 낮은 점수와 평가 불능은 다르다 (01).
 - **같은 사례인데 결과가 달라진다.** 모델 결과는 실행마다 다르다. 1회 관찰이라고 부르고 반복으로 본다.

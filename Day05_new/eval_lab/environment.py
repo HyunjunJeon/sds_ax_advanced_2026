@@ -7,8 +7,8 @@
 
 import sqlite3
 from copy import deepcopy
-from threading import RLock
-from time import perf_counter_ns
+from threading import Lock, RLock
+from time import perf_counter_ns, sleep, time_ns
 from uuid import uuid4
 
 from eval_lab.contracts import Event
@@ -17,6 +17,43 @@ from eval_lab.dataset import POLICY_VERSION
 WRITE_TOOLS = {"begin_cancellation", "refund_payment", "release_stock", "complete_cancellation"}
 TOOL_NAMES = {"get_order", "check_cancel_policy", "get_payment", "create_ticket", *WRITE_TOOLS}
 MAX_TOOL_CALLS = 18
+
+
+class MillisecondGate:
+    """Langfuse에 남기는 observation의 시작 시각이 같은 밀리초에 겹치지 않게 한다.
+
+    Langfuse는 observation 시작 시각을 밀리초로 저장하고, trace 트리를 그 시각으로 정렬한다.
+    모델 없는 scripted Episode는 서비스 호출 10개가 1~2ms 안에 끝나서, 같은 밀리초에 시작한
+    형제 observation의 순서가 화면에서 섞인다(2026-11-05 jp.cloud.langfuse.com v4.75.0에서 확인:
+    step 4인 check_cancel_policy가 step 9인 complete_cancellation보다 아래에 보였다).
+    그래서 Langfuse에 기록할 때만 observation을 열기 전에 wait()로 앞 observation과 다른 밀리초가
+    될 때까지 기다리고, 연 직후 mark()로 그 밀리초를 적는다. 한 번에 최대 약 1ms를 쓴다.
+    Event.step과 metadata의 step은 이와 상관없이 언제나 실제 순서다.
+    """
+
+    def __init__(self) -> None:
+        self._lock = Lock()
+        self._last_ms: int | None = None
+
+    @staticmethod
+    def now_ms() -> int:
+        return time_ns() // 1_000_000
+
+    def wait(self) -> None:
+        """앞에서 mark()한 밀리초가 지날 때까지 기다린다."""
+        with self._lock:
+            last = self._last_ms
+        while last is not None and self.now_ms() <= last:
+            sleep(0.0002)
+
+    def mark(self) -> None:
+        """방금 연 observation의 시작 밀리초를 적는다. 다음 wait()는 이 밀리초 뒤까지 기다린다."""
+        with self._lock:
+            self._last_ms = self.now_ms()
+
+
+# 한 프로세스 안의 모든 Episode가 함께 쓴다. 턴(turn-N)과 서비스 호출(service.*)이 모두 거친다.
+OBSERVATION_GATE = MillisecondGate()
 
 
 class OrderEnvironment:
@@ -90,9 +127,13 @@ class OrderEnvironment:
             start = perf_counter_ns()
             parent_id = (self.langfuse.get_current_observation_id()
                          if self.langfuse and hasattr(self.langfuse, "get_current_observation_id") else None)
+            if self.langfuse:
+                OBSERVATION_GATE.wait()
             scope = (self.langfuse.start_as_current_observation(name=f"service.{tool}", as_type="span", input=args)
                      if self.langfuse else nullcontext())
             with scope as span:
+                if self.langfuse:
+                    OBSERVATION_GATE.mark()
                 try:
                     result = self._dispatch(tool, args)
                 except Exception as exc:

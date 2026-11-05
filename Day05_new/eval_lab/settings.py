@@ -1,4 +1,11 @@
-"""실습 설정과 모델 생성. 키는 Day05_new/.env에서만 읽고, 값은 어디에도 출력하지 않는다."""
+"""실습 설정과 모델 생성. 키는 Day05_new/.env에서만 읽고, 값은 어디에도 출력하지 않는다.
+
+모델 공급자(provider)는 둘이다. 기본은 OpenGateway의 DeepSeek이다(2026-11-05 저자 결정).
+- opengateway: https://apis.opengateway.ai 의 Anthropic Messages 호환 엔드포인트(/v1/messages).
+  기본 모델 deepseek/deepseek-v4.1-flash-ultrafast, 키 OPENGATEWAY_API_KEY.
+- anthropic: https://api.anthropic.com, 기본 모델 claude-sonnet-5-5, 키 ANTHROPIC_API_KEY.
+두 공급자 모두 Anthropic Messages 방식이라 클라이언트는 같은 ChatAnthropic이다. 바뀌는 것은 주소, 키, 모델 이름뿐이다.
+"""
 from __future__ import annotations
 
 import os
@@ -10,29 +17,47 @@ from langchain_anthropic import ChatAnthropic
 
 ROOT = Path(__file__).resolve().parents[1]
 
-_DEFAULT_MODEL = "claude-sonnet-5-5"
+
+@dataclass(frozen=True)
+class Provider:
+    """모델 공급자 한 곳. 주소는 코드에 고정한다(셸의 ANTHROPIC_BASE_URL 같은 값으로 키가 다른 곳에 가지 않게)."""
+
+    name: str
+    api_url: str  # ChatAnthropic의 base_url. SDK가 뒤에 /v1/messages를 붙인다.
+    key_env: str  # 이 공급자의 키를 담은 .env 변수 이름
+    default_model: str
+
+
+PROVIDERS: dict[str, Provider] = {
+    "opengateway": Provider("opengateway", "https://apis.opengateway.ai", "OPENGATEWAY_API_KEY",
+                            "deepseek/deepseek-v4.1-flash-ultrafast"),
+    "anthropic": Provider("anthropic", "https://api.anthropic.com", "ANTHROPIC_API_KEY", "claude-sonnet-5-5"),
+}
+_DEFAULT_PROVIDER = "opengateway"
 _DEFAULT_EFFORT = "medium"
-_DEFAULT_JUDGE_MODEL = "claude-sonnet-5-5"
 _DEFAULT_JUDGE_EFFORT = "xhigh"  # 저자 결정: 판정자는 가장 깊게 생각하게 한다.
 _DEFAULT_IMPROVER_EFFORT = "high"
 _DEFAULT_ENVIRONMENT = "day05_new"
-_API_URL = "https://api.anthropic.com"  # 셸의 ANTHROPIC_BASE_URL로 키가 다른 곳에 가지 않게 고정한다.
 _AGENT_MAX_TOKENS = 16000  # 스트리밍 없는 요청이 HTTP 제한 시간 안에 끝나는 크기다.
 _AGENT_TIMEOUT = 120.0
 _JUDGE_MAX_TOKENS = 32000  # xhigh에서는 적응형 thinking이 max_tokens를 답변과 나눠 쓴다.
 _JUDGE_TIMEOUT = 300.0
+# 개선기(06의 정책 후보)도 Judge와 같은 한도. DeepSeek(OpenGateway)이 개선기 프롬프트에서 생각에 1.5만~2만 토큰을 써서
+# 16000에서는 답이 비거나 잘렸다(2026-11-05: 16000에서 4/4 stop=max_tokens, 32000에서 2/2 end_turn, DESIGN 19절).
+_IMPROVER_MAX_TOKENS = 32000
+_IMPROVER_TIMEOUT = 300.0
 _ENV_FILE_VARIABLE = "DAY05_ENV_FILE"  # 테스트가 존재하지 않는 경로를 가리켜 .env 읽기를 끈다.
 
 # 값이 비밀인 환경 변수 이름. key_status와 require가 이 목록만 다룬다.
 KEY_ENV_NAMES = (
-    "ANTHROPIC_API_KEY", "TYPESAFE_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY",
+    "OPENGATEWAY_API_KEY", "ANTHROPIC_API_KEY", "TYPESAFE_API_KEY", "OPENROUTER_API_KEY", "OPENAI_API_KEY",
     "AZURE_OPENAI_API_KEY", "LANGFUSE_PUBLIC_KEY", "LANGFUSE_SECRET_KEY",
 )
 # 테스트 fixture가 지우는 전체 목록. 키가 아닌 설정 이름도 포함한다.
 ALL_ENV_NAMES = KEY_ENV_NAMES + (
-    "DAY05_MODEL", "DAY05_EFFORT", "DAY05_JUDGE_MODEL", "DAY05_JUDGE_EFFORT", "DAY05_IMPROVER_EFFORT",
+    "DAY05_PROVIDER", "DAY05_MODEL", "DAY05_EFFORT", "DAY05_JUDGE_MODEL", "DAY05_JUDGE_EFFORT", "DAY05_IMPROVER_EFFORT",
     "DAY05_DECISION_BACKEND", "DAY05_AZURE_ENDPOINT", "DAY05_AZURE_DEPLOYMENT",
-    "LANGFUSE_HOST", "LANGFUSE_TRACING_ENVIRONMENT",
+    "LANGFUSE_HOST", "LANGFUSE_BASE_URL", "LANGFUSE_TRACING_ENVIRONMENT",
 )
 
 
@@ -40,10 +65,12 @@ ALL_ENV_NAMES = KEY_ENV_NAMES + (
 class Settings:
     """실습 설정 한 벌. 키 필드는 repr에 나타나지 않는다."""
 
+    provider: str = _DEFAULT_PROVIDER
+    opengateway_api_key: str = field(default="", repr=False)
     anthropic_api_key: str = field(default="", repr=False)
-    model: str = _DEFAULT_MODEL
+    model: str = PROVIDERS[_DEFAULT_PROVIDER].default_model
     effort: str = _DEFAULT_EFFORT
-    judge_model: str = _DEFAULT_JUDGE_MODEL
+    judge_model: str = PROVIDERS[_DEFAULT_PROVIDER].default_model
     judge_effort: str = _DEFAULT_JUDGE_EFFORT
     improver_effort: str = _DEFAULT_IMPROVER_EFFORT
     typesafe_api_key: str = field(default="", repr=False)
@@ -69,12 +96,19 @@ def load_settings(env_file: Path | str | None = None) -> Settings:
     path = Path(env_file or os.environ.get(_ENV_FILE_VARIABLE) or ROOT / ".env")
     # 2단계: 파일이 있을 때만 읽는다. 셸 환경 변수는 보지 않는다.
     values = dotenv_values(path) if path.is_file() else {}
-    # 3단계: 빈 값은 기본값으로 대신한다.
+    # 3단계: 공급자를 정한다. 모르는 이름이면 아무것도 부르기 전에 멈춘다.
+    provider_name = (values.get("DAY05_PROVIDER") or "").strip().lower() or _DEFAULT_PROVIDER
+    if provider_name not in PROVIDERS:
+        raise ValueError(f"DAY05_PROVIDER는 {', '.join(PROVIDERS)} 중 하나여야 합니다: {provider_name!r}")
+    default_model = PROVIDERS[provider_name].default_model
+    # 4단계: 빈 값은 기본값으로 대신한다. 모델 기본값은 공급자마다 다르다.
     return Settings(
+        provider=provider_name,
+        opengateway_api_key=values.get("OPENGATEWAY_API_KEY") or "",
         anthropic_api_key=values.get("ANTHROPIC_API_KEY") or "",
-        model=values.get("DAY05_MODEL") or _DEFAULT_MODEL,
+        model=values.get("DAY05_MODEL") or default_model,
         effort=values.get("DAY05_EFFORT") or _DEFAULT_EFFORT,
-        judge_model=values.get("DAY05_JUDGE_MODEL") or _DEFAULT_JUDGE_MODEL,
+        judge_model=values.get("DAY05_JUDGE_MODEL") or default_model,
         judge_effort=values.get("DAY05_JUDGE_EFFORT") or _DEFAULT_JUDGE_EFFORT,
         improver_effort=values.get("DAY05_IMPROVER_EFFORT") or _DEFAULT_IMPROVER_EFFORT,
         typesafe_api_key=values.get("TYPESAFE_API_KEY") or "",
@@ -86,7 +120,8 @@ def load_settings(env_file: Path | str | None = None) -> Settings:
         azure_deployment=(values.get("DAY05_AZURE_DEPLOYMENT") or "").strip(),
         langfuse_public_key=values.get("LANGFUSE_PUBLIC_KEY") or "",
         langfuse_secret_key=values.get("LANGFUSE_SECRET_KEY") or "",
-        langfuse_host=(values.get("LANGFUSE_HOST") or "").strip(),
+        # Langfuse 화면의 .env 예시는 주소를 LANGFUSE_BASE_URL로 준다(2026-11-05 확인). 둘 다 받고 LANGFUSE_HOST가 우선이다.
+        langfuse_host=(values.get("LANGFUSE_HOST") or values.get("LANGFUSE_BASE_URL") or "").strip(),
         langfuse_environment=(values.get("LANGFUSE_TRACING_ENVIRONMENT") or "").strip() or _DEFAULT_ENVIRONMENT,
     )
 
@@ -110,40 +145,51 @@ def require(settings: Settings, *env_names: str) -> Settings:
     return settings
 
 
-def _make_claude(settings: Settings, *, model: str, effort: str, max_tokens: int, timeout: float) -> ChatAnthropic:
+def provider_of(settings: Settings) -> Provider:
+    """설정이 고른 공급자. Settings를 직접 만들 때 모르는 이름을 넣으면 여기서 멈춘다."""
+    if settings.provider not in PROVIDERS:
+        raise ValueError(f"DAY05_PROVIDER는 {', '.join(PROVIDERS)} 중 하나여야 합니다: {settings.provider!r}")
+    return PROVIDERS[settings.provider]
+
+
+def _make_chat_model(settings: Settings, *, model: str, effort: str, max_tokens: int, timeout: float) -> ChatAnthropic:
     """세 모델이 공유하는 생성부. temperature와 thinking은 보내지 않고 깊이는 reasoning_effort로만 정한다.
 
-    max_retries=0: SDK 재시도는 호출 수 집계에 잡히지 않으므로 일시적 429도 실패로 드러낸다.
+    - 주소와 키는 공급자(provider_of)가 정한다. 키가 비어 있으면 그 키 이름만 대고 멈춘다.
+    - max_retries=0: SDK 재시도는 호출 수 집계에 잡히지 않으므로 일시적 429도 실패로 드러낸다.
+    - OpenGateway가 reasoning_effort를 DeepSeek의 어떤 설정으로 바꾸는지는 확인하지 않았다(미확인).
     """
-    settings = require(settings, "ANTHROPIC_API_KEY")
+    provider = provider_of(settings)
+    settings = require(settings, provider.key_env)
     return ChatAnthropic(
-        model=model, api_key=settings.anthropic_api_key, base_url=_API_URL,
+        model=model, api_key=getattr(settings, provider.key_env.lower()), base_url=provider.api_url,
         reasoning_effort=effort, max_tokens=max_tokens, timeout=timeout, max_retries=0,
     )
 
 
 def make_agent_model(settings: Settings) -> ChatAnthropic:
     """평가 대상 에이전트용 모델. settings.model과 settings.effort, max_tokens 16000, timeout 120초."""
-    return _make_claude(settings, model=settings.model, effort=settings.effort,
+    return _make_chat_model(settings, model=settings.model, effort=settings.effort,
                         max_tokens=_AGENT_MAX_TOKENS, timeout=_AGENT_TIMEOUT)
 
 
 def make_judge_model(settings: Settings) -> ChatAnthropic:
     """판정자(Judge)용 모델. judge_model과 judge_effort(기본 xhigh), max_tokens 32000, timeout 300초."""
-    return _make_claude(settings, model=settings.judge_model, effort=settings.judge_effort,
+    return _make_chat_model(settings, model=settings.judge_model, effort=settings.judge_effort,
                         max_tokens=_JUDGE_MAX_TOKENS, timeout=_JUDGE_TIMEOUT)
 
 
 def make_improver_model(settings: Settings) -> ChatAnthropic:
-    """개선안 제안용 모델. settings.model과 improver_effort(기본 high), max_tokens 16000, timeout 120초."""
-    return _make_claude(settings, model=settings.model, effort=settings.improver_effort,
-                        max_tokens=_AGENT_MAX_TOKENS, timeout=_AGENT_TIMEOUT)
+    """개선안 제안용 모델. settings.model과 improver_effort(기본 high), max_tokens 32000, timeout 300초."""
+    return _make_chat_model(settings, model=settings.model, effort=settings.improver_effort,
+                        max_tokens=_IMPROVER_MAX_TOKENS, timeout=_IMPROVER_TIMEOUT)
 
 
 def make_langfuse(settings: Settings | None = None):
     """Langfuse 클라이언트를 만든다. 두 LANGFUSE 키가 없으면 이름만 대고 멈춘다.
 
-    LANGFUSE_HOST가 있으면 그 주소를, 없으면 라이브러리 기본 주소를 쓴다.
+    LANGFUSE_HOST(없으면 LANGFUSE_BASE_URL)가 있으면 그 주소를, 둘 다 없으면 라이브러리 기본 주소를 쓴다.
+    주소는 키를 만든 프로젝트의 데이터 지역과 같아야 한다. 다르면 인증이 401로 실패한다.
     """
     from langfuse import Langfuse  # 키가 필요 없는 경로에서 import 비용을 내지 않는다.
 

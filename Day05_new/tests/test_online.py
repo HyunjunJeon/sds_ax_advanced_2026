@@ -11,7 +11,6 @@ from eval_lab.online import (
     create_root_rule,
     enqueue_for_review,
     evaluate_records_locally,
-    observation_mapper,
     online_evaluators,
     push_scores,
     request_shape,
@@ -77,12 +76,27 @@ class FakeAnnotationQueues:
         return SimpleNamespace(data=list(self.queues), meta=SimpleNamespace(total_items=len(self.queues)))
 
     def create_queue(self, *, name, score_config_ids, description=None):
-        queue = SimpleNamespace(id=f"q{len(self.queues) + 1}", name=name)
+        assert score_config_ids, "실제 Langfuse는 점수 설정 없는 대기열을 400으로 거절한다"
+        queue = SimpleNamespace(id=f"q{len(self.queues) + 1}", name=name, score_config_ids=list(score_config_ids))
         self.queues.append(queue)
         return queue
 
     def create_queue_item(self, queue_id, *, object_id, object_type):
         self.items.append((queue_id, object_id, str(object_type)))
+
+
+class FakeScoreConfigs:
+    def __init__(self):
+        self.configs: list[SimpleNamespace] = []
+
+    def get(self, *, page=None, limit=None):
+        return SimpleNamespace(data=list(self.configs), meta=SimpleNamespace(total_items=len(self.configs)))
+
+    def create(self, *, name, data_type, categories=None, description=None, **_):
+        config = SimpleNamespace(id=f"sc{len(self.configs) + 1}", name=name, data_type=str(data_type),
+                                 categories=categories, is_archived=False)
+        self.configs.append(config)
+        return config
 
 
 class FakeEvaluationRules:
@@ -94,30 +108,37 @@ class FakeEvaluationRules:
         return SimpleNamespace(id="rule-1")
 
 
-class FakeLangfuse:
-    """run_batched_evaluation, create_score, api.annotation_queues, api.evaluation_rules를 흉내 낸다.
+class FakeObservationsV2:
+    """관측 목록 v2(api.observations.get_many). 받은 인자를 남기고, 가진 observation을 limit만큼 쪽으로 나눠 준다.
 
-    run_batched_evaluation은 가진 observation에 mapper와 평가기를 진짜로 돌리고 점수를 create_score로 남긴다.
+    필터 JSON은 해석하지 않는다(필터 해석은 tests/fakes.py의 FakeLangfuse가 시험한다). cursor는 다음 시작 위치다.
+    """
+
+    def __init__(self, observations):
+        self.observations = observations
+        self.calls: list[dict] = []
+
+    def get_many(self, **kwargs):
+        self.calls.append(kwargs)
+        start = int(kwargs.get("cursor") or 0)
+        end = start + (kwargs.get("limit") or len(self.observations))
+        next_cursor = str(end) if end < len(self.observations) else None
+        return SimpleNamespace(data=self.observations[start:end], meta=SimpleNamespace(cursor=next_cursor))
+
+
+class FakeLangfuse:
+    """api.observations(v2), create_score, api.annotation_queues, api.score_configs, api.evaluation_rules를 흉내 낸다.
+
+    v1 관측 API와 run_batched_evaluation은 일부러 두지 않는다. batch_evaluate가 그쪽을 부르면 AttributeError로 드러난다
+    (Langfuse Cloud가 v1 관측 API를 2026-11-16에 없앤다).
     """
 
     def __init__(self, observations=()):
         self.observations = list(observations)
-        self.batch_calls: list[dict] = []
         self.scores: list[dict] = []
-        self.api = SimpleNamespace(annotation_queues=FakeAnnotationQueues(), evaluation_rules=FakeEvaluationRules())
-
-    def run_batched_evaluation(self, **kwargs):
-        self.batch_calls.append(kwargs)
-        for observation in self.observations[: kwargs["max_items"]]:
-            inputs = kwargs["mapper"](item=observation)
-            for evaluator in kwargs["evaluators"]:
-                result = evaluator(input=inputs.input, output=inputs.output,
-                                   expected_output=inputs.expected_output, metadata=inputs.metadata)
-                for evaluation in result:
-                    self.create_score(trace_id=observation.trace_id, observation_id=observation.id,
-                                      name=evaluation.name, value=evaluation.value,
-                                      data_type=evaluation.data_type, comment=evaluation.comment)
-        return SimpleNamespace(completed=True)
+        self.api = SimpleNamespace(observations=FakeObservationsV2(self.observations),
+                                   annotation_queues=FakeAnnotationQueues(), score_configs=FakeScoreConfigs(),
+                                   evaluation_rules=FakeEvaluationRules())
 
     def create_score(self, **kwargs):
         self.scores.append(kwargs)
@@ -279,23 +300,46 @@ def test_mid_band_question_goes_to_the_judge(clean_records):
 
 # ---------------------------------------------------------------- 일괄 채점과 점수 붙이기
 
-def test_batch_evaluate_passes_observation_scope_and_root_filter():
+def test_batch_evaluate_reads_v2_observations_with_root_filter():
     client = FakeLangfuse()
-    token = object()
-    batch_evaluate(client, evaluators=sure_pass_evaluators(), environment="day05_new", max_items=7, resume_from=token)
-    call = client.batch_calls[0]
-    assert call["scope"] == "observations"
-    assert call["max_items"] == 7 and call["resume_from"] is token
-    assert call["mapper"] is observation_mapper
+    batch_evaluate(client, evaluators=sure_pass_evaluators(), environment="day05_new", max_items=7, resume_from="3")
+    call = client.api.observations.calls[0]
+    # v2 관측 API: io를 함께 요청하고, 이어 가기 토큰은 cursor로, 상한은 limit으로 간다.
+    assert call["fields"] == "core,basic,io" and call["cursor"] == "3" and call["limit"] == 7
     conditions = json.loads(call["filter"])
     assert {"type": "string", "column": "environment", "operator": "=", "value": "day05_new"} in conditions
     assert {"type": "string", "column": "name", "operator": "=", "value": "episode"} in conditions
     assert call["filter"] == root_filter("day05_new")
+    assert "parse_io_as_json" not in call  # 서버가 거절하는 인자다
 
     batch_evaluate(client, evaluators=[], environment="x", max_items=1, filter_json="[]")
-    assert client.batch_calls[1]["filter"] == "[]"
+    assert client.api.observations.calls[1]["filter"] == "[]"
     with pytest.raises(ValueError):
         batch_evaluate(client, evaluators=[], environment="x", max_items=0)
+
+
+def test_batch_evaluate_stops_at_max_items_and_resumes(clean_records):
+    records = with_trace_ids(clean_records[:3])
+    client = FakeLangfuse([observation_of(r, f"obs-{i}") for i, r in enumerate(records)])
+    first = batch_evaluate(client, evaluators=sure_pass_evaluators(), environment="day05_new", max_items=2)
+    assert (first.total_items_fetched, first.completed, first.has_more_items) == (2, False, True)
+    rest = batch_evaluate(client, evaluators=sure_pass_evaluators(), environment="day05_new", max_items=5,
+                          resume_from=first.resume_token)
+    assert (rest.total_items_fetched, rest.completed, rest.resume_token) == (1, True, None)
+    assert set(first.item_evaluations) | set(rest.item_evaluations) == {"obs-0", "obs-1", "obs-2"}
+
+
+def test_batch_evaluate_counts_evaluator_failures_and_keeps_going(clean_records):
+    records = with_trace_ids(clean_records[:2])
+    client = FakeLangfuse([observation_of(r, f"obs-{i}") for i, r in enumerate(records)])
+
+    def broken(**_):
+        raise RuntimeError("평가기 고장")
+
+    result = batch_evaluate(client, evaluators=[broken, *sure_pass_evaluators()], environment="day05_new", max_items=5)
+    assert (result.total_items_processed, result.total_evaluations_failed) == (2, 2)
+    assert result.error_summary == {"RuntimeError": 2}
+    assert result.total_scores_created == len(client.scores) > 0
 
 
 def test_batch_run_scores_land_on_the_observation(clean_records, mistake_record):
@@ -347,6 +391,10 @@ def test_enqueue_creates_queue_once_and_skips_missing_trace():
     second = enqueue_for_review(client, "day05-review", selections[:1])
     assert second["queue_id"] == "q1"
     assert len(client.api.annotation_queues.queues) == 1
+    # 대기열에는 사람 검수 점수 설정(human_verdict: PASS/FAIL) 하나가 붙고, 두 번째 호출은 설정을 새로 만들지 않는다.
+    assert [c.name for c in client.api.score_configs.configs] == ["human_verdict"]
+    assert client.api.annotation_queues.queues[0].score_config_ids == ["sc1"]
+    assert [c.label for c in client.api.score_configs.configs[0].categories] == ["PASS", "FAIL"]
     assert [(item[1], item[2]) for item in client.api.annotation_queues.items] == \
         [("t0", "TRACE"), ("t2", "TRACE"), ("t0", "TRACE")]
 
@@ -362,3 +410,37 @@ def test_create_root_rule_is_a_draft_by_default():
     assert columns == {"environment": ["day05_new"], "isRootObservation": True}
     with pytest.raises(ValueError):
         create_root_rule(client, evaluator_id="ev-1", environment="day05_new", sampling=0)
+
+
+def test_review_score_config_is_reused_and_archived_one_is_skipped():
+    """같은 이름의 점수 설정이 있으면 그것을 쓰고, 보관된 설정은 쓰지 않고 새로 만든다."""
+    from eval_lab.online import ensure_review_score_config
+
+    client = FakeLangfuse()
+    client.api.score_configs.configs.append(SimpleNamespace(id="old", name="human_verdict", is_archived=True))
+    created = ensure_review_score_config(client)
+    assert created != "old" and ensure_review_score_config(client) == created
+
+
+
+def test_wait_for_observations_waits_for_ingestion_and_reports_shortfall(clean_records):
+    """집계 지연: 처음에는 0건, 세 번째 조회부터 보이는 서버. 다 보이면 멈추고, 시간이 다 되면 모자란 수를 그대로 돌려준다."""
+    from eval_lab.online import wait_for_observations
+
+    records = with_trace_ids(clean_records[:2])
+    visible = [observation_of(r, f"obs-{i}") for i, r in enumerate(records)]
+
+    class LaggingObservations(FakeObservationsV2):
+        def get_many(self, **kwargs):
+            self.calls.append(kwargs)
+            data = visible if len(self.calls) >= 3 else []
+            return SimpleNamespace(data=data, meta=SimpleNamespace(cursor=None))
+
+    client = FakeLangfuse()
+    client.api.observations = LaggingObservations([])
+    counted, _ = wait_for_observations(client, root_filter("day05_new"), expected=2, interval_s=0)
+    assert counted == 2 and len(client.api.observations.calls) == 3
+
+    never = FakeLangfuse()
+    counted, waited = wait_for_observations(never, root_filter("day05_new"), expected=5, timeout_s=0, interval_s=0)
+    assert counted == 0 and waited >= 0

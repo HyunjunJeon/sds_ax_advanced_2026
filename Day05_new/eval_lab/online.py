@@ -19,13 +19,15 @@ from __future__ import annotations
 import json
 import math
 import random
-from collections import defaultdict
+import time
+from collections import Counter, defaultdict
 from collections.abc import Callable
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 from langchain_core.language_models.chat_models import BaseChatModel
 from langfuse import Evaluation, EvaluatorInputs
+from langfuse.api import ConfigCategory, ScoreConfigDataType
 from langfuse.api.annotation_queues.types import AnnotationQueueObjectType
 from langfuse.api.evaluation_commons.types import (
     EvaluationRuleBooleanFilterOperator,
@@ -302,7 +304,7 @@ def _trajectory_evaluations(artifact: Artifact) -> list[Evaluation]:
 
 def online_evaluators(*, decider: DecisionBackend, judge_model: BaseChatModel,
                       mode: str = "cascade") -> list[Callable[..., Any]]:
-    """Langfuse `run_batched_evaluation`에 넘길 평가기 2개를 만든다(EvaluatorFunction 형식).
+    """`batch_evaluate`(SDK `run_batched_evaluation`과 같은 EvaluatorFunction 형식)에 넘길 평가기 2개를 만든다.
 
     1. 궤적 평가기: trajectory_status, fatal_count, warn_count, blocked_attempts.
        Artifact를 못 만들면 trajectory_status만 NO_EVIDENCE 또는 INCOMPLETE로 낸다(개수 점수는 내지 않는다.
@@ -370,27 +372,152 @@ def observation_mapper(*, item: Any, **kwargs: Any) -> EvaluatorInputs:
     )
 
 
-def batch_evaluate(client: Any, *, evaluators: list[Callable[..., Any]], environment: str,
-                   max_items: int, resume_from: Any = None, filter_json: str | None = None) -> Any:
-    """`client.run_batched_evaluation`을 observation 범위로 부르는 얇은 감싸기.
+# Langfuse v2 관측 API에서 읽을 칸. 기본 응답에는 input/output이 없어 io를 함께 요청한다.
+# v2는 input/output을 언제나 JSON 문자열로 준다(parseIoAsJson은 2026-11-05 서버가 400으로 거절). _rebuild가 문자열을 읽는다.
+V2_OBSERVATION_FIELDS = "core,basic,io"
+_V2_PAGE_LIMIT = 50
 
-    - scope는 'observations'다. 점수는 Langfuse가 해당 observation(root)에 붙인다.
-    - filter_json을 주지 않으면 root_filter(environment)를 쓴다.
-    - max_items로 한 번에 채점할 양(=비용)을 제한한다. 중간에 멈추면 결과의 resume_token을
-      resume_from에 넘겨 이어 간다.
-    - 결과(BatchEvaluationResult)를 그대로 돌려준다. 평가기 실패는 항목 단위로 기록되고 배치는 계속된다.
+
+@dataclass
+class BatchResult:
+    """batch_evaluate의 결과. 칸 이름은 Langfuse SDK의 BatchEvaluationResult와 같게 두었다(노트북이 이 이름으로 읽는다)."""
+
+    total_items_fetched: int = 0
+    total_items_processed: int = 0
+    total_items_failed: int = 0
+    total_scores_created: int = 0
+    total_evaluations_failed: int = 0
+    completed: bool = False
+    has_more_items: bool = False
+    resume_token: str | None = None
+    duration_seconds: float = 0.0
+    failed_item_ids: list[str] = field(default_factory=list)
+    error_summary: dict[str, int] = field(default_factory=dict)
+    item_evaluations: dict[str, list[Evaluation]] = field(default_factory=dict)
+
+
+def _score_kwargs(item: Any, evaluation: Evaluation) -> dict:
+    """평가 하나를 그 observation에 붙이는 create_score 인자. SDK의 observation 범위 점수와 같은 칸이다."""
+    return {
+        "observation_id": _read_field(item, "id"),
+        "trace_id": _read_field(item, "trace_id"),
+        "name": evaluation.name,
+        "value": evaluation.value,
+        "comment": evaluation.comment,
+        "metadata": evaluation.metadata or {},
+        "data_type": evaluation.data_type,
+        "config_id": evaluation.config_id,
+    }
+
+
+def count_observations(client: Any, filter_json: str, *, cap: int = 10_000) -> int:
+    """filter_json에 걸리는 observation 수를 v2 관측 API로 센다. v2에는 전체 개수 칸이 없어 쪽을 넘기며 센다.
+
+    cap에서 멈춘다(그 이상이면 cap을 돌려준다). 집계 지연 때문에 방금 기록한 것은 아직 안 세일 수 있다.
+    """
+    counted, cursor = 0, None
+    while counted < cap:
+        response = client.api.observations.get_many(fields="core", limit=min(100, cap - counted), cursor=cursor,
+                                                    filter=filter_json)
+        counted += len(response.data)
+        cursor = getattr(response.meta, "cursor", None) or None
+        if not response.data or cursor is None:
+            break
+    return counted
+
+
+def wait_for_observations(client: Any, filter_json: str, *, expected: int, timeout_s: float = 180.0,
+                          interval_s: float = 10.0) -> tuple[int, float]:
+    """filter_json에 걸리는 observation이 expected건이 될 때까지 기다린다. (센 수, 기다린 초)를 돌려준다.
+
+    Langfuse의 집계는 비동기라 방금 기록한 trace가 바로 읽히지 않는다(2026-11-05 1회 관찰: 기록 직후 0건, 몇 분 뒤 전부).
+    timeout_s가 지나면 그때까지 센 수를 그대로 돌려준다. 모자란 수를 채우거나 숨기지 않는다.
+    """
+    started = time.monotonic()
+    counted = count_observations(client, filter_json, cap=max(expected, 1))
+    while counted < expected and time.monotonic() - started < timeout_s:
+        time.sleep(interval_s)
+        counted = count_observations(client, filter_json, cap=max(expected, 1))
+    return counted, round(time.monotonic() - started, 1)
+
+
+def batch_evaluate(client: Any, *, evaluators: list[Callable[..., Any]], environment: str,
+                   max_items: int, resume_from: str | None = None, filter_json: str | None = None) -> BatchResult:
+    """Langfuse에 쌓인 root observation(Episode)을 읽어 평가기를 돌리고, 점수를 그 observation에 붙인다.
+
+    계약은 SDK의 `run_batched_evaluation(scope="observations")`과 같다: observation_mapper → 평가기 → create_score.
+    그 함수를 부르지 않고 직접 도는 이유: 설치된 SDK(langfuse 4.15.1)의 run_batched_evaluation은 v1 관측 API
+    (GET /api/public/observations)로 항목을 읽는데, Langfuse Cloud가 이 API를 2026-11-16에 없앤다
+    (2026-11-05 jp.cloud.langfuse.com 응답의 Sunset 헤더와 본문 _deprecation.sunsetAt). 대체는 v2 관측 API다.
+
+    - 읽는 곳: GET /api/public/v2/observations, fields=core,basic,io. 필터는 filter_json이 없으면 root_filter(environment)다.
+      filter_json은 같은 형식의 조건 배열이다(예: root_filter에 traceId "any of" 조건을 더한 것).
+    - max_items로 한 번에 채점할 양(=비용)을 제한한다. 다 읽기 전에 멈추면 resume_token(v2 cursor)이 남고,
+      그 값을 resume_from에 넘겨 이어 간다.
+    - 평가기 하나가 예외를 내도 배치는 계속하고 total_evaluations_failed와 error_summary에 센다.
+      mapper가 실패한 항목은 total_items_failed와 failed_item_ids에 남긴다. 실패를 지우지 않는다.
+    - 집계 지연: 방금 기록한 trace는 아직 읽히지 않을 수 있다. total_items_fetched가 0이면 1~2분 뒤 다시 부른다.
     """
     if max_items < 1:
         raise ValueError("max_items는 1 이상이어야 합니다.")
     effective_filter = filter_json if filter_json is not None else root_filter(environment)
-    return client.run_batched_evaluation(
-        scope="observations",
-        mapper=observation_mapper,
-        filter=effective_filter,
-        evaluators=evaluators,
-        max_items=max_items,
-        resume_from=resume_from,
-    )
+    started = time.monotonic()
+    result = BatchResult()
+    errors: Counter = Counter()
+    cursor = resume_from
+    next_cursor: str | None = None
+
+    while result.total_items_fetched < max_items:
+        # 1단계: 한 쪽을 읽는다. 남은 양보다 많이 읽지 않으므로 쪽 중간에서 멈추는 일이 없다.
+        limit = min(_V2_PAGE_LIMIT, max_items - result.total_items_fetched)
+        response = client.api.observations.get_many(fields=V2_OBSERVATION_FIELDS, limit=limit, cursor=cursor,
+                                                    filter=effective_filter)
+        items = list(response.data)
+        next_cursor = getattr(response.meta, "cursor", None) or None
+
+        for item in items:
+            result.total_items_fetched += 1
+            item_id = str(_read_field(item, "id"))
+            # 2단계: 평가기 입력을 만든다. 여기서 실패하면 그 항목은 채점하지 못한 것으로 남긴다.
+            try:
+                inputs = observation_mapper(item=item)
+            except Exception as error:  # noqa: BLE001 - 어떤 실패든 항목 단위로 남기고 배치를 계속한다
+                result.total_items_failed += 1
+                result.failed_item_ids.append(item_id)
+                errors[type(error).__name__] += 1
+                continue
+            # 3단계: 평가기마다 돌리고, 낸 평가를 그 observation에 점수로 붙인다.
+            evaluations: list[Evaluation] = []
+            for evaluator in evaluators:
+                try:
+                    produced = list(evaluator(input=inputs.input, output=inputs.output,
+                                              expected_output=inputs.expected_output, metadata=inputs.metadata))
+                except Exception as error:  # noqa: BLE001 - SDK와 같게 평가기 실패는 세고 계속한다
+                    result.total_evaluations_failed += 1
+                    errors[type(error).__name__] += 1
+                    continue
+                for evaluation in produced:
+                    client.create_score(**_score_kwargs(item, evaluation))
+                    result.total_scores_created += 1
+                evaluations.extend(produced)
+            result.item_evaluations[item_id] = evaluations
+            result.total_items_processed += 1
+
+        # 4단계: 다음 쪽이 없으면 끝이다.
+        if not items or next_cursor is None:
+            next_cursor = None
+            break
+        cursor = next_cursor
+
+    result.has_more_items = next_cursor is not None
+    result.resume_token = next_cursor
+    result.completed = next_cursor is None
+    result.error_summary = dict(errors)
+    result.duration_seconds = round(time.monotonic() - started, 3)
+    flush = getattr(client, "flush", None)
+    if flush is not None:
+        flush()
+    return result
 
 
 # ---------------------------------------------------------------- 5. 키 없는 경로
@@ -466,17 +593,47 @@ def _find_queue_id(client: Any, queue_name: str) -> str | None:
         page += 1
 
 
+# 사람 검수 대기열에 붙이는 점수 설정. Langfuse는 대기열을 만들 때 점수 설정이 1개 이상 있어야 한다.
+# 2026-11-05 jp.cloud.langfuse.com(v4.75.0)이 빈 scoreConfigIds를 400 "Too small: expected array to have >=1 items"로
+# 거절했다(05 노트북이 미확인으로 남긴 항목). 검수자는 Langfuse 화면에서 이 점수(PASS/FAIL)를 고른다.
+REVIEW_SCORE_CONFIG_NAME = "human_verdict"
+REVIEW_SCORE_CATEGORIES = (("PASS", 1.0), ("FAIL", 0.0))
+REVIEW_SCORE_DESCRIPTION = "사람 검수: 이 Episode의 처리가 정책 문서와 기록에 맞는가(PASS) 아닌가(FAIL)"
+
+
+def ensure_review_score_config(client: Any) -> str:
+    """사람 검수용 범주형 점수 설정(human_verdict: PASS/FAIL)의 ID. 보관되지 않은 같은 이름이 있으면 그것을, 없으면 만든다."""
+    # 1단계: 쪽수를 넘기며 같은 이름을 찾는다. 보관(archived)된 설정은 쓰지 않는다.
+    page, limit = 1, 50
+    while True:
+        response = client.api.score_configs.get(page=page, limit=limit)
+        for config in response.data:
+            if config.name == REVIEW_SCORE_CONFIG_NAME and not getattr(config, "is_archived", False):
+                return config.id
+        if not response.data or page * limit >= response.meta.total_items:
+            break
+        page += 1
+    # 2단계: 없으면 만든다.
+    created = client.api.score_configs.create(
+        name=REVIEW_SCORE_CONFIG_NAME, data_type=ScoreConfigDataType.CATEGORICAL,
+        categories=[ConfigCategory(label=label, value=value) for label, value in REVIEW_SCORE_CATEGORIES],
+        description=REVIEW_SCORE_DESCRIPTION)
+    return created.id
+
+
 def enqueue_for_review(client: Any, queue_name: str, selections: list[Selection]) -> dict:
     """선정된 trace를 사람 검수 annotation queue에 넣는다. 대기열이 없으면 만든다.
 
     - trace_id가 없는 선정은 넣을 수 없어 건너뛴다.
-    - 새 대기열은 score config 없이 만든다. 검수 항목은 Langfuse 화면에서 정한다.
+    - 새 대기열에는 점수 설정 human_verdict(PASS/FAIL) 하나를 붙인다(ensure_review_score_config).
+      Langfuse는 점수 설정이 없는 대기열을 거절한다.
     돌려주는 값은 {"queue_id", "enqueued", "skipped"}다.
     """
     queue_id = _find_queue_id(client, queue_name)
     if queue_id is None:
         created = client.api.annotation_queues.create_queue(
-            name=queue_name, score_config_ids=[], description="Day05_new 온라인 평가에서 선정한 trace 검수")
+            name=queue_name, score_config_ids=[ensure_review_score_config(client)],
+            description="Day05_new 온라인 평가에서 선정한 trace 검수")
         queue_id = created.id
 
     enqueued = 0
