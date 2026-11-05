@@ -2,7 +2,7 @@
 
 > **핵심 질문: 궤적 규칙이 "치명"이라고 할 때, 틀린 것은 에이전트인가 평가기인가? 평가기를 고쳤다면 그 평가기는 어떻게 믿는가?**
 >
-> 강의는 `reference/03b-Trajectory-Eval.ipynb` 1~8절(궤적과 규칙, 치명·경고, 판정 5종, 읽기 예산, 글자는 행동이 아니다, 규칙·DeepEval·Jev·Judge 비교, 평가기를 평가하기)을 설명합니다.
+> 강의는 `concepts/m3b.md` 1~8절(궤적과 규칙, 치명·경고, 판정 5종, 읽기 예산, 글자는 행동이 아니다, 규칙·DeepEval·Jev·Judge 비교, 평가기를 평가하기)을 설명합니다.
 > 이 미션의 재료는 **실제 모델의 운영 기록**입니다. 규칙 문장은 내가 쓰고, 코드는 Claude Code가 쓰고, 그 코드는 결함 주입으로 시험합니다.
 
 ## 이 미션의 비용
@@ -63,7 +63,7 @@ Langfuse environment는 `cc_ops`, version은 `agent-v1`입니다. m4·m5가 같�
 
 ## M3b-5. `[따라하기]` 평가기를 평가한다: 결함 주입과 정상 변형 (14분)
 
-> `reference/03b-Trajectory-Eval.ipynb` 8절처럼, dev 카드 9장의 정상 scripted Episode에 `meta_eval.inject_defect(artifact, "write-before-approval", seed=...)`로 결함을 넣은 것과 `meta_eval.benign_variants`로 만든 정상 변형을 만들어, 원래 규칙(v1)과 내 규칙(v2)의 재현율(결함을 잡은 비율)과 오탐률(정상을 위반이라 한 비율)을 Wilson 95% 구간과 함께 비교해 줘. M3b-1의 실제 '이어서 처리' Episode에서 두 규칙이 낸 판정도 같은 표에 붙여 줘. `work/m3b_meta.py`로.
+> `concepts/m3b.md` 8절처럼, dev 카드 9장의 정상 scripted Episode에 `meta_eval.inject_defect(artifact, "write-before-approval", seed=...)`로 결함을 넣은 것과 `meta_eval.benign_variants`로 만든 정상 변형을 만들어, 원래 규칙(v1)과 내 규칙(v2)의 재현율(결함을 잡은 비율)과 오탐률(정상을 위반이라 한 비율)을 Wilson 95% 구간과 함께 비교해 줘. M3b-1의 실제 '이어서 처리' Episode에서 두 규칙이 낸 판정도 같은 표에 붙여 줘. `work/m3b_meta.py`로.
 
 **먼저 예측하세요.** v2는 v1보다 재현율이 떨어질까요? 오탐률은?
 

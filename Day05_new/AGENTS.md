@@ -46,7 +46,7 @@ Golden, Episode, Trace, Rule, Evaluator, Jev, Judge, holdout, dev, release는 �
 
 노트북은 00부터 번호 순서로 푼다. 건너뛰게 유도하지 않는다. 폴더에는 이 밖에 `eval_lab/`(지원 라이브러리), `data/`(시나리오·fixture·정책 문서), `docs/`, `tests/`(저자용)가 있다.
 
-**Claude Code 실습 구성(`use_cc/`, 2026-11-05).** 같은 Part 1~5 + 실습을 Claude Code와 Langfuse 두 화면으로 하는 미션 카드(`use_cc/missions/m0`~`m6`)다. 수강생은 `use_cc/setup_sandbox.py`로 **저장소 밖**에 실습 폴더를 만들고 그 폴더에서 Claude Code를 연다. 실습 폴더의 규칙은 그 폴더의 `CLAUDE.md`(원본 `use_cc/sandbox/CLAUDE.md`)가 맡는다. 실습 폴더에는 holdout 내용이 없고(ID만), holdout은 `use_cc/tools/holdout_check.py`로만 연다. 이 저장소 안에서 수강생이 use_cc를 묻으면 `use_cc/README.md`를 가리킨다.
+**Claude Code 실습 구성(`use_cc/`, 2026-11-05).** 수업 경로는 use_cc다. 같은 Part 1~5 + 실습을 Claude Code와 Langfuse 두 화면으로 하는 미션 카드(`use_cc/missions/m0`~`m6`)와 개념 문서(`use_cc/concepts/`, m0~m6, 노트북 하나에 문서 하나, 제목 번호는 노트북과 같다)로 진행하고, 노트북은 자습과 강사 시연용으로만 남는다. 수강생은 `use_cc/setup_sandbox.py`로 **저장소 밖**에 실습 폴더를 만들고 그 폴더에서 Claude Code를 연다. 실습 폴더에는 `concepts/`가 복사되고 노트북 사본은 없다. 실습 폴더의 규칙은 그 폴더의 `CLAUDE.md`(원본 `use_cc/sandbox/CLAUDE.md`)가 맡는다. 실습 폴더에는 holdout 내용이 없고(ID만), holdout은 `use_cc/tools/holdout_check.py`로만 연다. 수강생이 노트북 절을 물으면 같은 번호의 개념 문서 절(`use_cc/concepts/<id>.md`, 예: 노트북 02 3절은 `use_cc/concepts/m2.md` 3절)을 근거로 답한다. 이 저장소 안에서 수강생이 use_cc를 묻으면 `use_cc/README.md`를 가리킨다. **합성 배경 운영 로그(`synth_ops`).** 7일치 가상 운영 기록을 m0에서 한 번 수강생 본인의 Langfuse 프로젝트에 적재하고(`eval_lab/synth.py`가 오프라인 simulator Episode로 결정적으로 만들고 `use_cc/sandbox/tools/synth_load.py`가 올린다) m3a·m4·m5가 읽는다. 시간·지연·토큰·비용·generation은 합성이며 모델 이름은 `synthetic/deepseek-v4.1-flash-ultrafast`다. 합성 기록은 모델 성능이 아니고 m6의 replay 풀·holdout·PREREG P3·03b 메타평가에 쓰지 않는다(8장 6번).
 
 ---
 
@@ -108,6 +108,7 @@ uv run jupyter lab          # 실행은 이 폴더에서
 | 06 | 144 / 0 / 0 / 1 (pilot 72 + holdout 72) | 228 / 0 / 0 / 2 |
 
 - 02는 두 스위치가 유료 호출을 만들지 않아 같은 값이다. 05의 `RUN_EXERCISE`도 무료다.
+- **배경 운영 로그 적재(m0, `synth_load.py`)는 모델 호출 0회**다. Langfuse에는 trace 280개와 observation 약 4,796개(합 약 5,076 unit, `--dry-run`이 정확한 값을 먼저 보여 준다)가 들어가고, Hobby 플랜 한도는 월 50k unit이다. 한 번만 적재한다.
 - 06의 holdout은 사례 3개 상한(72회)으로 고지한다. 현재 승인된 holdout 카드가 2개라 실제 상한은 이보다 24회 적다. 06은 의미 판정(Jev·Judge)을 부르지 않는다.
 - `DESIGN.md` 13절의 계획 표는 노트북의 `announce` 인자를 옮겨 적은 것이다. 노트북이 바뀌면 그 셀의 `announce` 줄이 정답이다. 숫자를 말하기 전에 해당 셀의 `announce` 줄을 다시 본다.
 - Decision API(Jev)는 질문과 state(요청·사건 요약·최종 상태·응답)를 공급자에게 보내고, Langfuse는 프롬프트·도구 입출력·점수를 받는다 (`docs/DESIGN.md` 14절). 서버 쪽 Judge를 켜면 수강생 키가 Langfuse LLM Connection에 저장된다. 켜기 전에 알린다.
@@ -179,6 +180,8 @@ uv run jupyter lab          # 실행은 이 폴더에서
 - **판정이 `NOT_DETERMINABLE`이다.** "개선이 없다"가 아니라 **재지 못했다**는 뜻이다. 두 정책 중 하나라도 평가 완료율(PASS+FAIL / 전체)이 90% 미만이거나, π0의 치명 위반 Episode가 0이라 개선 여지를 잴 수 없을 때 나온다 (`eval_lab/rsi.py:904`). 보류(HOLD)·채택(ADOPT)과 구분해서 읽게 하고, 이유 목록을 먼저 본다. 낮은 점수와 평가 불능은 다르다 (01).
 - **같은 사례인데 결과가 달라진다.** 모델 결과는 실행마다 다르다. 1회 관찰이라고 부르고 반복으로 본다.
 - **`ToolStrategy` 구조화 응답 오류나 Judge 응답 잘림.** 5장의 미확인 항목이다. 00에서 이름과 `stop_reason`을 읽게 하고 `max_tokens`를 올려 감추지 않는다(8장 3번).
+- **`synth_load.py`가 "이미 적재됨"이라며 거부한다.** `synth_ops` 환경에 데이터가 이미 있으면 중복 적재를 막으려고 멈춘다. 다시 올리거나 지워서 통과시키지 않는다. 정말 필요하면 새 환경 이름을 쓴다.
+- **배경 로그가 Langfuse에서 안 보이거나 `lf_table.py`가 비어 있다.** 기록 시각이 과거(최대 7일 전)라 기본 조회 창 밖이다. `lf_table.py --minutes 10080`을 쓰고 Langfuse 화면은 'Past 7 days'로 고른다. `synth_ops`는 합성이라 모델 성능으로 말하지 않고 m6·holdout·replay에 섞지 않는다(8장 6번).
 - **같은 라벨로 작업 폴더를 두 번 만들면 겹친다.** 오류 메시지의 폴더 이름을 읽게 하고 기록을 지워서 통과시키지 않는다 (`new_run_dir`, `eval_lab/notebook.py:55`).
 
 ---

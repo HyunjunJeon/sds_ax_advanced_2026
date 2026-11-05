@@ -7,9 +7,9 @@
 만드는 것:
 
     <실습 폴더>/
-      CLAUDE.md                     이 폴더에서 연 Claude Code가 읽는 규칙과 eval_lab 지도
+      CLAUDE.md                     이 폴더에서 연 Claude Code가 읽는 규칙과 eval_lab 지도(MISSION_GUIDE.md를 @로 불러온다)
+      MISSION_GUIDE.md              미션 진행 가이드. CLAUDE.md와 함께 세션마다 읽힌다. 수강생은 "m0 시작하자"처럼 말로 시작한다
       .claude/settings.json         권한 규칙: .env 읽기 금지, 고정 부품(eval_lab, data) 수정 금지, 저장소의 data 읽기 금지
-      .claude/skills/mission/       /mission m1 처럼 부르는 조교 Skill
       lab                           이 폴더의 Python. 저장소 루트의 uv 환경을 쓰고 이 폴더를 import 경로 맨 앞에 둔다
       .env                          Day05_new/.env가 있으면 그 사본(값은 출력하지 않는다), 없으면 .env.example 사본
       eval_lab/                     Day05_new/eval_lab의 사본(고정 부품)
@@ -17,7 +17,7 @@
       ops.py                        Part 3b·4·5의 모의 운영 트래픽(이어서 처리 사례 포함)
       tools/                        모델을 부르지 않는 보기 도구
       missions/                     미션 카드 m0~m6
-      reference/                    노트북 00~06의 참고본(Claude Code가 함수 사용법을 읽는 곳, 실행하지 않는다)
+      concepts/                     개념 문서 m0~m6: 수업 본문과 코드 예시(Claude Code가 함수 사용법을 읽는 곳, 실행하지 않는다)
       work/ notes/                  Claude Code가 만든 스크립트와 수강생의 예측·답
 
 왜 저장소 밖이어야 하는가:
@@ -46,6 +46,7 @@ DAY05_DIR = USE_CC_DIR.parent  # Day05_new
 COURSE_DIR = DAY05_DIR.parent  # 저장소 루트(uv workspace)
 TEMPLATE_DIR = USE_CC_DIR / "sandbox"
 MISSIONS_DIR = USE_CC_DIR / "missions"
+CONCEPTS_DIR = USE_CC_DIR / "concepts"
 
 # 실습 폴더에 그대로 복사하는 데이터 파일. scenarios.json과 fixtures.json은 dev만 골라 따로 쓴다.
 PLAIN_DATA_FILES = ("order_policy.md", "interview.md")
@@ -166,7 +167,7 @@ def create_sandbox(target: Path) -> list[Path]:
     created: list[Path] = []
     target.mkdir(parents=True, exist_ok=True)
 
-    # 1. 규칙, 권한, Skill, 보기 도구, 운영 트래픽 모듈(템플릿).
+    # 1. 규칙(CLAUDE.md), 미션 진행 가이드(MISSION_GUIDE.md), 권한, 보기 도구, 운영 트래픽 모듈(템플릿).
     created += copy_template(target)
 
     # 2. 고정 부품: eval_lab 사본. 캐시 폴더는 옮기지 않는다.
@@ -185,18 +186,17 @@ def create_sandbox(target: Path) -> list[Path]:
         shutil.copyfile(DAY05_DIR / "data" / name, data / name)
     created.append(data)
 
-    # 4. 미션 카드와 참고 노트북. 노트북은 Claude Code가 함수 사용법을 읽는 곳이다(실행하지 않는다).
-    #    저장본에는 실행 출력이 없다(Day05_new/tests/check_notebook.py가 검사한다).
+    # 4. 미션 카드와 개념 문서. 개념 문서는 Claude Code가 함수 사용법을 읽는 곳이다(실행하지 않는다).
     missions = target / "missions"
     missions.mkdir()
     for card in sorted(MISSIONS_DIR.glob("*.md")):
         (missions / card.name).write_text(render(card.read_text(encoding="utf-8")), encoding="utf-8")
     created.append(missions)
-    reference = target / "reference"
-    reference.mkdir()
-    for notebook in sorted(DAY05_DIR.glob("0*.ipynb")):
-        shutil.copyfile(notebook, reference / notebook.name)
-    created.append(reference)
+    concepts = target / "concepts"
+    concepts.mkdir()
+    for document in sorted(CONCEPTS_DIR.glob("*.md")):
+        (concepts / document.name).write_text(render(document.read_text(encoding="utf-8")), encoding="utf-8")
+    created.append(concepts)
 
     # 5. 키 파일: 수강생이 Day05_new/.env를 채웠으면 그 사본, 아니면 빈 양식. 값은 읽어 출력하지 않는다.
     env_source = DAY05_DIR / ".env"
@@ -229,7 +229,7 @@ def next_steps(target: Path) -> str:
         f"  cd {shlex.quote(str(target))}",
         "  claude",
         "  처음 열면 폴더 신뢰 화면이 나옵니다. 기본 선택이 'No, exit'이므로 화살표로 'Yes, I trust this folder'를 고릅니다.",
-        "  열린 뒤 /mission m0 을 입력하면 준비 카드부터 시작합니다.",
+        "  열린 뒤 '첫 번째 실습 시작하자'라고 말하면 준비 카드(m0)부터 시작합니다(이 폴더의 CLAUDE.md와 MISSION_GUIDE.md가 자동으로 읽힙니다).",
         "  브라우저에서 Langfuse 프로젝트를 열어 둡니다. 이 실습의 두 번째 화면입니다.",
         "",
     ])

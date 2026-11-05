@@ -86,6 +86,7 @@
 | `trajectory_rules.py` | 새로 | 7절 규칙, 판정 5종, 읽기 예산 |
 | `meta_eval.py` | 새로 | 결함 주입·정상 변형 생성, 재현율·오탐률·정밀도, Wilson 95% 구간 |
 | `traffic.py` | 새로 | 모의 운영 트래픽(요청 문형 × fixture × 날짜별 분포 변화) |
+| `synth.py` | 새로 | 합성 7일 배경 운영 로그(21절): 이야기 계획, 시뮬레이터 실행, 합성 시간·지연·토큰·비용·generation 입히기, 로컬 기록, OTLP 적재, 적재 전 가드 보조 |
 | `online.py` | 새로 | 표본 선정 전략, 일괄 채점 `batch_evaluate`(v2 관측 API, `run_batched_evaluation`과 같은 계약), Rule·Evaluator API(선택), annotation queue |
 | `monitoring.py` | 새로 | Metrics API v2 질의, 로컬 원자료에서 같은 지표 계산(키 없는 대체), 경보 판정 |
 | `replay.py`, `rsi.py` | 새로 | 재생 풀, 정책 명세 해석기, 재생 점수, 개선기 루프, holdout 게이트 |
@@ -383,3 +384,114 @@ PREREG 블록은 그대로 두고, 구현 중 설계가 말하지 않은 곳을 
 - **사람 검수 대기열에는 점수 설정이 필요하다 (2026-11-05 추가).** Langfuse가 빈 `scoreConfigIds`를 400으로 거절했다(05의 미확인 항목). `enqueue_for_review`가 범주형 점수 설정 `human_verdict`(PASS/FAIL)를 찾거나 만들어 붙인다(`ensure_review_score_config`). 오프라인 가짜도 같은 조건을 거절한다.
 - **집계 지연은 실제로 보였다 (2026-11-05, 1회 관찰).** 04의 원격 지표는 기록 직후 0건, 1~2분 뒤 60건이었다. 03a의 일괄 채점은 기록 직후에 불려 root observation을 0건 읽었고, 몇 분 뒤 같은 필터는 20건을 읽었다. 노트북은 이 지연을 숨기지 않고 보여 준다.
 - **개선기의 출력 한도를 32000으로 올렸다 (2026-11-05 추가, 측정 전).** OpenGateway의 DeepSeek은 개선기 프롬프트(약 8,600자)에서 생각(reasoning)에 1.5만~2만 토큰을 쓴다. 한도 16000(에이전트와 같은 값)에서는 4번 모두 `stop_reason=max_tokens`로 답이 비거나 잘렸고, 라운드가 "개선기 답에서 JSON 목록을 읽지 못했습니다"로 후보 0개가 됐다. effort를 medium으로 낮춰도 생각이 줄지 않았다(2번 모두 잘림). 32000에서는 2번 모두 `end_turn`, 후보 3개였다. 그래서 `_IMPROVER_MAX_TOKENS = 32000`, 대기 300초다(`eval_lab/settings.py`). 결과(후보의 좋고 나쁨)를 보고 바꾼 것이 아니라 답이 아예 나오지 않아서 바꿨다. 판정 문턱값·예산·반복은 그대로다.
+
+
+## 20. Claude Code 실습 전환: 노트북 의존 제거 (2026-11-05)
+
+저자가 2026-11-05에 두 질문에 답했다.
+
+1. 범위: 노트북 의존을 없앤다. 노트북 00~06의 강의 본문과 호출 예시는 노트북마다 개념 문서 하나로 옮기고, 미션 카드·샌드박스 규칙(`sandbox/CLAUDE.md`, 미션 skill, 권한 규칙)·`setup_sandbox.py`는 노트북 대신 그 개념 문서를 인용하고 배포한다. 수업은 노트북 없이 진행한다.
+2. 노트북: 노트북 00~06과 그 테스트는 저장소에 그대로 둔다. 자습과 강사 시연용이며 수업 경로 밖이다.
+
+구조:
+
+- `use_cc/concepts/{m0,m1,m2,m3a,m3b,m4,m5,m6}.md`는 각각 노트북 00, 01, 02, 03a, 03b, 04, 05, 06이다. 노트북의 절 번호를 그대로 유지한다.
+- 샌드박스에는 `concepts/`를 두고, `reference/`의 노트북은 두지 않는다.
+- 인용 형식은 `concepts/<id>.md N절`이다.
+- 노트북별 대응표(`use_cc/instructor/coverage/`)는 강사가 갖고 있고 저장소에 없다(git 제외).
+
+검사: 오프라인 검사 파일(`use_cc/tests/test_concepts.py`)은 강사가 갖고 있고 저장소에 없다(git 제외). 이 파일이 확인하는 내용은 다음과 같다. 수업 경로에 노트북 참조가 없는지, 인용이 제목으로 풀리는지, 코드 예시가 파싱되는지, `eval_lab`의 이름이 실제로 있는지를 본다. 위 사전 등록 블록은 바꾸지 않았다(`tests/check_prereg.py`가 해시를 검사한다).
+
+미확인: 전환 뒤 유료 Claude Code 리허설은 하지 않았다. Langfuse 2026-11-16 v1 API 주의 사항은 그대로다.
+
+미션 진행 방식 변경(2026-11-05, 저자 결정): 위 1번의 "미션 skill"(`sandbox/.claude/skills/mission/SKILL.md`, `/mission m0`으로 부르는 Skill)을 없애고 같은 내용을 가이드 문서 `use_cc/sandbox/MISSION_GUIDE.md`로 옮겼다. 실습 폴더의 `CLAUDE.md`가 `@MISSION_GUIDE.md`로 불러오므로 세션을 열 때마다 함께 읽히고, 수강생은 명령 없이 "m0 시작하자"처럼 말로 시작한다. 저자의 이유: Skill은 `disable-model-invocation`이라 수강생이 `/mission`을 직접 쳐야만 실리므로, 지시를 억지로 해야 하는 Skill보다 Claude가 늘 읽는 가이드 문서가 낫다. 가이드는 고정 부품으로 권한 규칙(`Edit(./MISSION_GUIDE.md)` 거부)에 넣었고, `use_cc/tests/test_setup_sandbox.py`가 복사·불러오기·Skill 부재를 확인한다.
+
+
+## 21. 합성 배경 운영 로그 (2026-11-05)
+
+m3a, m4, m5는 며칠에 걸친 운영 기록이 필요하다. 지금의 scripted 트래픽은 몇 초에 끝나고 토큰·비용이 0이며(`eval_lab/episodes.py:121`) generation observation이 없다. 근거 노트는 `docs/sources/synth-langfuse-2026-11.md`(이하 근거 노트)이고, 아래 Q·R·D 번호는 그 노트의 행이다.
+
+### 21.1 저자 결정
+
+- 7일치 합성 로그 하나를 m3a·m4·m5가 함께 쓰는 배경으로 둔다. 수강생이 각자 자기 Langfuse 프로젝트에 스크립트로 한 번 적재한다. 모델 호출은 0회다.
+- 기존 미션은 지우지 않고 단계를 덧붙인다.
+- 이야기: 1~4일차 정상, 5일차 14~16시(KST) 결제 장애, 6일차 agent-v2 canary, 7일차 ops-resume 급증. 하루 Episode 40개, 합 280개(`eval_lab/synth.py:79-82`, `:155`).
+- 합성 generation의 모델명은 `synthetic/deepseek-v4.1-flash-ultrafast`(`eval_lab/synth.py:88`), environment는 `synth_ops`(`:85`).
+
+### 21.2 실제와 합성의 경계
+
+| 구분 | 내용 | 이유 |
+|---|---|---|
+| 실제 | 도구 호출 사건, 상태, 응답. 오프라인 주문 시뮬레이터가 Episode를 실행해 만든 artifact(`simulate`, `eval_lab/synth.py:364`) | 궤적 판정이 이 사건에 달려 있으므로 지어내면 평가 연습이 무너진다 |
+| 합성 | 시각, 지연, 토큰, 비용, generation observation | scripted 값은 ms 단위이고 토큰·비용이 0이며 generation이 없어(`episodes.py:121`) 운영 지표를 만들 수 없다. 합성 분포는 저자의 실제 DeepSeek 실행 보정(근거 노트 4절, 1회 관찰)을 따른다 |
+
+합성 값은 모델 성능을 말하지 않는다. 5일차 장애에서 결제 도구 지연을 4배(`eval_lab/synth.py:430`), TIMEOUT 4.5~5.5초(`:427`)로 둔 것도 합성 설정이다. 생성기가 따르는 보정 값은 `outputs/synth-probe/calibrate-all-notes.md`(live Episode 56개, holdout 12개 제외, 1회 관찰)의 median·p90 표본이다(`:417-419`, `:439`). 출처 변경은 21.9에 적는다.
+
+### 21.3 생성 파이프라인과 불변 조건
+
+`plan_episodes`(`eval_lab/synth.py:206`) -> `simulate`(`:364`) -> `dress`(`:487`) -> `local_records`(`:757`) / `export_otlp`(`:881`).
+
+1. 결정성: 난수는 seed와 Episode 번호에만 의존하고 기준일(anchor)에는 의존하지 않는다. 같은 seed면 모든 수강생이 같은 이야기를 받고, anchor는 날짜만 옮긴다. trace·span id는 결정적이다(D2).
+2. 루트 요약 왕복: 루트 output에 `episode_summary`(day05-episode-summary-v1)를 넣어 `artifact_from_root_observation`이 복원한다(Q3, D8).
+3. 궤적 판정 불변: 합성은 사건을 바꾸지 않으므로 로컬 `evaluate_trajectory` 판정과 서버 쪽 복원 판정이 같다. 일별 FAIL은 3, 5, 4, 1, 1, 5, 3건이다(synth-loader 드라이런, 로컬 값).
+4. trace 전체 속성(environment, version, session, user, tags, metadata)은 모든 span에 복사한다. Langfuse는 루트에서 자식으로 전파하지 않는다(Q4, R6, D4).
+5. 날짜는 적재일 기준 7일 전부터 어제까지의 KST 날짜로 되돌린다. 과거 시각은 그대로 저장된다(Q1, 1회 관찰). 트래픽은 08~22시 KST다.
+6. 모델 호출은 보정 분포를 따라 도구 호출을 묶는다(호출당 도구 1~3개, 가중 62:30:8, `:439`). 호출당 GENERATION은 바깥 하나만 둔다(D3).
+7. 버전: agent-v1이 기본이고, 6일차는 오전 13시 전 20%, 이후 100%가 agent-v2다. 7일차는 canary를 되돌린 agent-v1이다. v2는 skip_final_check 비율이 0.40으로 높다. 이는 합성 설정이며 실제 v2 성능이 아니다.
+
+### 21.4 한 번만 적재하는 가드
+
+`use_cc/sandbox/tools/synth_load.py`는 대상 environment의 root가 이미 있으면 거부한다(`check_environment_is_empty`, `synth_load.py:28`; 생성기 쪽 `existing_root_count`, `eval_lab/synth.py:924`). 이유: 재전송을 문서는 중복 위험으로 경고하고(R4), 탐침은 upsert 수렴을 1회 관찰했지만 수렴 전 약 49초 동안 일시 중복(13건)이 보였다(Q2). 따라서 재전송의 안전성은 미확인이고 기본 동작을 "빈 프로젝트에 한 번"으로 한다(D2). 적재 전에 `estimate_observations`(`eval_lab/synth.py:933`)로 규모를 한 줄 고지한다.
+
+### 21.5 Hobby 예산
+
+unit은 trace, observation, score를 각각 센다(R2). 이 생성기는 trace 280 + observation 4,796 = 5,076 units이다(`estimate_observations`, 시드 7, 보정 재조정 뒤 값. generation 1,370, agent 560, tool 1,433, span 1,433). Hobby 월 50k의 약 10%다. 분포는 `calibrate-all-notes.md`의 56개 Episode 보정을 따른다. 수강생이 만드는 score, Judge, experiment도 같은 한도를 쓰므로 여유를 남긴 크기다. 한도 초과 시 차단인지 제한인지는 문서에 없다(R2, 미확인).
+
+### 21.6 실제 적재 1회 관찰
+
+저자 프로젝트(JP)에 한 번 적재해 로컬 기록과 비교했다(근거: `Day05_new/outputs/synth-live/live-load-notes.md`, git 제외 저자 증거이며 수강생 자료가 아니다). 모두 1회 관찰이다.
+
+| 점검 | 로컬 | 서버 | 차이 |
+|---|---|---|---|
+| 날짜별 root 수(Metrics v2, KST 7일) | 날마다 40 | 날마다 40 | 0 |
+| 7일 합 totalCost / input / output | 0.1227594 USD / 328,940 / 122,364 | 0.122759399656 / 328,940 / 122,364 | 3.4e-10 / 0 / 0 |
+| 날짜별 p95 root 지연 | 6,877~7,438 ms, 5일차 21,398 ms | 같음 | 1e-12 수준 |
+| root 수 v1 / v2 | 252 / 28 | 252 / 28 | 0 |
+| TOOL observation 대 서비스 사건 | 1,433 | 1,433 | 0 |
+| 관측 유형 | SPAN 1,433, GENERATION 1,217, AGENT 560 (합 4643) | 같음 | 0 |
+| `lf_table.py` 20행 판정 | PASS 18 / FAIL 2 | PASS 18 / FAIL 2 | 불일치 0 |
+| `batch_evaluate` 코드 평가기 40건 | PASS 37 / FAIL 3 | PASS 37 / FAIL 3 | 불일치 0 |
+
+저자의 이 적재는 보정 재조정 전 상수로 만든 `synth_ops` 기록(trace 280, observation 4643, 위 표의 값)이다. 수강생은 재조정한 상수로 적재하므로 observation은 4,796, unit은 5,076으로 달라진다. 이 비교는 파이프라인(id, 시각, 개수, 비용, 판정)의 일치를 확인하며 재조정은 그 파이프라인을 바꾸지 않는다.
+
+적재 후 약 10.6초 만에 root 280개가 읽혔다. 5일차 p95가 다른 날의 약 3배인 것은 장애 이야기와 맞는다. 이 점검은 로컬과 서버의 일치를 보일 뿐 합성 분포가 실제 운영을 대표한다는 증거가 아니다. `batch_evaluate`가 만든 score 160개(약 160 units)는 저자 프로젝트에 남아 있다.
+
+### 21.7 경계
+
+- 합성 로그는 06의 재생 풀, holdout, PREREG P3 측정, 03b 메타 평가에 쓰지 않는다. 사건은 실제 시뮬레이터에서 왔어도 시각·분포는 지어낸 값이라 측정을 오염시킨다.
+- 모델 성능이나 DeepSeek의 실제 지연·비용을 말하는 근거로 쓰지 않는다. 보정 표본은 live Episode 56개와 저자 1일 실행이다(근거 노트 7절).
+- 합성 값을 "측정"이라 부르지 않는다. 수강생 화면에서는 CAUTION 문구(`synth_load.py:24`)로 합성 기록임을 밝힌다.
+
+### 21.8 미확인
+
+- Agent Dashboard의 도구 위젯이 type `tool` observation을 세는지, 합성 trace가 거기에 나오는지(R1). 적재는 TOOL 1,433개를 서버가 그대로 읽었음(Metrics)까지만 확인했고 UI 위젯은 보지 않았다.
+- GENERATION을 호출당 하나로 줄인 모양(D3)은 근거가 없는 잠정 선택이다. live는 호출당 둘이라 Agent Dashboard와 비용 집계가 다를 수 있다.
+- Hobby 한도 초과 시 동작(R2). 재전송의 정확한 의미(Q2 대 R4). 기본 시간 창 상한과 backdated 데이터의 대시보드 표시(R3). 2026-11-16 이후 `x-langfuse-ingestion-version` 필수 여부(R6).
+- FAIL Episode의 Rule id 일치: 로컬·서버 FAIL 건수는 일치했으나(37/3) Rule id 단위 비교는 이 문서가 확인한 바 없다. 확인 필요.
+- 7일차를 agent-v1로 둔 것은 이 문서가 정한 해석이다. v2로 바꾸면 7일차에 회귀가 섞인다(synth-core 판단).
+
+### 21.9 보정 상수의 출처 변경
+
+- 처음 보정은 live trace 최신 10개를 표본으로 했다(`outputs/synth-probe/calibrate-live-notes.md`). 이후 집계에서 live root 68개 중 12개가 holdout Episode였음이 드러나, 그 10개에 holdout이 섞였을 수 있다. 저자는 10개가 너무 적다고 판단했다.
+- 지금 상수는 holdout 12개를 제외한 live Episode 56개에서 온다(`outputs/synth-probe/calibrate-all-notes.md`, 1회 관찰). 모델 호출 0회, Langfuse 읽기 전용 보정이다. 이 상수는 모델 성능이 아니라 저자의 하루치 실행 분포다.
+- 바뀐 값(이전 -> 지금, `eval_lab/synth.py:417-419`, `:439`):
+
+| 상수 | 이전 | 지금 |
+|---|---|---|
+| 생성 지연(ms) | median 291, p90 561, 범위 165~923 | median 276, p90 567, 범위 159~1315 |
+| 입력 토큰 | median 265, p90 363, 범위 133~1567 | median 268, p90 358, 범위 130~1567 |
+| 출력 토큰 | median 68, p90 197, 범위 41~435 | median 60, p90 197, 범위 41~476 |
+| 호출당 도구 수 가중(1:2:3) | 45:35:20 | 62:30:8 |
+
+- 결과: trace 280은 그대로이고 observation은 4643에서 4,796으로, unit은 4,923에서 5,076으로 늘었다(GENERATION 1,217 -> 1,370). Episode당 모델 호출은 중앙값 5, p90 8, 최대 10이다(live는 5, 10, 11). p90 10까지 맞추려면 중앙값이 6으로 올라 중앙값을 우선했다. 루트 지연 p90은 합성 결제 TIMEOUT(4.5~5.5초) 때문에 live(3,571ms)보다 큰 약 6,952ms다.
+- 저자의 `synth_ops` 적재(21.6)는 이전 상수로 만들었다. 일별 알림 판정 집합(5일차 fatal-rate·latency-p95, 7일차 fatal-rate·input-mix-shift)은 재조정 뒤에도 같았다.
