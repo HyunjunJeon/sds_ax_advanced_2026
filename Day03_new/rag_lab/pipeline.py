@@ -1,4 +1,4 @@
-"""AutoRAG 후보 흐름: 질의 분해, 넓은 후보, 원 질문 기준 재순위, 컨텍스트 자르기."""
+"""검색 후보 흐름: 질의 분해, 넓은 후보, 원 질문 기준 재순위, 컨텍스트 자르기."""
 from __future__ import annotations
 
 from collections.abc import Callable
@@ -44,7 +44,7 @@ class RetrievalRun:
 
 
 def decompose_question(model: BaseChatModel, question: str) -> list[str]:
-    """검색 질의를 최대 5개 만든다. 답을 해석할 수 없으면 질문 하나로 돌아간다(AutoRAG와 같은 대체 경로)."""
+    """검색 질의를 최대 5개 만든다. 답을 해석할 수 없으면 질문 하나로 돌아간다(대체 경로)."""
     # 프롬프트에 JSON 중괄호가 있어 str.format을 쓸 수 없다.
     reply = model.invoke(_DECOMPOSE_PROMPT.replace("{question}", question)).text
     try:  # 코드 울타리로 감싼 답도 읽도록 바깥 중괄호 사이만 본다.
