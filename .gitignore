@@ -20,6 +20,7 @@ wheels/
 # AI
 .gjc
 .ouroboros
+.openviking
 
 # Lecture Note
 Lecture_Note/
