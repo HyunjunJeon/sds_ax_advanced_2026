@@ -1,0 +1,5 @@
+{
+  "permissions": {
+    "deny": ["Edit(./MISSION_GUIDE.md)"]
+  }
+}

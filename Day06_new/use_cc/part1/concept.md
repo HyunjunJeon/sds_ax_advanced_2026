@@ -1,117 +1,92 @@
-# Part 1. Coding Agent와 AI SDLC — 개념 정리
+# Part 1. Coding Agent와 AI SDLC(Software Development Life Cycle) (개념 12분 + 시연 5분)
 
-> **핵심 질문: AI가 코드를 쓰는 지금, 개발의 각 단계는 무엇을 남겨야 다음 단계가 이어 갈 수 있는가?**
+## 핵심 질문
 
-이 문서는 강의(개념 10분)의 내용을 글로 옮긴 것이다. 영어 인용은 원문 그대로 두고, 근거는 `Day06_new/docs/SOURCES.md`의 대장 위치를 함께 적었다.
+> **채팅으로 묻는 것과 에이전트에게 맡기는 것은 무엇이 다르고, 맡긴 일의 각 행동은 SDLC의 어느 단계인가?**
+
+이 문서의 Claude Code 사실은 모두 `Day06_new/docs/sources/claude_code/`의 근거 대장에 항목이 있는 것만 적는다. 문장 뒤의 `S1` 같은 표시는 그 항목 번호이고, 누르면 대장 파일로 간다. 대장에 없는 것은 쓰지 않았다. 이 Part의 미션은 실험 폴더 하나에서 요청 하나를 맡기고 첫 1분을 관찰하는 것이다. 단계는 `mission.md`에 있다.
 
 ---
 
-## 1. 코딩 에이전트는 "모델 + 하네스"다
+## 1. 채팅과 에이전트: 도구가 있어야 에이전트다
 
-같은 모델을 써도 결과가 다른 이유를 설명하는 가장 짧은 식이 있다.
+Claude Code는 모델 둘레에서 도구를 주고 모델이 보는 맥락을 관리하는 층이다. 공식 문서는 이 층을 agentic harness라고 부른다 ([S2](../../docs/sources/claude_code/04_state.md)). 루프는 두 구성요소로 돈다. 추론하는 모델과 행동하는 도구다 ([S2](../../docs/sources/claude_code/04_state.md)). 도구가 없으면 Claude는 글로만 답한다 ([S2](../../docs/sources/claude_code/04_state.md)). 채팅으로 묻는 것은 이 글 답이고, 에이전트에게 맡기는 것은 도구로 파일을 읽고 고치고 명령을 돌리는 일이다.
 
-> "Agent = Model + Harness" — Birgitta Böckeler, *Harness engineering for coding agent users* (martinfowler.com, 2026-04-02)
+에이전트 루프는 세 단계다. 맥락 모으기, 행동, 결과 확인이다. 사용자는 어느 지점에서든 끼어들 수 있다 ([S1](../../docs/sources/claude_code/04_state.md)). 문서는 세 단계가 서로 섞인다고도 적는다. 순서가 고정된 파이프라인으로 외우지 않는다 ([S1](../../docs/sources/claude_code/04_state.md)).
 
-모델은 다음 행동을 고른다. 그 바깥의 모든 것, 즉 무엇을 읽게 할지, 어떤 도구를 줄지, 무엇을 막을지, 무엇을 기억시킬지,
-끝났다는 말을 무엇으로 확인할지가 하네스(harness)다. 학습용 하네스를 단계별로 만드는 저장소 하나는 이렇게 나눈다.
+내장 도구 가운데 Read는 승인이 필요 없고 Edit·Write·Bash는 필요하다 ([T1](../../docs/sources/claude_code/02_tools.md)). 관찰은 자유롭고 변경은 승인을 거친다. 도구 표는 모델과 플랫폼에 따라 달라지므로 도구가 몇 개라고 숫자로 외우지 않는다 ([T1](../../docs/sources/claude_code/02_tools.md)).
 
-> "The loop belongs to the agent. The mechanisms belong to the harness." — shareAI-lab/learn-claude-code `README.md:162`
+## 2. 시작 권한 모드: 무엇이 묻지 않고 실행되는가
 
-여러분이 매일 쓰는 Claude Code도 하네스다. 모델은 Anthropic이 고르지만, 그 하네스의 상당 부분(CLAUDE.md, Skill, 권한, Hook, 기록)은 **여러분이 설정한다.**
-오늘 하루는 "모델을 바꾸지 않고, 내가 바꿀 수 있는 쪽"을 다룬다.
+Claude Code v2.1.283 이상에서 대화형 터미널 세션의 시작 권한 모드는 기본이 auto다 ([C10](../../docs/sources/claude_code/03_control.md)). 모드는 `--permission-mode` 플래그로 시작할 때 지정한다 ([C10](../../docs/sources/claude_code/03_control.md), [K2](../../docs/sources/claude_code/07_commands_cli.md)). 화면의 Manual과 설정값 `default`는 같은 모드이고, CLI는 `manual`을 별칭으로 받는다 ([C6](../../docs/sources/claude_code/03_control.md), [C10](../../docs/sources/claude_code/03_control.md)).
 
-## 2. AI SDLC: 단계마다 다음 단계가 읽을 산출물을 남긴다
+auto는 승인이 없는 모드가 아니다. 별도의 분류기 모델이 행동을 실행 전에 검토하고, 분류기 호출은 토큰 비용에 들어간다 ([C8](../../docs/sources/claude_code/03_control.md)). auto가 안전을 보장하지도 않는다 ([C8](../../docs/sources/claude_code/03_control.md)).
 
-Anthropic Applied AI 팀의 Louis Claxton이 쓴 *The AI-native SDLC playbook*(2026-08-21)은 소프트웨어 개발 수명 주기를 여섯 단계로 본다.
+그래서 이 수업은 실험 세션을 아래 명령으로 연다.
 
-> "six non-linear stages (Plan, Design, Build, Test, Deploy, Maintain)"
+```
+claude --permission-mode acceptEdits
+```
 
-그리고 이 플레이북 전체를 한 문장으로 줄이면 이것이다.
+acceptEdits는 파일 편집과 `mkdir, touch, rm, rmdir, mv, cp, sed`를 묻지 않고 실행하고, 그 밖의 Bash 명령은 읽기 전용 내장 집합을 빼고 묻는다 ([C6](../../docs/sources/claude_code/03_control.md)). 이 수업이 acceptEdits를 고르는 이유는 두 가지다. 어떤 행동이 묻지 않고 실행되는지가 표로 정해져 있어서 관찰이 쉽고, 분류기 호출이라는 변수가 실험에 끼지 않기 때문이다 ([C6](../../docs/sources/claude_code/03_control.md), [C8](../../docs/sources/claude_code/03_control.md)). 세션을 연 뒤에는 상태 줄에서 모드를 먼저 확인한다 ([C10](../../docs/sources/claude_code/03_control.md)).
 
-> "Every stage commits an artifact the next stage can read."
+## 3. 일찍 바로잡기와 끝 확인
 
-원문이 드는 산출물 사슬은 다음과 같다(`docs/sources/web.md` 1절 항목 3·5).
+- **Esc**: 현재 응답이나 도구 호출을 중간에 멈추고 방향을 바꾼다. 거기까지 한 일은 남는다 ([K3](../../docs/sources/claude_code/07_commands_cli.md), [I18](../../docs/sources/claude_code/01_instructions.md)).
+- **`/clear`**: 두 번 고쳐도 틀리면 세 번째 교정 대신 `/clear`로 대화를 비우고 배운 것을 넣어 새로 쓴다 ([I18](../../docs/sources/claude_code/01_instructions.md), [K1](../../docs/sources/claude_code/07_commands_cli.md)).
+- **통과/실패 검사를 같이 준다**: Claude는 일이 끝나 보이면 멈춘다. "끝났다고 했는데 아니었다"는 대개 스스로 확인할 방법이 없었기 때문이다. 통과나 실패로 돌아오는 검사를 주고, 명령과 그 출력이라는 근거(Evidence)를 요구한다 ([I17](../../docs/sources/claude_code/01_instructions.md)). 보지 않은 세션에서는 이것이 유일한 근거다 ([I17](../../docs/sources/claude_code/01_instructions.md)).
 
-| 단계 | 끝날 때 버전 관리에 남기는 것 | 다음 단계가 그것을 읽어 하는 일 |
-|---|---|---|
-| Plan | `intent.md` — 요청한 사람의 말로 쓴 문제·결과·대상·제약 | 받아들여진 intent가 요구사항·설계를 시작시킨다 |
-| Design | `spec.md` — 동작·구조·수용 기준 | 승인된 spec이 plan mode를 시작시킨다 |
-| Build | `plan.md` — 바꿀 파일, 순서, 위험, 증명(테스트) | 계획대로 구현하고 diff와 테스트를 남긴다 |
-| Test | diff와 그 테스트 | 검토 결과가 달린 PR이 된다 |
-| Deploy | 검토 결과가 달린 PR | 병합이 배포 파이프라인을 시작시킨다 |
-| Maintain | 사고 기록 | 운영 지표가 기준을 벗어나면 새 `intent.md`를 쓴다(루프가 닫힌다) |
+## 4. 기록: 한 일을 어디서 보는가
 
-> "An accepted intent.md triggers the requirements and design pass, an approved spec.md triggers plan mode, a merged PR triggers the pipeline, and a breached control band in production writes the next intent.md"
+- 대화 기록은 `~/.claude/projects/<project>/<session-id>.jsonl`에 쌓인다. 형식은 내부용이고 버전마다 바뀌므로 직접 파싱하는 스크립트는 깨질 수 있다 ([S12](../../docs/sources/claude_code/04_state.md)).
+- **Ctrl+O**로 트랜스크립트 보기를 열면 도구 사용의 상세가 보인다 ([K3](../../docs/sources/claude_code/07_commands_cli.md)).
+- **`/usage`**는 세션 비용을 보여 준다 ([K1](../../docs/sources/claude_code/07_commands_cli.md), [V10](../../docs/sources/claude_code/06_verification_records.md)). 구독자에게는 달러 값이 청구와 무관하다 ([V10](../../docs/sources/claude_code/06_verification_records.md)). `/clear`로 새 세션을 열면 합계가 초기화된다 ([V10](../../docs/sources/claude_code/06_verification_records.md)).
 
-주의할 점 두 가지.
+## 5. AI SDLC 여섯 단계
 
-- `REVIEW.md`는 이 사슬의 산출물이 아니다. 기술 리드가 저장소 루트에 두는 **검토 정책 파일**이다.
-- 이 플레이북은 **조직** 단위의 글이다. 제품 담당자, 플랫폼 엔지니어, 기술 리드가 나눠 맡는 일을 전제로 한다. 오늘 실습은 이것을 **나 한 사람**의 루프로 옮긴다(5절).
-- 한국어판(`claude.com/ko/...`)은 부분 번역이다. 측정 지표 부분은 한국어판에도 영어로 남아 있다.
+Anthropic의 *The AI-native SDLC playbook*은 소프트웨어 개발 수명 주기를 여섯 비선형 단계로 본다. Plan, Design, Build, Test, Deploy, Maintain이다 (`docs/sources/web.md:26`, 이 항목은 Claude Code 대장이 아니라 웹 원문 대장이다). 이 Part에서는 맡긴 일의 도구 호출 하나하나를 이 여섯 단계 중 어디에 놓을지 말하는 것까지 한다. 단계마다 남기는 산출물은 Part 3에서 다룬다.
 
-## 3. 왜 "산출물"이어야 하는가: 에이전트는 못 보는 것을 모른다
+## 6. 실패 → 책임 → 장치 → 확인
 
-OpenAI에서 3명의 엔지니어가 5개월 동안 손으로 코드를 쓰지 않고 Codex로 제품을 만든 보고서(Ryan Lopopolo, 2026-02-11)는 이렇게 쓴다.
+| 실패 | 책임 | Claude Code 장치 | 동작 확인 |
+|---|---|---|---|
+| 채팅 답을 손으로 옮기다 틀린다 | 도구 | 파일을 읽고 고치고 명령을 돌리는 내장 도구 ([T1](../../docs/sources/claude_code/02_tools.md), [S2](../../docs/sources/claude_code/04_state.md)) | `show_session.py` 표의 도구 호출 줄 |
+| "끝났다"고 했는데 검사를 안 돌렸다 | 검증 | 검사 명령을 지침에 두고 근거를 요구 ([I17](../../docs/sources/claude_code/01_instructions.md)) | 표에서 구현 뒤에 `python3 -m unittest`가 있는가 |
+| 엉뚱한 방향으로 오래 간다 | 실행 제어 | Esc, 두 번 틀리면 `/clear` ([I18](../../docs/sources/claude_code/01_instructions.md), [K3](../../docs/sources/claude_code/07_commands_cli.md)) | 첫 1분 관찰 메모 |
+| 어떤 행동이 묻지 않고 실행되는지 모른다 | 실행 제어 | 시작 모드를 명시하고 상태 줄로 확인 ([C10](../../docs/sources/claude_code/03_control.md), [C6](../../docs/sources/claude_code/03_control.md)) | 승인 화면이 뜬 호출 목록. `git commit`은 acceptEdits에서도 묻는다 ([C6](../../docs/sources/claude_code/03_control.md)) |
 
-> "From the agent’s point of view, anything it can’t access in-context while running effectively doesn’t exist."
+## 7. 시연 (5분)
 
-채팅창에서 정한 범위, 머릿속의 완료 기준, 어제 대화에서 합의한 예외는 **다음 세션의 에이전트에게 존재하지 않는다.**
-그래서 같은 보고서는 계획을 저장소에 커밋되는 "일급 산출물"로 다룬다.
+같은 질문을 두 곳에 던진다. 예: "이 폴더의 테스트가 통과하는지 알려 줘."
 
-> "Plans are treated as first-class artifacts."
+1. 채팅(도구가 없는 곳)에 묻는다. 답은 글이다. 실제로 돌려 봤는지 확인할 수 없다 ([S2](../../docs/sources/claude_code/04_state.md)).
+2. 실험 대상 세션을 `claude --permission-mode acceptEdits`로 열고 같은 질문을 던진다. 어떤 도구 호출에서 승인 화면이 뜨는지 본다 ([T1](../../docs/sources/claude_code/02_tools.md), [C6](../../docs/sources/claude_code/03_control.md)).
+3. 답이 끝나면 Ctrl+O로 도구 호출을 연다. 호출 순서를 루프 세 단계 (모으기, 행동, 확인) 에 놓는다 ([K3](../../docs/sources/claude_code/07_commands_cli.md), [S1](../../docs/sources/claude_code/04_state.md)).
 
-채팅형으로 AI를 쓰면 대개 이렇게 된다.
+강사는 둘의 차이를 한 문장으로 말하게 한다. 한쪽은 말만 했고 다른 쪽은 실행한 명령과 출력이 남았다.
 
-| 단계 | 채팅형 사용에서 흔한 모습 | 끊기는 것 |
-|---|---|---|
-| Plan·Design | "이런 기능 만들어 줘" 한 문장 | 완료 기준이 대화에만 있다 |
-| Build | 대화에서 바로 코드가 나온다 | 무엇을 바꾸기로 했는지(계획)가 남지 않는다 |
-| Test | "잘 되네요"로 끝난다 | 무엇을 실행해 확인했는지(증거)가 남지 않는다 |
-| Deploy·Maintain | 사람이 복사해 붙인다 | 다음에 같은 실수를 막을 장치가 남지 않는다 |
+## 8. 잘 다루기 습관
 
-## 4. 하네스는 그 사슬을 "강제"하는 쪽이다
+1. 맡길 때 "끝을 무엇으로 확인할지" 명령 한 줄을 같이 준다 ([I17](../../docs/sources/claude_code/01_instructions.md)).
+2. 첫 1분을 보고, 어긋나면 Esc. 두 번 고쳐도 틀리면 `/clear` 뒤 새로 쓴다 ([I18](../../docs/sources/claude_code/01_instructions.md), [K3](../../docs/sources/claude_code/07_commands_cli.md)).
+3. 세션을 열면 권한 모드부터 본다. 기본은 버전마다 다르다 ([C10](../../docs/sources/claude_code/03_control.md)).
+4. 결과는 최종 답이 아니라 도구 호출 기록으로 읽는다 ([S12](../../docs/sources/claude_code/04_state.md), [K3](../../docs/sources/claude_code/07_commands_cli.md)).
 
-산출물을 남기라고 **부탁**하는 것과 **강제**하는 것은 다르다. 플레이북은 둘을 이렇게 구분한다.
+## 근거
 
-> "A skill is an advisory control while a hook is the deterministic layer behind it."
->
-> "The skill makes violations rare and the hook makes them close to impossible."
+본문과 표에서 인용한 대장 항목이다. 링크는 이 저장소의 대장 파일이고, 오른쪽이 그 항목이 적은 공식 문서다.
 
-그리고 빌드 단계의 원칙을 한 줄로 적는다.
-
-> "Nothing is implemented without an accepted plan."
-
-오늘 Part 2~5는 이 "강제하는 쪽", 즉 하네스를 여섯 책임(지침·도구·실행 제어·상태·검증·기록)으로 나눠 읽는다.
-
-## 5. 조직의 플레이북을 내 루프로: 한 사람의 AI SDLC 예
-
-`jh941213/ADLC-harness`는 한 개발자가 위 플레이북과 비슷한 루프를 Claude Code·Codex·Copilot CLI용 plugin으로 만든 것이다(라이선스 표기가 없어 이 저장소에 복사하지 않았다. 링크로만 본다).
-
-- 루프: "의도 → 설계 → 계획 → 구현 → 검증 → 리뷰 → 출시 → 학습" (`README.md:5`)
-- 사람이 멈춰 승인하는 곳은 네 곳뿐: "사람은 의도·설계·계획·출시 게이트에서만 승인하고, 단계마다 문서와 승인 기록이 커밋으로 남는다." (`README.md:7`)
-- 완료 주장의 규칙: "완료는 이번에 실행한 검증 출력으로만 말한다." (`README.md:8`)
-- 멈춤 규칙: "같은 원인으로 세 번 실패하면 멈추고 보고한다." (`README.md:79`)
-
-조직에서는 승인자와 구현자가 다른 사람이다. 혼자 일할 때는 **내가 의도를 쓰고, 내가 승인하고, 내가 AI에게 구현시키고, 내가 확인한다.**
-그래서 게이트가 쉽게 생략된다. 한 사람의 AI SDLC에서 하네스가 더 중요한 이유다.
-
-## 6. 오늘 하루의 지도
-
-오늘 손에 남는 것은 `notes/MY_AI_SDLC.md` 하나다. Part마다 한 칸씩 채우고, 실습에서 완성한다.
-
-| 칸 | 채우는 곳 | 질문 |
-|---|---|---|
-| §1 지금 내 흐름 | Part 1 | 최근 작업 하나는 어느 단계에서 무엇을 남겼나 |
-| §2 내 하네스 지도 | Part 2 | 내 폴더에서 Claude Code에 무엇이 실리고, 어느 책임이 비어 있나 |
-| §3 Plan·Checkpoint·Evidence | Part 3 | 내 작업은 무엇으로 이어 가고, 무엇으로 완료를 인정하나 |
-| §4 가져올 설계 | Part 4 | 남의 하네스에서 근거를 확인하고 가져올 것 하나 |
-| §5 내 계획 양식 | Part 5 | 내 작업의 계획에 꼭 들어갈 칸과 실행 구조 |
-| §6~§9 진단·분류·장치·지표 | 실습 | 반복되는 문제, 실패한 책임, 고칠 장치, 확인할 지표 |
-
-## 원문
-
-- Claude, *The AI-native SDLC playbook* — https://claude.com/resources/articles/the-ai-native-sdlc-playbook (한국어판 `https://claude.com/ko/resources/articles/the-ai-native-sdlc-playbook`)
-- Birgitta Böckeler, *Harness engineering for coding agent users* — https://martinfowler.com/articles/harness-engineering.html
-- OpenAI, *Harness engineering: leveraging Codex in an agent-first world* — https://openai.com/index/harness-engineering/ (봇 접근이 막혀 있다. 보관본: `docs/sources/web.md` 4절)
-- shareAI-lab/learn-claude-code — https://github.com/shareAI-lab/learn-claude-code
-- jh941213/ADLC-harness — https://github.com/jh941213/ADLC-harness
+- [C6](../../docs/sources/claude_code/03_control.md) 권한 모드 표: default, acceptEdits — https://code.claude.com/docs/en/permission-modes.md
+- [C8](../../docs/sources/claude_code/03_control.md) auto 모드: 누가 결정하는가와 비용 — https://code.claude.com/docs/en/permission-modes.md
+- [C10](../../docs/sources/claude_code/03_control.md) 모드 전환과 시작 모드 — https://code.claude.com/docs/en/permission-modes.md
+- [I17](../../docs/sources/claude_code/01_instructions.md) 검증 기준을 지침으로 주기 (best-practices) — https://code.claude.com/docs/en/best-practices.md
+- [I18](../../docs/sources/claude_code/01_instructions.md) 설계, 조기 교정 (best-practices) — https://code.claude.com/docs/en/best-practices.md
+- [K1](../../docs/sources/claude_code/07_commands_cli.md) 내장 명령 — https://code.claude.com/docs/en/commands.md
+- [K2](../../docs/sources/claude_code/07_commands_cli.md) CLI 플래그 — https://code.claude.com/docs/en/cli-reference.md
+- [K3](../../docs/sources/claude_code/07_commands_cli.md) 키 조작 — https://code.claude.com/docs/en/interactive-mode.md
+- [S1](../../docs/sources/claude_code/04_state.md) 에이전트 루프(세 단계) — https://code.claude.com/docs/en/how-claude-code-works.md
+- [S2](../../docs/sources/claude_code/04_state.md) Claude Code는 무엇인가(모델과 도구, 하네스 표현) — https://code.claude.com/docs/en/how-claude-code-works.md
+- [S12](../../docs/sources/claude_code/04_state.md) transcript 위치와 형식 경고 — https://code.claude.com/docs/en/sessions.md#where-transcripts-are-stored
+- [T1](../../docs/sources/claude_code/02_tools.md) 내장 도구 목록과 권한 필요 여부 — https://code.claude.com/docs/en/tools-reference
+- [V10](../../docs/sources/claude_code/06_verification_records.md) 비용 추적 명령 (/usage) — https://code.claude.com/docs/en/costs
+- 웹 원문 대장 `docs/sources/web.md:26` — Claude, *The AI-native SDLC playbook* — https://claude.com/resources/articles/the-ai-native-sdlc-playbook

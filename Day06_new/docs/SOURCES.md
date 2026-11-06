@@ -1,13 +1,14 @@
-# Day06_new 근거 대장 (저자용, 확인일 2026-11-05)
+# Day06_new 근거 대장 (확인일 2026-11-05)
 
 수업 자료에 나오는 외부 사실은 모두 아래 대장 중 하나에서 원문 대조 수준과 함께 확인한 것이다. 대장에 없는 사실은 수업 자료에 쓰지 않는다.
 
 | 대장 | 범위 | 확인 방법 |
 |---|---|---|
 | [sources/web.md](sources/web.md) | 웹 글 7종: Claude AI-native SDLC 플레이북(영문·한국어), Anthropic 장기 실행 하네스 글 2편, OpenAI Harness engineering, Böckeler(martinfowler.com), Claude Code 공식 문서, Raschka | 원문을 내려받아 인용문을 문자열로 대조. OpenAI 글만 Wayback 사본으로 대조 |
-| [sources/github.md](sources/github.md) | 저장소 15개(superpowers, spec-kit, HumanLayer ACE, better-harness, AHE, learn-harness-engineering, mini-coding-agent, learn-claude-code, agentic-coding-design-patterns, ADLC-harness, anti-samcheonpo, harness-map, ramo-harness, revfactory/harness, claude-quickstarts) | 기본 브랜치 HEAD를 SHA로 고정하고 `path:line` 인용 |
+| [sources/github.md](sources/github.md) | 저장소 16개(superpowers, spec-kit, HumanLayer ACE, better-harness, AHE, learn-harness-engineering, mini-coding-agent, learn-claude-code, agentic-coding-design-patterns, ADLC-harness, anti-samcheonpo, harness-map, ramo-harness, revfactory/harness, claude-quickstarts, claude-plugins-official의 ralph-loop) | 기본 브랜치 HEAD를 SHA로 고정하고 `path:line` 인용 |
+| [sources/claude_code/](sources/claude_code/README.md) | Claude Code 공식 문서 (8개 파일, 지침·도구·실행 제어·상태·실행 구조·검증·기록·명령, Part 4 plugin 후보) | 각 쪽의 .md 판을 내려받아 인용문을 문자열로 대조, 2026-11-06 |
 | `sources/part4_claims.md` (git 제외, 강사용) | Part 4 연습 정답지: learn-harness-engineering의 Pi·DeepSeek 분석 주장 12개를 `Day06/` 스냅샷으로 판정 | 진입점에서 호출을 따라간 소스 읽기. 하네스는 실행하지 않음 |
-| 이 파일 아래 "직접 읽은 코드" | `vendor/` 두 스냅샷의 줄 인용 | 저자가 스냅샷 파일을 직접 읽음 |
+| 이 파일 아래 "직접 읽은 코드" | `vendor/`의 mini-coding-agent(Part 2 대조 시연)와 autonomous-coding(Part 3 대조) 줄 인용. ralph-loop(`anthropics/claude-plugins-official`의 `plugins/ralph-loop` @ `1aa4a4b`, Part 4 주 사례, 라이선스 Apache-2.0, 저장소의 MIT와 다름)의 줄 인용은 `sources/claude_code/08_plugin_candidates.md` | 저자가 스냅샷 파일을 직접 읽음 |
 
 ## 대장에서 나온 주의 (수업 자료에 반영함)
 
@@ -27,7 +28,7 @@
 
 ## 직접 읽은 코드 (vendor/, 2026-11-05)
 
-### vendor/autonomous-coding (claude-quickstarts `8ef47d71`)
+### vendor/autonomous-coding (claude-quickstarts `8ef47d71`) — Part 3의 대조용(최대 5분)
 
 | 사실 | 근거 | 수준 |
 |---|---|---|
@@ -43,7 +44,7 @@
 | 권한 설정은 sandbox 사용, 편집 자동 승인, 프로젝트 폴더 안 파일 도구 허용, `Bash(*)` 허용 후 hook으로 거른다 | `client.py:67-85` | 코드에 정의만 확인 |
 | README의 License 절은 "Internal Anthropic use."다(저장소는 MIT) | `README.md:161-163` | 문서 |
 
-### vendor/mini-coding-agent (`717cae4f`)
+### vendor/mini-coding-agent (`717cae4f`) — Part 2의 대조 시연용(6분)
 
 | 사실 | 근거 | 수준 |
 |---|---|---|

@@ -32,10 +32,12 @@ from pathlib import Path
 # Skill을 부르면 Claude Code가 SKILL.md 본문을 이 문장으로 시작하는 사용자 메시지로 넣는다(2.1.318에서 관찰).
 SKILL_BODY_PREFIX = "Base directory for this skill:"
 
+TABLE_HEADER = ["| 차례 | 도구 | 인자 | 결과 | is_error |", "|---|---|---|---|---|"]
+
 
 @dataclass
 class Step:
-    """표의 한 줄. kind는 tool(도구 호출), skill_body(Skill 본문이 들어옴), turn(새 발화) 중 하나다."""
+    """표의 한 줄. kind는 tool(도구 호출), skill_body(Skill 본문이 들어옴), turn(새 발화), compact(대화 압축 표식) 중 하나다."""
 
     kind: str
     turn: int | None = None
@@ -59,6 +61,13 @@ class Session:
     final_texts: list[str] = field(default_factory=list)
     # JSON으로 읽을 수 없어 건너뛴 줄 수. 진행 중인 세션의 마지막 줄이 흔한 경우다.
     skipped_lines: int = 0
+    # 첫 system/init 줄의 머리 정보. 키가 없으면 None이고 화면에는 '알 수 없음'으로 나온다.
+    permission_mode: str | None = None
+    agent_definition_count: int | None = None
+    output_style: str | None = None
+    _init_seen: bool = False
+    # 하위 에이전트 기록: 에이전트 이름 -> 그 기록의 steps. 부모 steps에는 섞지 않는다.
+    subagents: dict[str, list[Step]] = field(default_factory=dict)
 
 
 def content_blocks(event: dict) -> list[dict]:
@@ -111,6 +120,15 @@ def read_session(path: Path) -> Session:
         if event_type == "system" and event.get("subtype") == "init":
             session.claude_code_version = event.get("claude_code_version") or session.claude_code_version
             session.model = event.get("model") or session.model
+            if not session._init_seen:
+                session._init_seen = True
+                session.permission_mode = event.get("permissionMode")
+                agents = event.get("agents")
+                session.agent_definition_count = len(agents) if isinstance(agents, list) else None
+                session.output_style = event.get("output_style")
+        if event_type == "system" and event.get("subtype") == "compact_boundary":
+            # 대화가 압축된 지점이다. 도구 호출이 아니므로 도구 호출 수에 들어가지 않는다.
+            session.steps.append(Step(kind="compact", turn=current_turn, note="대화가 압축됨"))
         if event.get("version") and not session.claude_code_version:
             session.claude_code_version = event["version"]
 
@@ -146,7 +164,14 @@ def read_session(path: Path) -> Session:
                     # 지침이 대화에 들어오는 순간이다. 본문 길이만 적는다.
                     session.steps.append(Step(kind="skill_body", turn=current_turn,
                                               note=f"Skill 본문이 대화에 들어옴 ({len(block['text'])}자)"))
+    session.subagents = read_subagents(path)
     return session
+
+
+def read_subagents(path: Path) -> dict[str, list[Step]]:
+    """<세션 ID>.jsonl 옆 <세션 ID>/subagents/agent-*.jsonl 을 같은 읽기 함수로 읽는다. 폴더가 없으면 빈 사전."""
+    folder = path.with_suffix("") / "subagents"
+    return {agent_file.stem: read_session(agent_file).steps for agent_file in sorted(folder.glob("agent-*.jsonl"))}
 
 
 def summarize_result(text: str) -> str:
@@ -183,32 +208,47 @@ def turn_utterances(path: Path) -> dict[int, str]:
 def render(session: Session, width: int, utterances: dict[int, str]) -> str:
     """Session을 마크다운 표로. 터미널에서 읽기 쉽고 강사 노트에 그대로 붙일 수 있다."""
     tool_steps = [step for step in session.steps if step.kind == "tool"]
+    unknown = "알 수 없음"
     lines = [
+        f"권한 모드: {session.permission_mode or unknown} / 하위 에이전트 정의 수: "
+        f"{unknown if session.agent_definition_count is None else session.agent_definition_count} / "
+        f"output style: {session.output_style or unknown}",
         f"세션 ID: {', '.join(session.session_ids) or '(없음)'}",
         f"Claude Code 버전: {session.claude_code_version or '(기록에 없음)'} / 모델: {session.model or '(기록에 없음)'}",
         f"모델 호출 수(서로 다른 응답 id): {len(session.model_call_ids)} / 도구 호출 수: {len(tool_steps)}",
     ]
     if session.skipped_lines:
         lines.append(f"읽을 수 없어 건너뛴 줄: {session.skipped_lines} (진행 중인 세션이면 마지막 줄이 덜 쓰였을 수 있다)")
-    lines += [
-        "",
-        "| 차례 | 도구 | 인자 | 결과 | is_error |",
-        "|---|---|---|---|---|",
-    ]
+    lines += ["", *TABLE_HEADER]
+    lines += step_rows(session.steps, width, utterances, indent="")
+    for agent, steps in session.subagents.items():
+        if not any(step.kind == "tool" for step in steps):
+            continue
+        if "## 하위 에이전트" not in lines:
+            lines += ["", "## 하위 에이전트"]
+        lines += ["", f"### {agent}", "", *TABLE_HEADER, *step_rows(steps, width, {}, indent="↳ ")]
+    return "\n".join(lines)
+
+
+def step_rows(steps: list[Step], width: int, utterances: dict[int, str], indent: str) -> list[str]:
+    """steps를 표의 행으로. indent는 도구 칸 앞에 붙인다(하위 에이전트 행은 '↳ ')."""
+    rows = []
     number = 0
-    for step in session.steps:
+    for step in steps:
         if step.kind == "turn":
             said = utterances.get(step.turn, "")
-            lines.append(f"| | **발화 {step.turn}** | {shorten(said, width)} | | |")
+            rows.append(f"| | **발화 {step.turn}** | {shorten(said, width)} | | |")
         elif step.kind == "skill_body":
-            lines.append(f"| | (지침) | {step.note} | | |")
+            rows.append(f"| | (지침) | {step.note} | | |")
+        elif step.kind == "compact":
+            rows.append(f"| | (압축) | {step.note} | | |")
         else:
             number += 1
             arguments = json.dumps(step.arguments, ensure_ascii=False)
             result = summarize_result(step.result_text) if step.result_text else "(결과 없음)"
             error = "" if step.is_error is None else str(step.is_error).lower()
-            lines.append(f"| {number} | {step.name} | {shorten(arguments, width)} | {shorten(result, width)} | {error} |")
-    return "\n".join(lines)
+            rows.append(f"| {number} | {indent}{step.name} | {shorten(arguments, width)} | {shorten(result, width)} | {error} |")
+    return rows
 
 
 def latest_transcript(sandbox: Path) -> Path:

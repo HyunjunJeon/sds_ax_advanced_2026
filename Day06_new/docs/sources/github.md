@@ -23,6 +23,7 @@
 | woowabros/ramo-harness | `3485937e` | 2026-10-20 | MIT | 30 |
 | revfactory/harness | `92d9f1b2` | 2026-09-28 | Apache-2.0 | 9,324 |
 | anthropics/claude-quickstarts | `8ef47d71` | 2026-11-02 | MIT | 19,110 |
+| anthropics/claude-plugins-official (`plugins/ralph-loop`) | `1aa4a4b1` | 2026-11-06 | Apache-2.0 | 46,253 |
 
 전체 SHA:
 
@@ -43,6 +44,7 @@ Dominic-DK/harness-map                                    40deadb2070f896e310bc9
 woowabros/ramo-harness                                    3485937edac23f4a78c42429c4b4dd866a1e9b9f
 revfactory/harness                                        92d9f1b29e7af81acebf51a9fcd1832e739a1414
 anthropics/claude-quickstarts                             8ef47d719eba5379ff8f38133f5defcc499e856f
+anthropics/claude-plugins-official                        1aa4a4b10e6c5e8694d0f72a03dbac4e93bcafd8
 ```
 
 ## 1. obra/superpowers
@@ -105,7 +107,7 @@ SHA `22f0b463e7a5e579904dd6211a520321035526f7`
 - `skills/brainstorming/SKILL.md:101-102` — 질문 조건 — "Ask a question only when the answer would change what gets built and neither the request nor the project answers it."
 - `skills/brainstorming/SKILL.md:106` — 한 번에 하나씩 — "Ask one at a time."
 - `skills/brainstorming/SKILL.md:245-246` — 설계 문서 위치 — "`docs/superpowers/specs/YYYY-MM-DD-<topic>-design.md`, committed."
-- `skills/brainstorming/SKILL.md:270` — HARD-GATE: 설계 문서 승인 전에는 아무것도 만들지 않는다 — "Nothing gets built until your human partner approves the design doc"
+- `skills/brainstorming/SKILL.md:268-269` — HARD-GATE: 설계 문서 승인 전에는 아무것도 만들지 않는다 — "Nothing gets built until your human partner approves the design doc"
 
 ## 2. github/spec-kit
 
@@ -456,6 +458,14 @@ SHA `8ef47d719eba5379ff8f38133f5defcc499e856f`(예상한 `8ef47d71…`와 일치
 - `autonomous-coding/README.md:134` — 기본 모델 — "| `--model` | Claude model to use | `claude-sonnet-4-5-20250929` |"
 - 주의: `autonomous-coding/README.md:163`은 "Internal Anthropic use."라고 적었지만 저장소 라이선스는 MIT다(API 값). 진행 파일 이름은 여기서 `claude-progress.txt`이고 learn-harness-engineering은 `claude-progress.md`다. 진행 저장 수단으로 `:62`는 `feature_list.json`과 git 커밋만 들고, `claude-progress.txt`는 생성물 목록(`:106`)에만 나온다.
 
+## 16. anthropics/claude-plugins-official (`plugins/ralph-loop`)
+
+SHA `1aa4a4b10e6c5e8694d0f72a03dbac4e93bcafd8`(SHA7 `1aa4a4b`, 커밋일 2026-11-06, 라이선스 Apache-2.0은 2026-11-06 API 조회값)
+
+- 이 저장소는 `plugins/ralph-loop` 폴더만 `vendor/ralph-loop/`에 사본으로 두었다(`../../vendor/SNAPSHOTS.md`). 이 사본은 Part 4의 주 사례다.
+- 줄 인용은 `plugins/ralph-loop/` 아래 경로이고 모두 위 SHA 기준이다. 줄 번호와 해석은 `claude_code/08_plugin_candidates.md`의 P3 절이 갖는다: `commands/ralph-loop.md:4`·`:16`·`:18`, `commands/cancel-ralph.md:3`, `hooks/hooks.json:4`, `hooks/stop-hook.sh:4`·`:13`·`:60-63`·`:135-136`·`:185`, `scripts/setup-ralph-loop.sh:140-143`.
+- 라이선스: `plugins/ralph-loop/LICENSE`는 Apache-2.0 전문이고 저작권자 줄은 틀 그대로 "Copyright [yyyy] [name of copyright owner]"다. NOTICE 파일은 없다. 이 저장소의 MIT와 다르다.
+
 ## 확인 못 한 것
 
 - **superpowers**: README:314의 "2-5 minutes each"와 "complete code"는 현재 `skills/writing-plans/SKILL.md`와 맞지 않는다. SKILL.md에는 시간 기준이 없고 코드 스텝은 시그니처만 쓴다(`:148-151`). README가 이전 표기를 남긴 것으로 보이지만 저자의 의도는 확인하지 않았다.
@@ -465,4 +475,5 @@ SHA `8ef47d719eba5379ff8f38133f5defcc499e856f`(예상한 `8ef47d71…`와 일치
 - **agentic-harness-engineering**: arXiv 2604.25850 논문 본문은 열지 않았다. 일곱 구성 요소 목록은 README 두 곳(`:37`, `:194`)만 대조했고 둘이 다르다.
 - **learn-harness-engineering**: 한국어 번역이 영문 최신본과 같은 시점의 내용인지(번역 지연 여부)는 파일 목록만 비교했고 본문은 대조하지 않았다.
 - **claude-quickstarts**: 지시대로 `autonomous-coding`의 코드(`security.py`, `client.py`, `prompts/*`)는 읽지 않았다. README의 허용 명령 목록이 실제 `ALLOWED_COMMANDS`와 같은지는 코드 쪽 확인이 필요하다.
+- **claude-plugins-official**: `plugins/ralph-loop` 밖(다른 plugin 40여 개, 마켓플레이스 카탈로그)은 `08_plugin_candidates.md`의 후보 비교용으로 열어 보았을 뿐 이 대장에서 인용하지 않는다.
 - **★ 수**는 2026-11-05 조회 시점 값이라 바뀔 수 있다.

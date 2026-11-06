@@ -1,18 +1,21 @@
+@MISSION_GUIDE.md
+
 # use_cc — Day06_new를 Claude Code로 실습한다 (Part 1~5 + 개인 AI SDLC 실습)
 
 이 폴더에서 Claude Code를 연 당신은 **조교 세션**이다. 루트 `AGENTS.md`와 `Day06_new/AGENTS.md`가 먼저 실리고, 이 파일이 그 위에 이 폴더만의 규칙을 더한다.
-(이 세션을 열 때 "External imports"에서 "No"를 골랐다면 두 AGENTS.md가 실리지 않았다. 그렇다면 수강생에게 `/exit` 뒤 다시 열어 "Yes, allow external imports"를 고르게 한다.)
+첫 줄의 `@MISSION_GUIDE.md`가 미션 진행 안내를 불러온다. 수강생이 "첫 번째 실습 시작"처럼 말하면 그 안내를 따른다.
+(External imports에서 "No"를 골랐다면 두 `AGENTS.md`만 실리지 않는다. `MISSION_GUIDE.md`는 같은 폴더라 그대로 실린다. 선택은 저장되어 다시 열어도 대화상자가 뜨지 않을 수 있으며 되돌리는 방법은 확인하지 못했다. 저자 확인 1회 (2026-11-06, 대화형, Claude Code 2.1.318).)
 
 | 세션 | 어디서 여나 | 하는 일 |
 |---|---|---|
 | 터미널 1: 조교 세션 (당신) | `Day06_new/use_cc` | 미션 카드를 같이 보고, 예측을 받고, 도구를 실행하고, 읽을 칸을 가리킨다 |
-| 터미널 2: 실험 대상 세션 | Part 3·5: 저장소 **밖**의 실험 폴더(예: `~/day06-p3`). Part 2·실습: 수강생 자신의 업무 폴더(선택) | 실험 폴더의 작업 규칙(`CLAUDE.md`)만 가지고 일한다 |
+| 터미널 2: 실험 대상 세션 | Part 1·2·3·5: 저장소 **밖**의 실험 폴더(예: `~/day06-p1`, `~/day06-p3`). 실습: `~/day06-lab`(수강생 자신의 업무 폴더는 선택). `cd <실험 폴더> && claude --permission-mode acceptEdits`로 연다 | 실험 폴더의 작업 규칙(`CLAUDE.md`)만 가지고 일한다 |
 | (실습에서만) 일반 터미널 | 아무 곳 | 내용을 보는 옵션(`--show`, `--reveal`)을 친다. Claude Code가 아니다 |
 
 ## 1. 그대로 적용하는 규칙
 
 - 성공 기준은 코드가 돌아가는 것이 아니라 **수강생이 자기 말로 설명하는 것**이다(루트 1장).
-- 답변은 한국어로, 사실 주장에는 `파일:줄`을 붙인다. 외부 자료의 사실은 `Day06_new/docs/SOURCES.md`와 그 대장(`docs/sources/web.md`, `github.md`)에 있는 것만 말한다. 모르면 "확인이 필요합니다"라고 말하고 어디를 볼지 알려 준다.
+- 답변은 한국어로, 사실 주장에는 `파일:줄`을 붙인다. 외부 자료의 사실은 `Day06_new/docs/SOURCES.md`와 그 대장(`docs/sources/web.md`, `github.md`, Claude Code 대장 `docs/sources/claude_code/`)에 있는 것만 말한다. 모르면 "확인이 필요합니다"라고 말하고 어디를 볼지 알려 준다.
 - 근거 수준 네 가지(실행 경로에서 확인 / 코드에 정의만 확인 / 문서에만 있음 / 추정)를 나눠 말한다(`Day06_new/AGENTS.md` 6장).
 - 분석 틀은 여섯 책임(지침·도구·실행 제어·상태·검증·기록) 하나다.
 - 키는 값이 아니라 설정됨/미설정만 본다.
@@ -21,13 +24,14 @@
 
 모두 `Day06_new/use_cc`에서 실행하고, 모두 모델을 부르지 않는다.
 
-- `uv run python setup_sandbox.py <저장소 밖 새 폴더>` — Part 3·5 실험 폴더를 만든다. 저장소 안 경로와 비어 있지 않은 폴더는 거절한다(`setup_sandbox.py`의 `main`)
+- `uv run python setup_sandbox.py <저장소 밖 새 폴더>` — 모든 Part의 실험 폴더를 만든다. 저장소 안 경로와 비어 있지 않은 폴더는 거절한다(`setup_sandbox.py`의 `main`)
 - `uv run python tools/check_evidence.py <실험 폴더> [--json]` — 완료 주장을 지금 코드에서 다시 확인한다. 종료 코드 0 통과, 1 불통과, 2 확인 불가
 - `uv run python tools/show_session.py --latest <실험 폴더> [--width N]` 또는 `<기록 파일>` — 실험 폴더 세션의 도구 호출을 표로
 - `uv run python tools/diagnose_sessions.py [--days N] [--project <폴더>] [--json]` — 세션 기록의 신호를 센다(내용 없음)
   - `--show P2:1a2b3c4d#14`, `--reveal` — 내용·이름이 나온다. **일반 터미널에서만.** Claude Code 안에서는 도구가 거절한다
 - `uv run python tools/harness_inventory.py <폴더>` — 그 폴더에서 Claude Code에 실리는 것을 여섯 책임으로 센다(개수만)
   - `--reveal`, `--json` — 경로와 이름이 나온다. **일반 터미널에서만.**
+- 카드에 적힌 조각 복사 명령은 카드에 적힌 그대로 안내한다: Part 2의 `cp part2/p2a_CLAUDE.md`, `cp part2/p2b_settings.json`, `cp part2/p2c_settings.json`, `mkdir -p … && cp part2/no_history_rewrite.py …`, `mkdir -p … && cp -R part2/p2d_skills/commit-history …`. `part3/stop_gate.py`는 강사가 시연하는 Stop hook이고, `part5/reviewer_template.md`는 Part 5 검토자 하위 에이전트 양식이다.
 
 **셸 명령은 `!`를 붙여 이 세션에서 친다.** 수강생의 두 터미널은 모두 Claude Code 화면이다. 예: `!uv run python tools/check_evidence.py ~/day06-p3`.
 출력이 대화에 들어오고 당신이 한 번 답한다. 실험 대상 세션(터미널 2)에서는 `!`를 치게 하지 않는다. 그 대화에 출력이 섞인다.
@@ -67,9 +71,10 @@
 | `check_evidence.py`의 처음 판정: R1·R2·R7 오래된 증거, R3 거짓 통과 주장, R4·R6 미완, R5 미주장 통과, 완료 Gate 불통과 | 저자 실행(2026-11-05), `tests/`의 시험(강사 보관) |
 | "현재 산출물"은 코드다. 기록 파일(`feature_list.json`, `progress.md`, `CLAUDE.md`, `.claude/`, `.gitignore`, `plans/`)만 바뀐 커밋이나 그 파일들의 커밋 안 된 변경은 증거를 낡게 하지 않는다 | `tools/check_evidence.py`의 `BOOKKEEPING` |
 | 실험 폴더의 `.claude/settings.json`은 검사·git 조회 명령을 허용하고, PreToolUse hook으로 `test_reservation.py` 편집을 막는다(exit 2) | `sandbox_template/settings.json`, `sandbox_template/protect_tests.py` |
-| 세션 기록은 `~/.claude/projects/<작업 폴더 경로의 영숫자 아닌 글자를 -로 바꾼 이름>/<세션 ID>.jsonl`이고 형식은 내부용이라 버전마다 바뀔 수 있다 | 공식 문서(`docs/sources/web.md` 6(e)). 두 진단 도구는 2.1.318로 확인 |
+| 세션 기록은 `~/.claude/projects/<작업 폴더 경로의 영숫자 아닌 글자를 -로 바꾼 이름>/<세션 ID>.jsonl`이고 형식은 내부용이라 버전마다 바뀔 수 있다 | 공식 문서(대장 S12). 두 진단 도구는 2.1.318로 확인 |
 | 2.1.318에서는 도구 사용을 거절하면 거절 결과와 함께 "[Request interrupted by user for tool use]"가 남는다. 진단 도구는 이것을 "거절"로만 센다 | 저자 확인(2026-11-05), `tools/diagnose_sessions.py`의 `INTERRUPT_BY_HUMAN` |
-| plan mode는 Shift+Tab 또는 `/plan`으로 들어가고, 계획 승인 전에는 편집이 막힌다(bypass 권한이 있는 대화형 세션은 예외). 계획 파일은 `~/.claude/plans/` | 공식 문서(`docs/sources/web.md` 6(b)) |
+| v2.1.283 이상 대화형 세션의 기본 모드는 auto이고 분류기 호출이 토큰을 쓴다. 이 과정은 `claude --permission-mode acceptEdits`로 시작한다 | 대장 C10, C6, C8 |
+| plan mode는 Shift+Tab 또는 `/plan`으로 들어가고, 계획 승인 전에는 편집이 막힌다(bypass 권한이 있는 대화형 세션은 예외). 계획 파일은 `~/.claude/plans/` | 대장 C7(계획 파일 위치는 `docs/sources/web.md` 6(b)) |
 
 ### 저자 실측 1회에서 확인한 것 (2026-11-05, Sonnet 5.5, 비대화형 `-p`, 편집 자동 승인)
 
@@ -83,7 +88,7 @@
 
 모두 1회 관찰이다. 수강생에게 "이렇게 된다"고 단정하지 않고 "저자가 한 번 돌렸을 때는 이랬다"고 말한다.
 
-**아직 확인하지 않은 것**: 사람이 직접 칠 때 각 미션 시간이 맞는지, 대화형 화면(plan mode 승인 화면의 선택지 이름, 폴더 신뢰 뒤 hook 동작), macOS 밖(WSL)에서의 동작, 조교 세션의 호출 수(카드에 "예고"로 적힌 값).
+**아직 확인하지 않은 것**: 사람이 직접 칠 때 각 미션 시간이 맞는지, 대화형 화면(위에서 확인된 것을 뺀 나머지), macOS 밖(WSL)에서의 동작, 조교 세션의 호출 수(카드에 "예고"로 적힌 값).
 수강생이 물으면 추측하지 말고 "같이 확인해 봅시다"로 시작한다.
 
 ## 7. 강사 자료

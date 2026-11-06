@@ -101,6 +101,7 @@ class SessionScan:
     interrupts: list = field(default_factory=list)
     compactions: list = field(default_factory=list)
     skipped_lines: int = 0
+    subagent_files: int = 0  # <세션 ID>/subagents/agent-*.jsonl 개수. 파일은 열지 않고 센다.
 
     @property
     def turns(self):
@@ -128,6 +129,7 @@ def is_prompt_text(text):
 def scan_session(path, project_dir):
     """세션 기록 파일 하나를 읽는다. 읽을 수 없는 줄은 세기만 하고 건너뛴다."""
     scan = SessionScan(session_id=path.stem, project_dir=project_dir)
+    scan.subagent_files = len(list((path.parent / path.stem / "subagents").glob("agent-*.jsonl")))
     by_id = {}
     with path.open(encoding="utf-8", errors="replace") as handle:
         for line in handle:
@@ -308,9 +310,10 @@ def summarize(labels, scans, reveal=False, examples=3):
         row = per_project.setdefault(
             label,
             {"label": label, "folder": scan.project_dir if reveal else None, "sessions": 0, "turns": 0,
-             "tool_calls": 0, "tool_errors": 0, "signals": 0},
+             "tool_calls": 0, "tool_errors": 0, "signals": 0, "subagents": 0},
         )
         row["sessions"] += 1
+        row["subagents"] += scan.subagent_files
         row["turns"] += scan.turns
         row["tool_calls"] += len(scan.calls)
         row["tool_errors"] += sum(1 for c in scan.calls if c.is_error)
@@ -331,6 +334,7 @@ def summarize(labels, scans, reveal=False, examples=3):
         "projects": len({label for label, _ in scans}),
         "turns": sum(scan.turns for _, scan in scans),
         "tool_calls": sum(len(scan.calls) for _, scan in scans),
+        "subagents": sum(scan.subagent_files for _, scan in scans),
         "signals": [
             {"key": key, "name": name, "responsibility": resp, "count": totals[key],
              "sessions": sessions_with[key], "examples": where[key]}
@@ -344,7 +348,8 @@ def summarize(labels, scans, reveal=False, examples=3):
 def render(summary, days, reveal):
     lines = [
         f"진단 범위: 최근 {days}일, 프로젝트 {summary['projects']}개, 세션 {summary['sessions']}개, "
-        f"사람 차례 {summary['turns']}개, 도구 호출 {summary['tool_calls']}개",
+        f"사람 차례 {summary['turns']}개, 도구 호출 {summary['tool_calls']}개, "
+        f"하위 에이전트 기록 {summary['subagents']}개",
         "(모델 호출 없음. 대화 내용은 출력하지 않음. 신호는 다시 볼 곳이지 판정이 아님)",
         "",
         "| 신호 | 건수 | 세션 수 | 관련될 수 있는 책임(추정) | 위치 예 (프로젝트:세션#차례) |",
@@ -355,11 +360,11 @@ def render(summary, days, reveal):
             f"| {item['name']} | {item['count']} | {item['sessions']} | {item['responsibility']} | "
             f"{', '.join(item['examples']) or '-'} |"
         )
-    lines += ["", "| 프로젝트 | 세션 | 사람 차례 | 도구 호출 | 오류 결과 | 신호 합 |" + (" 폴더 |" if reveal else ""),
-              "|---|---|---|---|---|---|" + ("---|" if reveal else "")]
+    lines += ["", "| 프로젝트 | 세션 | 사람 차례 | 도구 호출 | 오류 결과 | 하위 에이전트 기록 | 신호 합 |" + (" 폴더 |" if reveal else ""),
+              "|---|---|---|---|---|---|---|" + ("---|" if reveal else "")]
     for row in summary["projects_table"]:
         line = (f"| {row['label']} | {row['sessions']} | {row['turns']} | {row['tool_calls']} | "
-                f"{row['tool_errors']} | {row['signals']} |")
+                f"{row['tool_errors']} | {row['subagents']} | {row['signals']} |")
         if reveal:
             line += f" {row['folder']} |"
         lines.append(line)

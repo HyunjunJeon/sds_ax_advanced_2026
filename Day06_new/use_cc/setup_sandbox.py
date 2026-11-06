@@ -218,7 +218,7 @@ def main(argv=None):
         print(f"  {short_hash}  {label}")
     print()
     print("다음 단계:")
-    print(f"  터미널 2:  cd {target} && claude")
+    print(f"  터미널 2:  cd {target} && claude --permission-mode acceptEdits")
     print(f"  터미널 1:  !uv run python tools/check_evidence.py {target}")
     return 0
 
