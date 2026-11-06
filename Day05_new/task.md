@@ -11,3 +11,17 @@ JEV(Decision Model) -> "Tool Call" 로 동작하면 의미 없음.
 아래 이미지를 참고해서 개선하는 방향을 고려하세요!
 
 ![Day05_01](./Day05_01.png)
+
+
+
+
+
+---
+
+## 읽어보면 좋을 글
+
+1. https://github.com/google/elephant-goldfish-model
+
+2. https://www.langchain.com/blog/how-we-optimized-browser-use-for-deep-agents
+
+3. https://www.langchain.com/blog/context-engineering-challenges-late-2026
